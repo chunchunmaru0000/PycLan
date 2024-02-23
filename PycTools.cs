@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace PycLan
 {
-    internal class PycTools
+    class PycTools
     {
         public static bool Usable (char c) { 
             return c != '+' && c != '-' && c != '*' && c != '/' &&
                    c != '(' && c != ')' && c != '"' && c != '!' && 
                    c != ' ' && c != '@' && c != ';' && c != '=' &&
-                   c != '\0';
+                   c != '%' && c != '\0';
         }
     }
 }
