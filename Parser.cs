@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using System.Xml.XPath;
 
 namespace PycLan
 {
-    class Parser
+    public class Parser
     {
         public Token[] tokens;
         public int lenght;
@@ -40,62 +41,96 @@ namespace PycLan
             return true;
         }
 
-        private NumExpression Primary()
+        private bool Match(TokenType type0, TokenType type1)
         {
-            if (Match(TokenType.NUMBER))
+            if (Current.Type != type0 && Current.Type != type1)
+                return false;
+            position++;
+            return true;
+        }
+
+        private IExpression Primary()
+        {
+            if (Match(TokenType.INTEGER, TokenType.FLOAT))
                 return new NumExpression(Current.Value);
+            Console.WriteLine($"### {Current.Value} {Current.View} {Current.Type}");
             throw new Exception("НЕВОЗМОЖНОЕ ВЫРАЖЕНИЕ");
         }
 
         private IExpression Unary()
         {
-            NumExpression num = Primary();
+            IExpression result = Primary();
             if (Match(TokenType.MINUS))
-                return new UnaryExpression(Current, num);
-            return num;
+                result = new UnaryExpression(Current, result);
+            return result;
         }
 
-        private NumExpression Muly()
+        private IExpression Muly()
         {
             IExpression result = Unary();
             while (true)
             {
                 if (Match(TokenType.MULTIPLICATION))
                 {
-                    result = new BinExpression((NumExpression)result, new Token() { Type = TokenType.MULTIPLICATION }, (NumExpression)Unary());
+                    result = new BinExpression(result, new Token() { Type = TokenType.MULTIPLICATION }, Unary());
                     continue;
                 }
                 if (Match(TokenType.DIVISION))
                 {
-                    result = new BinExpression((NumExpression)result, new Token() { Type = TokenType.DIVISION }, (NumExpression)Unary());
+                    result = new BinExpression(result, new Token() { Type = TokenType.DIVISION }, Unary());
                     continue;
                 }
                 if (Match(TokenType.POWER))
                 {
-                    result = new PowerExpression((NumExpression)result, (NumExpression)Unary());
+                    result = new PowerExpression(result, Unary());
                     continue;
                 }
                 if (Match(TokenType.MOD))
                 {
-                    result = new ModExpression((NumExpression)result, (NumExpression)Unary());
+                    result = new ModExpression(result, Unary());
                     continue;
                 }
                 if (Match(TokenType.DIV))
                 {
-                    result = new DivExpression((NumExpression)result, (NumExpression)Unary());
+                    result = new DivExpression(result, Unary());
                     continue;
                 }
                 break;
             }
-            return (NumExpression)result;
+            return result;
         }
 
-
-
-        private List<IExpression> Parse()
+        private IExpression Addity()
         {
+            IExpression result = Unary();
+            while (true)
+            {
+                if (Match(TokenType.PLUS))
+                {
+                    result = new BinExpression(result, new Token() { Type = TokenType.PLUS }, Muly());
+                    continue;
+                }
+                if (Match(TokenType.MINUS))
+                {
+                    result = new BinExpression(result, new Token() { Type = TokenType.MINUS }, Muly());
+                    continue;
+                }
+                break;
+            }
+            return result;
+        }
 
-            return null;
+        private IExpression Expression()
+        {
+            return Addity();
+        }
+
+        public IExpression[] Parse()
+        {
+            List<IExpression> parsed = new List<IExpression>();
+            while (!Match(TokenType.EOF))
+                parsed.Add(Expression());
+            return parsed.ToArray();
         }
     }
 }

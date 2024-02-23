@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PycLan
 {
-    sealed class NumExpression : IExpression
+    public sealed class NumExpression : IExpression
     {
         public object Value { get; set; }
 
@@ -23,12 +23,12 @@ namespace PycLan
         } 
     }
 
-    sealed class UnaryExpression : IExpression
+    public sealed class UnaryExpression : IExpression
     {
         public Token Operation;
-        public NumExpression Value;
+        public IExpression Value;
         
-        public UnaryExpression(Token operation, NumExpression value)
+        public UnaryExpression(Token operation, IExpression value)
         {
             Operation = operation;
             Value = value;
@@ -52,12 +52,12 @@ namespace PycLan
         }
     }
 
-    sealed class PowerExpression : IExpression
+    public sealed class PowerExpression : IExpression
     {
-        public NumExpression Value;
-        public NumExpression Power;
+        public IExpression Value;
+        public IExpression Power;
 
-        public PowerExpression(NumExpression value, NumExpression power)
+        public PowerExpression(IExpression value, IExpression power)
         {
             Value = value;
             Power = power;
@@ -71,12 +71,12 @@ namespace PycLan
         }
     }
 
-    sealed class ModExpression : IExpression
+    public sealed class ModExpression : IExpression
     {
-        public NumExpression left;
-        public NumExpression right;
+        public IExpression left;
+        public IExpression right;
 
-        public ModExpression(NumExpression left, NumExpression right)
+        public ModExpression(IExpression left, IExpression right)
         {
             this.left = left;
             this.right = right;
@@ -90,12 +90,12 @@ namespace PycLan
         }
     }
 
-    sealed class DivExpression : IExpression
+    public sealed class DivExpression : IExpression
     {
-        public NumExpression left;
-        public NumExpression right;
+        public IExpression left;
+        public IExpression right;
 
-        public DivExpression(NumExpression left, NumExpression right)
+        public DivExpression(IExpression left, IExpression right)
         {
             this.left = left;
             this.right = right;
@@ -109,13 +109,13 @@ namespace PycLan
         }
     }
 
-    sealed class BinExpression : IExpression 
+    public sealed class BinExpression : IExpression 
     {
-        public NumExpression left;
+        public IExpression left;
         public Token operation;
-        public NumExpression right;
+        public IExpression right;
 
-        public BinExpression(NumExpression left, Token operation, NumExpression right)
+        public BinExpression(IExpression left, Token operation, IExpression right)
         {
             this.left = left;
             this.operation = operation;
@@ -124,26 +124,28 @@ namespace PycLan
 
         public object Evaluated()
         {
+            object lft = left.Evaluated();
+            object rght = right.Evaluated();
             switch (operation.Type)
             {
                 case TokenType.PLUS:
-                    if (left.Value is float || right.Value is float) 
-                        return (float)left.Value + (float)right.Value;
-                    return (int)left.Value + (int)right.Value;
+                    if (lft is float || rght is float) 
+                        return (float)lft + (float)rght;
+                    return (int)lft + (int)rght;
                 case TokenType.MINUS:
-                    if (left.Value is float || right.Value is float)
-                        return (float)left.Value - (float)right.Value;
-                    return (int)left.Value - (int)right.Value;
+                    if (lft is float || rght is float)
+                        return (float)lft - (float)rght;
+                    return (int)lft - (int)rght;
                 case TokenType.MULTIPLICATION:
-                    if (left.Value is float || right.Value is float)
-                        return (float)left.Value * (float)right.Value;
-                    return (int)left.Value * (int)right.Value;
+                    if (lft is float || rght is float)
+                        return (float)lft * (float)rght;
+                    return (int)lft * (int)rght;
                 case TokenType.DIVISION:
-                    if ((float)right.Value != 0)
+                    if ((float)rght != 0)
                     {
-                        if (left.Value is float || right.Value is float)
-                            return (float)left.Value + (float)right.Value;
-                        return (int)left.Value + (int)right.Value;
+                        if (lft is float || rght is float)
+                            return (float)lft + (float)rght;
+                        return (int)lft + (int)rght;
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
                 default:
@@ -152,7 +154,7 @@ namespace PycLan
         }
     }
 
-    sealed class BoolExpression : IExpression
+    public sealed class BoolExpression : IExpression
     {
         public bool Value { get; set; }
 
@@ -173,13 +175,13 @@ namespace PycLan
         }
     }
 
-    sealed class CmpExpression : IExpression
+    public sealed class CmpExpression : IExpression
     {
-        public BoolExpression left;
+        public IExpression left;
         public Token comparation;
-        public BoolExpression right;
+        public IExpression right;
 
-        public CmpExpression(BoolExpression left, Token comparation, BoolExpression right)
+        public CmpExpression(IExpression left, Token comparation, IExpression right)
         {
             this.left = left;
             this.comparation = comparation;
@@ -188,12 +190,14 @@ namespace PycLan
 
         public object Evaluated()
         {
+            object lft = left.Evaluated();
+            object rght = right.Evaluated();
             switch (comparation.Type)
             {
                 case TokenType.EQUALITY:
-                    return left.Value == right.Value;
+                    return lft == rght;
                 case TokenType.NOTEQUALITY:
-                    return left.Value != right.Value;
+                    return lft != rght;
                 default:
                     throw new Exception("НЕСРАВНЕННО");
             }
