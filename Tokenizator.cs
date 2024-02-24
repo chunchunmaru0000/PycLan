@@ -43,10 +43,19 @@ namespace PycLan
             if (char.IsDigit(Current))
             {
                 int start = position;
-                while (char.IsDigit(Current))
+                int dots = 0;
+                while (char.IsDigit(Current) || Current == '.')
+                {
+                    if (Current == '.')
+                        dots++;
                     Next();
+                }
                 string word = code.Substring(start, position - start);
-                return new Token() { View = word, Value = Convert.ToInt32(word), Type = TokenType.INTEGER };
+                if (dots == 0)
+                    return new Token() { View = word, Value = Convert.ToInt32(word), Type = TokenType.INTEGER };
+                if (dots == 1)
+                    return new Token() { View = word, Value = Convert.ToDouble(word), Type = TokenType.DOUBLE };
+                throw new Exception("МНОГА ТОЧЕК ДЛЯ ЧИСЛА");
             }
             if (PycTools.Usable(Current))
             {

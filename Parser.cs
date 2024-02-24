@@ -51,33 +51,37 @@ namespace PycLan
 
         private IExpression Primary()
         {
-            if (Match(TokenType.INTEGER, TokenType.FLOAT))
-                return new NumExpression(Current.Value);
-            Console.WriteLine($"### {Current.Value} {Current.View} {Current.Type}");
+            Token current = Current;
+            if (Match(TokenType.INTEGER, TokenType.DOUBLE))
+                return new NumExpression(current.Value);
+            Console.WriteLine($"### {current.Value} {current.View} {current.Type}");
             throw new Exception("НЕВОЗМОЖНОЕ ВЫРАЖЕНИЕ");
         }
 
         private IExpression Unary()
         {
-            IExpression result = Primary();
+            Token current = Current;
+            if (Match(TokenType.PLUS))
+                return new NumExpression(current.Value);
             if (Match(TokenType.MINUS))
-                result = new UnaryExpression(Current, result);
-            return result;
+                return new UnaryExpression(current, Primary());
+            return Primary();
         }
 
         private IExpression Muly()
         {
             IExpression result = Unary();
+            Token current = Current;
             while (true)
             {
                 if (Match(TokenType.MULTIPLICATION))
                 {
-                    result = new BinExpression(result, new Token() { Type = TokenType.MULTIPLICATION }, Unary());
+                    result = new BinExpression(result, current, Unary());
                     continue;
                 }
                 if (Match(TokenType.DIVISION))
                 {
-                    result = new BinExpression(result, new Token() { Type = TokenType.DIVISION }, Unary());
+                    result = new BinExpression(result, current, Unary());
                     continue;
                 }
                 if (Match(TokenType.POWER))
@@ -103,16 +107,17 @@ namespace PycLan
         private IExpression Addity()
         {
             IExpression result = Unary();
+            Token current = Current;
             while (true)
             {
                 if (Match(TokenType.PLUS))
                 {
-                    result = new BinExpression(result, new Token() { Type = TokenType.PLUS }, Muly());
+                    result = new BinExpression(result, current, Muly());
                     continue;
                 }
                 if (Match(TokenType.MINUS))
                 {
-                    result = new BinExpression(result, new Token() { Type = TokenType.MINUS }, Muly());
+                    result = new BinExpression(result, current, Muly());
                     continue;
                 }
                 break;

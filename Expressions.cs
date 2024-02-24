@@ -45,8 +45,9 @@ namespace PycLan
                     if (value is int)
                         return -(int)value;
                     else 
-                        return -(float)value;
+                        return -(double)value;
                 default:
+                    Console.WriteLine($"value {Value.Evaluated()}|Value {Value}|op {Operation.Type}|Op {Operation.View}");
                     throw new Exception("ДА КАК ТАК ВООБЩЕ ВОЗМОЖНО ЧТО ЛИБО ПОСТАВИТЬ КРОМЕ + ИЛИ - ПЕРЕД ЧИСЛОМ");
             }
         }
@@ -67,7 +68,7 @@ namespace PycLan
         {
             if (Value.Evaluated() is int)
                 return (int)Math.Pow((double)Value.Evaluated(), (double)Power.Evaluated());
-            return (float)Math.Pow((double)Value.Evaluated(), (double)Power.Evaluated());
+            return Math.Pow((double)Value.Evaluated(), (double)Power.Evaluated());
         }
     }
 
@@ -84,8 +85,8 @@ namespace PycLan
 
         public object Evaluated()
         {
-            if (left.Evaluated() is float || right.Evaluated() is float)
-                return (float)left.Evaluated() % (float)right.Evaluated();
+            if (left.Evaluated() is double || right.Evaluated() is double)
+                return (double)left.Evaluated() % (double)right.Evaluated();
             return (int)left.Evaluated() % (int)right.Evaluated();
         }
     }
@@ -103,8 +104,8 @@ namespace PycLan
 
         public object Evaluated()
         {
-            if (left.Evaluated() is float || right.Evaluated() is float)
-                return (float)left.Evaluated() / (float)right.Evaluated();
+            if (left.Evaluated() is double || right.Evaluated() is double)
+                return (double)left.Evaluated() / (double)right.Evaluated();
             return (int)left.Evaluated() / (int)right.Evaluated();
         }
     }
@@ -129,22 +130,22 @@ namespace PycLan
             switch (operation.Type)
             {
                 case TokenType.PLUS:
-                    if (lft is float || rght is float) 
-                        return (float)lft + (float)rght;
+                    if (lft is double || rght is double) 
+                        return (double)lft + (double)rght;
                     return (int)lft + (int)rght;
                 case TokenType.MINUS:
-                    if (lft is float || rght is float)
-                        return (float)lft - (float)rght;
+                    if (lft is double || rght is double)
+                        return (double)lft - (double)rght;
                     return (int)lft - (int)rght;
                 case TokenType.MULTIPLICATION:
-                    if (lft is float || rght is float)
-                        return (float)lft * (float)rght;
+                    if (lft is double || rght is double)
+                        return (double)lft * (double)rght;
                     return (int)lft * (int)rght;
                 case TokenType.DIVISION:
-                    if ((float)rght != 0)
+                    if ((double)rght != 0)
                     {
-                        if (lft is float || rght is float)
-                            return (float)lft + (float)rght;
+                        if (lft is double || rght is double)
+                            return (double)lft + (double)rght;
                         return (int)lft + (int)rght;
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
@@ -162,8 +163,8 @@ namespace PycLan
         {
             if (!(value is bool))
             {
-                if (value is float || value is int)
-                    Value = (float)value == 0;
+                if (value is double || value is int)
+                    Value = (double)value != 0;
                 else throw new Exception("ЭТО КАК");
             }
             Value = (bool)value;

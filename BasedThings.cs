@@ -16,7 +16,7 @@ namespace PycLan
 
         NUMBER,
         INTEGER,
-        FLOAT,
+        DOUBLE,
 
         //operators
         PLUS,
