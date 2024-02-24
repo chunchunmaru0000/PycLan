@@ -35,7 +35,11 @@ namespace PycLan
 
         public void Execute()
         {
-            Console.WriteLine(Expression.Evaluated());
+            object value = Expression.Evaluated();
+            if (value is bool)
+                Console.WriteLine((bool)value ? "Истина" : "Ложь");
+            else
+                Console.WriteLine(Expression.Evaluated());
         }
     }
 }

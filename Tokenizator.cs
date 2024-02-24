@@ -115,6 +115,22 @@ namespace PycLan
                         return new Token() { View = "--", Value = null, Type = TokenType.MINUSMINUS };
                     }
                     return new Token() { View = "-", Value = null, Type = TokenType.MINUS };
+                case '<':
+                    Next();
+                    if (Current == '=')
+                    {
+                        Next();
+                        return new Token() { View = "<=", Value = null, Type = TokenType.LESSEQ };
+                    }
+                    return new Token() { View = "<", Value = null, Type = TokenType.LESS };
+                case '>':
+                    Next();
+                    if (Current == '=')
+                    {
+                        Next();
+                        return new Token() { View = ">=", Value = null, Type = TokenType.MOREEQ };
+                    }
+                    return new Token() { View = ">", Value = null, Type = TokenType.MORE };
                 case '@':
                     Next();
                     return new Token() { View = "@", Value = null, Type = TokenType.DOG };
@@ -148,6 +164,9 @@ namespace PycLan
                 case '.':
                     Next();
                     return new Token() { View = ".", Value = null, Type = TokenType.DOT };
+                case ',':
+                    Next();
+                    return new Token() { View = ",", Value = null, Type = TokenType.COMMA };
                 default:
                     throw new Exception("НЕ СУЩЕСТВУЮЩИЙ СИМВОЛ В ДАННОМ ЯЗЫКЕ");
             }

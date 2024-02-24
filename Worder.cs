@@ -28,12 +28,15 @@ namespace PycLan
                     word.Type = TokenType.WORD_PRINT;
                     return word;
                 case "истина":
+                    word.Value = true;
                     word.Type = TokenType.WORD_TRUE;
                     return word;
                 case "правда":
+                    word.Value = true;
                     word.Type = TokenType.WORD_TRUE;
                     return word;
                 case "ложь":
+                    word.Value = false;
                     word.Type = TokenType.WORD_FALSE;
                     return word;
                 default:

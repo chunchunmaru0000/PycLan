@@ -36,16 +36,18 @@ namespace PycLan
 
         public object Evaluated()
         {
+            object value = Value.Evaluated();
             switch (Operation.Type) 
             {
                 case TokenType.PLUS:
-                    return Value.Evaluated();
+                    return value;
                 case TokenType.MINUS:
-                    object value = Value.Evaluated();
                     if (value is int)
                         return -(int)value;
                     else 
                         return -(double)value;
+                case TokenType.NOT:
+                    return !Convert.ToBoolean(value);
                 default:
                     Console.WriteLine($"value {Value.Evaluated()}|Value {Value}|op {Operation.Type}|Op {Operation.View}");
                     throw new Exception("ДА КАК ТАК ВООБЩЕ ВОЗМОЖНО ЧТО ЛИБО ПОСТАВИТЬ КРОМЕ + ИЛИ - ПЕРЕД ЧИСЛОМ");
@@ -108,29 +110,8 @@ namespace PycLan
                         return Convert.ToDouble(lft) / Convert.ToDouble(rght);
                     return (int)lft / (int)rght;
                 default:
-                    throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ\n{lft}/{operation.Type}/{rght}/{left}/{operation}/{right}");
+                    throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ: {lft} {operation.Type} {rght} | {left} {operation} {right}");
             }
-        }
-    }
-
-    public sealed class BoolExpression : IExpression
-    {
-        public bool Value { get; set; }
-
-        public BoolExpression(object value)
-        {
-            if (!(value is bool))
-            {
-                if (value is double || value is int)
-                    Value = Convert.ToDouble(value) != 0;
-                else throw new Exception($"ЭТО КАК {Value} {value}");
-            }
-            Value = (bool)value;
-        }
-
-        public object Evaluated()
-        {
-            return Value;
         }
     }
 
@@ -150,15 +131,27 @@ namespace PycLan
         public object Evaluated()
         {
             object lft = left.Evaluated();
+            if (!(lft is bool))
+                lft = Convert.ToDouble(lft);
             object rght = right.Evaluated();
+            if (!(rght is bool))
+                rght = Convert.ToDouble(rght);
             switch (comparation.Type)
             {
                 case TokenType.EQUALITY:
-                    return lft == rght;
+                    return (bool)lft == (bool)rght;
                 case TokenType.NOTEQUALITY:
-                    return lft != rght;
+                    return (bool)lft != (bool)rght;
+                case TokenType.LESS:
+                    return (double)lft < (double)rght;
+                case TokenType.LESSEQ:
+                    return (double)lft <= (double)rght;
+                case TokenType.MORE:
+                    return (double)lft > (double)rght;
+                case TokenType.MOREEQ:
+                    return (double)lft >= (double)rght;
                 default:
-                    throw new Exception($"НЕСРАВНЕННО {lft} {comparation.Type} {rght}\n{left}{comparation}{right}");
+                    throw new Exception($"НЕСРАВНЕННО: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
             }
         }
     }

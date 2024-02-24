@@ -46,6 +46,18 @@ namespace PycLan
             return current;
         }
 
+        private bool Printble(TokenType type)
+        {
+            return type == TokenType.INTEGER    ||
+                   type == TokenType.DOUBLE     ||
+                   type == TokenType.VARIABLE   ||
+                   type == TokenType.WORD_TRUE  ||
+                   type == TokenType.WORD_FALSE ||
+                   type == TokenType.PLUS       ||
+                   type == TokenType.MINUS      ||
+                   type == TokenType.NOT        ;
+        }
+
         private bool Match(TokenType type)
         {
             if (Current.Type != type)
@@ -92,6 +104,8 @@ namespace PycLan
         private IExpression Primary()
         {
             Token current = Current;
+            if (Match(TokenType.WORD_TRUE, TokenType.WORD_FALSE))
+                return new NumExpression(current.Value);
             if (Match(TokenType.INTEGER, TokenType.DOUBLE))
             {
                 IExpression number = new NumExpression(current.Value);
@@ -114,6 +128,8 @@ namespace PycLan
         private IExpression Unary()
         {
             Token current = Current;
+            if (Match(TokenType.NOT))
+                return new UnaryExpression(current, Primary());
             if (Match(TokenType.PLUS))
                 return new NumExpression(current.Value);
             if (Match(TokenType.MINUS))
@@ -121,15 +137,31 @@ namespace PycLan
             return Primary();
         }
 
-        private IExpression Powy()
+        private IExpression Booly()
         {
             IExpression result = Unary();
             Token current = Current;
             while (true)
             {
+                if (Match(TokenType.EQUALITY, TokenType.NOTEQUALITY))
+                {
+                    result = new CmpExpression(result, current, Unary());
+                    continue;
+                }
+                break;
+            }
+            return result;
+        }
+
+        private IExpression Powy()
+        {
+            IExpression result = Booly();
+            Token current = Current;
+            while (true)
+            {
                 if (Match(TokenType.POWER))
                 {
-                    result = new BinExpression(result, current, Unary());
+                    result = new BinExpression(result, current, Booly());
                     continue;
                 }
                 break;
@@ -199,7 +231,15 @@ namespace PycLan
                 Consume(TokenType.DO_EQUAL);
                 return new AssignStatement(current.View, Expression());
             }
-            if (current.Type == TokenType.INTEGER || current.Type == TokenType.DOUBLE || current.Type == TokenType.VARIABLE)
+
+            if (Match(TokenType.WORD_FOR))
+            {
+                
+            }
+
+            if (Match(TokenType.WORD_PRINT))
+                return new PrintNumberStatement(Expression());
+            if (Printble(current.Type))
                 return new PrintNumberStatement(Expression());
 
             throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.View}/{current.Value}/{current.Type}");

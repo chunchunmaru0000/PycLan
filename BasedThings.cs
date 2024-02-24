@@ -32,6 +32,10 @@ namespace PycLan
         //cmp
         EQUALITY,
         NOTEQUALITY,
+        MORE,
+        MOREEQ,
+        LESS,
+        LESSEQ,
         NOT,
 
         //other
@@ -39,6 +43,7 @@ namespace PycLan
         SEMICOLON,
         PLUSPLUS,
         MINUSMINUS,
+        COMMA,
 
         RIGHTSCOB,
         LEFTSCOB,
