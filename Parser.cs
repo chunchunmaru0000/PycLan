@@ -68,7 +68,7 @@ namespace PycLan
             return Primary();
         }
 
-        private IExpression Muly()
+        private IExpression Powy()
         {
             IExpression result = Unary();
             Token current = Current;
@@ -76,27 +76,39 @@ namespace PycLan
             {
                 if (Match(TokenType.POWER))
                 {
-                    result = new PowerExpression(result, Unary());
-                    continue;
-                }
-                if (Match(TokenType.MOD))
-                {
-                    result = new ModExpression(result, Unary());
-                    continue;
-                }
-                if (Match(TokenType.DIV))
-                {
-                    result = new DivExpression(result, Unary());
-                    continue;
-                }
-                if (Match(TokenType.MULTIPLICATION))
-                {
                     result = new BinExpression(result, current, Unary());
                     continue;
                 }
-                if (Match(TokenType.DIVISION))
+                break;
+            }
+            return result;
+        }
+
+        private IExpression Mody()
+        {
+            IExpression result = Powy();
+            Token current = Current;
+            while (true)
+            {
+                if (Match(TokenType.MOD) || Match(TokenType.DIV))
                 {
-                    result = new BinExpression(result, current, Unary());
+                    result = new BinExpression(result, current, Powy());
+                    continue;
+                }
+                break;
+            }
+            return result;
+        }
+
+        private IExpression Muly()
+        {
+            IExpression result = Mody();
+            Token current = Current;
+            while (true)
+            {
+                if (Match(TokenType.MULTIPLICATION) || Match(TokenType.DIVISION))
+                {
+                    result = new BinExpression(result, current, Mody());
                     continue;
                 }
                 break;
@@ -110,16 +122,18 @@ namespace PycLan
             Token current = Current;
             while (true)
             {
-                if (Match(TokenType.PLUS))
+                if (Match(TokenType.PLUS) || Match(TokenType.MINUS))
                 {
                     result = new BinExpression(result, current, Muly());
                     continue;
                 }
+                /*
                 if (Match(TokenType.MINUS))
                 {
                     result = new BinExpression(result, current, Muly());
                     continue;
                 }
+                */
                 break;
             }
             return result;

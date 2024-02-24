@@ -53,69 +53,6 @@ namespace PycLan
         }
     }
 
-    public sealed class PowerExpression : IExpression
-    {
-        public IExpression Value;
-        public IExpression Power;
-
-        public PowerExpression(IExpression value, IExpression power)
-        {
-            Value = value;
-            Power = power;
-        }
-
-        public object Evaluated()
-        {
-            object value = Value.Evaluated();
-            object power = Power.Evaluated();
-            if (value is int)
-                return Convert.ToInt32(Math.Pow(Convert.ToDouble(value), Convert.ToDouble(power)));
-            return Math.Pow(Convert.ToDouble(value), Convert.ToDouble(power));
-        }
-    }
-
-    public sealed class ModExpression : IExpression
-    {
-        public IExpression left;
-        public IExpression right;
-
-        public ModExpression(IExpression left, IExpression right)
-        {
-            this.left = left;
-            this.right = right;
-        }
-
-        public object Evaluated()
-        {
-            object lft = left.Evaluated();
-            object rght = right.Evaluated();
-            if (lft is double || rght is double)
-                return Convert.ToDouble(lft) % Convert.ToDouble(rght);
-            return (int)lft % (int)rght;
-        }
-    }
-
-    public sealed class DivExpression : IExpression
-    {
-        public IExpression left;
-        public IExpression right;
-
-        public DivExpression(IExpression left, IExpression right)
-        {
-            this.left = left;
-            this.right = right;
-        }
-
-        public object Evaluated()
-        {
-            object lft = left.Evaluated();
-            object rght = right.Evaluated();
-            if (lft is double || rght is double)
-                return Convert.ToDouble(lft) / Convert.ToDouble(rght);
-            return (int)lft / (int)rght;
-        }
-    }
-
     public sealed class BinExpression : IExpression 
     {
         public IExpression left;
@@ -155,8 +92,20 @@ namespace PycLan
                         return (int)lft / (int)rght;
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
+                case TokenType.POWER:
+                    if (lft is int)
+                        return Convert.ToInt32(Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght)));
+                    return Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght));
+                case TokenType.MOD:
+                    if (lft is double || rght is double)
+                        return Convert.ToDouble(lft) % Convert.ToDouble(rght);
+                    return (int)lft % (int)rght;
+                case TokenType.DIV:
+                    if (lft is double || rght is double)
+                        return Convert.ToDouble(lft) / Convert.ToDouble(rght);
+                    return (int)lft / (int)rght;
                 default:
-                    throw new Exception("НЕПОДДЕРЖИВАЕМАЯ ОПЕРАЦИЯ");
+                    throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ {lft} {operation.Type} {rght}\n{left}{operation}{right}");
             }
         }
     }
@@ -171,7 +120,7 @@ namespace PycLan
             {
                 if (value is double || value is int)
                     Value = Convert.ToDouble(value) != 0;
-                else throw new Exception("ЭТО КАК");
+                else throw new Exception($"ЭТО КАК {Value} {value}");
             }
             Value = (bool)value;
         }
@@ -206,7 +155,7 @@ namespace PycLan
                 case TokenType.NOTEQUALITY:
                     return lft != rght;
                 default:
-                    throw new Exception("НЕСРАВНЕННО");
+                    throw new Exception($"НЕСРАВНЕННО {lft} {comparation.Type} {rght}\n{left}{comparation}{right}");
             }
         }
     }
