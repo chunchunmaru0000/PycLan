@@ -41,7 +41,7 @@ namespace PycLan
                 catch (Exception error) 
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.ResetColor(); Console.WriteLine(error.Message);
+                    Console.WriteLine(error.Message);
                     Console.ResetColor();
                 }
             }

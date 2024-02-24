@@ -20,6 +20,7 @@ namespace PycLan
         public void Execute()
         {
             object result = Expression.Evaluated();
+            Objects.AddVariable(Variable, result);
         }
     }
 }

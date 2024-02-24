@@ -52,46 +52,53 @@ namespace PycLan
             return true;
         }
 
+        private IExpression ProceedMul(ref IExpression expression)
+        {
+            while (true)
+            {
+                Token now = Current;
+                if (Match(TokenType.INTEGER, TokenType.DOUBLE))
+                {
+                    expression = new BinExpression(expression, Mul, new NumExpression(now.Value));
+                    continue;
+                }
+                if (Match(TokenType.VARIABLE))
+                {
+                    expression = new BinExpression(expression, Mul, new VariableExpression(now));
+                    continue;
+                }
+                if (Match(TokenType.LEFTSCOB))
+                {
+                    IExpression result = Expression();
+                    Match(TokenType.RIGHTSCOB);
+                    expression = new BinExpression(expression, Mul, result);
+                    continue;
+                }
+                break;
+            }
+            return expression;
+        }
+
         private IExpression Primary()
         {
             Token current = Current;
             if (Match(TokenType.INTEGER, TokenType.DOUBLE))
             {
-                Token variable = Current;
-                if (Match(TokenType.VARIABLE))
-                    return new BinExpression(new NumExpression(current.Value), Mul, new VariableExpression(variable));
-                if (Match(TokenType.LEFTSCOB))
-                {
-                    IExpression result = Expression();
-                    Match(TokenType.RIGHTSCOB);
-                    return new BinExpression(new NumExpression(current.Value), Mul, result);
-                }
-
-                return new NumExpression(current.Value);
+                IExpression number = new NumExpression(current.Value);
+                return ProceedMul(ref number);
             }
             if (Match(TokenType.LEFTSCOB))
             {
                 IExpression result = Expression();
                 Match(TokenType.RIGHTSCOB);
-
-                Token now = Current;
-                if (Match(TokenType.INTEGER, TokenType.DOUBLE))
-                    return new BinExpression(result, Mul, new NumExpression(now.Value));
-                if (Match(TokenType.VARIABLE))
-                    return new BinExpression(result, Mul, new VariableExpression(now));
-                if (Match(TokenType.LEFTSCOB))
-                {
-                    IExpression resultation = Expression();
-                    Match(TokenType.RIGHTSCOB);
-                    return new BinExpression(result, Mul, resultation);
-                }
-
-                return result;
+                return ProceedMul(ref result);
             }
             if (Match(TokenType.VARIABLE))
-                return new VariableExpression(current);
-            Console.WriteLine($"### {current.Value} {current.View} {current.Type}");
-            throw new Exception("НЕВОЗМОЖНОЕ ВЫРАЖЕНИЕ");
+            {
+                IExpression variable = new VariableExpression(current);
+                return ProceedMul(ref variable);
+            }
+            throw new Exception($"НЕВОЗМОЖНОЕ ВЫРАЖЕНИЕ: {current.Value} {current.View} {current.Type}");
         }
 
         private IExpression Unary()

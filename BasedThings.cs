@@ -97,5 +97,10 @@ namespace PycLan
                 return Variables[key];
             throw new Exception($"НЕТ ТАКОЙ ПЕРЕМЕННОЙ В ДАННЫЙ МОМЕНТ ХОТЯ БЫ: {key}");
         }
+
+        public static void AddVariable(string key, object value)
+        {
+            Variables[key] = value;
+        } 
     }
 }
