@@ -94,7 +94,10 @@ namespace PycLan
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
                 case TokenType.POWER:
                     if (lft is double || rght is double)
-                        return Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght));
+                        if (Convert.ToDouble(lft) < 0 && rght is double)
+                            throw new Exception($"НЕЛЬЗЯ ПРИ ВОЗВЕДЕНИИ В СТЕПЕНЬ ОРИЦАТЕЛЬНОГО ЧИСЛА ИСПОЛЬЗОВАТЬ В СТЕПЕНИ НЕ ЦЕЛОЕ ЧИСЛО:\n{lft}/{operation.Type}/{rght}/{left}/{operation}/{right}");
+                        else
+                            return Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght));
                     return Convert.ToInt32(Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght)));
                 case TokenType.MOD:
                     if (lft is double || rght is double)
@@ -105,7 +108,7 @@ namespace PycLan
                         return Convert.ToDouble(lft) / Convert.ToDouble(rght);
                     return (int)lft / (int)rght;
                 default:
-                    throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ {lft} {operation.Type} {rght}\n{left}{operation}{right}");
+                    throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ\n{lft}/{operation.Type}/{rght}/{left}/{operation}/{right}");
             }
         }
     }
