@@ -123,22 +123,22 @@ namespace PycLan
                     return new Token() { View = ";", Value = null, Type = TokenType.SEMICOLON };
                 case '(':
                     Next();
-                    return new Token() { View = "(", Value = null, Type = TokenType.RIGHTSCOB };
+                    return new Token() { View = "(", Value = null, Type = TokenType.LEFTSCOB };
                 case ')':
                     Next();
-                    return new Token() { View = ")", Value = null, Type = TokenType.LEFTSCOB };
+                    return new Token() { View = ")", Value = null, Type = TokenType.RIGHTSCOB };
                 case '[':
                     Next();
-                    return new Token() { View = "[", Value = null, Type = TokenType.RCUBSCOB };
+                    return new Token() { View = "[", Value = null, Type = TokenType.LCUBSCOB };
                 case ']':
                     Next();
-                    return new Token() { View = "]", Value = null, Type = TokenType.LCUBSCOB };
+                    return new Token() { View = "]", Value = null, Type = TokenType.RCUBSCOB };
                 case '{':
                     Next();
-                    return new Token() { View = "{", Value = null, Type = TokenType.RTRISCOB };
+                    return new Token() { View = "{", Value = null, Type = TokenType.LTRISCOB };
                 case '}':
                     Next();
-                    return new Token() { View = "}", Value = null, Type = TokenType.LTRISCOB };
+                    return new Token() { View = "}", Value = null, Type = TokenType.RTRISCOB };
                 case '"':
                     Next();
                     return new Token() { View = '"' + "", Value = null, Type = TokenType.QUOTE };

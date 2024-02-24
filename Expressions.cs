@@ -93,9 +93,9 @@ namespace PycLan
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
                 case TokenType.POWER:
-                    if (lft is int)
-                        return Convert.ToInt32(Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght)));
-                    return Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght));
+                    if (lft is double || rght is double)
+                        return Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght));
+                    return Convert.ToInt32(Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght)));
                 case TokenType.MOD:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) % Convert.ToDouble(rght);

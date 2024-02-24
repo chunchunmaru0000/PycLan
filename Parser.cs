@@ -54,6 +54,12 @@ namespace PycLan
             Token current = Current;
             if (Match(TokenType.INTEGER, TokenType.DOUBLE))
                 return new NumExpression(current.Value);
+            if (Match(TokenType.LEFTSCOB))
+            {
+                IExpression result = Expression();
+                Match(TokenType.RIGHTSCOB);
+                return result;
+            }
             Console.WriteLine($"### {current.Value} {current.View} {current.Type}");
             throw new Exception("НЕВОЗМОЖНОЕ ВЫРАЖЕНИЕ");
         }

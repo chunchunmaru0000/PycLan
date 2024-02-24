@@ -34,6 +34,7 @@ namespace PycLan
         NOT,
 
         //other
+        VARIABLE, // not now
         SEMICOLON,
         PLUSPLUS,
         MINUSMINUS,
