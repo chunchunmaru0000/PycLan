@@ -50,7 +50,7 @@ namespace PycLan
                         dots++;
                     Next();
                 }
-                string word = code.Substring(start, position - start);
+                string word = code.Substring(start, position - start).Replace('.', ',');
                 if (dots == 0)
                     return new Token() { View = word, Value = Convert.ToInt32(word), Type = TokenType.INTEGER };
                 if (dots == 1)

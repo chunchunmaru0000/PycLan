@@ -66,9 +66,10 @@ namespace PycLan
 
         public object Evaluated()
         {
-            if (Value.Evaluated() is int)
-                return (int)Math.Pow((double)Value.Evaluated(), (double)Power.Evaluated());
-            return Math.Pow((double)Value.Evaluated(), (double)Power.Evaluated());
+            object value = Value.Evaluated();
+            if (value is int)
+                return (int)Math.Pow(Convert.ToDouble(value), (double)Power.Evaluated());
+            return Math.Pow(Convert.ToDouble(value), (double)Power.Evaluated());
         }
     }
 
@@ -85,9 +86,11 @@ namespace PycLan
 
         public object Evaluated()
         {
-            if (left.Evaluated() is double || right.Evaluated() is double)
-                return (double)left.Evaluated() % (double)right.Evaluated();
-            return (int)left.Evaluated() % (int)right.Evaluated();
+            object lft = left.Evaluated();
+            object rght = right.Evaluated();
+            if (lft is double || rght is double)
+                return Convert.ToDouble(lft) % Convert.ToDouble(rght);
+            return (int)lft % (int)rght;
         }
     }
 
@@ -104,9 +107,11 @@ namespace PycLan
 
         public object Evaluated()
         {
-            if (left.Evaluated() is double || right.Evaluated() is double)
-                return (double)left.Evaluated() / (double)right.Evaluated();
-            return (int)left.Evaluated() / (int)right.Evaluated();
+            object lft = left.Evaluated();
+            object rght = right.Evaluated();
+            if (lft is double || rght is double)
+                return Convert.ToDouble(lft) / Convert.ToDouble(rght);
+            return (int)lft / (int)rght;
         }
     }
 
@@ -131,21 +136,21 @@ namespace PycLan
             {
                 case TokenType.PLUS:
                     if (lft is double || rght is double) 
-                        return (double)lft + (double)rght;
+                        return Convert.ToDouble(lft) + Convert.ToDouble(rght);
                     return (int)lft + (int)rght;
                 case TokenType.MINUS:
                     if (lft is double || rght is double)
-                        return (double)lft - (double)rght;
+                        return Convert.ToDouble(lft) - Convert.ToDouble(rght);
                     return (int)lft - (int)rght;
                 case TokenType.MULTIPLICATION:
                     if (lft is double || rght is double)
-                        return (double)lft * (double)rght;
+                        return Convert.ToDouble(lft) * Convert.ToDouble(rght);
                     return (int)lft * (int)rght;
                 case TokenType.DIVISION:
-                    if ((double)rght != 0)
+                    if (Convert.ToDouble(rght) != 0)
                     {
                         if (lft is double || rght is double)
-                            return (double)lft + (double)rght;
+                            return Convert.ToDouble(lft) + Convert.ToDouble(rght);
                         return (int)lft + (int)rght;
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
@@ -164,7 +169,7 @@ namespace PycLan
             if (!(value is bool))
             {
                 if (value is double || value is int)
-                    Value = (double)value != 0;
+                    Value = Convert.ToDouble(value) != 0;
                 else throw new Exception("ЭТО КАК");
             }
             Value = (bool)value;
