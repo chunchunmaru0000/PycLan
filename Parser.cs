@@ -74,16 +74,6 @@ namespace PycLan
             Token current = Current;
             while (true)
             {
-                if (Match(TokenType.MULTIPLICATION))
-                {
-                    result = new BinExpression(result, current, Unary());
-                    continue;
-                }
-                if (Match(TokenType.DIVISION))
-                {
-                    result = new BinExpression(result, current, Unary());
-                    continue;
-                }
                 if (Match(TokenType.POWER))
                 {
                     result = new PowerExpression(result, Unary());
@@ -99,6 +89,16 @@ namespace PycLan
                     result = new DivExpression(result, Unary());
                     continue;
                 }
+                if (Match(TokenType.MULTIPLICATION))
+                {
+                    result = new BinExpression(result, current, Unary());
+                    continue;
+                }
+                if (Match(TokenType.DIVISION))
+                {
+                    result = new BinExpression(result, current, Unary());
+                    continue;
+                }
                 break;
             }
             return result;
@@ -106,7 +106,7 @@ namespace PycLan
 
         private IExpression Addity()
         {
-            IExpression result = Unary();
+            IExpression result = Muly();
             Token current = Current;
             while (true)
             {

@@ -67,9 +67,10 @@ namespace PycLan
         public object Evaluated()
         {
             object value = Value.Evaluated();
+            object power = Power.Evaluated();
             if (value is int)
-                return (int)Math.Pow(Convert.ToDouble(value), (double)Power.Evaluated());
-            return Math.Pow(Convert.ToDouble(value), (double)Power.Evaluated());
+                return Convert.ToInt32(Math.Pow(Convert.ToDouble(value), Convert.ToDouble(power)));
+            return Math.Pow(Convert.ToDouble(value), Convert.ToDouble(power));
         }
     }
 
@@ -150,8 +151,8 @@ namespace PycLan
                     if (Convert.ToDouble(rght) != 0)
                     {
                         if (lft is double || rght is double)
-                            return Convert.ToDouble(lft) + Convert.ToDouble(rght);
-                        return (int)lft + (int)rght;
+                            return Convert.ToDouble(lft) / Convert.ToDouble(rght);
+                        return (int)lft / (int)rght;
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
                 default:

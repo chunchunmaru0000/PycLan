@@ -101,9 +101,19 @@ namespace PycLan
                     return new Token() { View = "*", Value = null, Type = TokenType.MULTIPLICATION };
                 case '+':
                     Next();
+                    if (Current == '+')
+                    {
+                        Next();
+                        return new Token() { View = "++", Value = null, Type = TokenType.PLUSPLUS };
+                    }
                     return new Token() { View = "+", Value = null, Type = TokenType.PLUS };
                 case '-':
                     Next();
+                    if (Current == '-')
+                    {
+                        Next();
+                        return new Token() { View = "--", Value = null, Type = TokenType.MINUSMINUS };
+                    }
                     return new Token() { View = "-", Value = null, Type = TokenType.MINUS };
                 case '@':
                     Next();
@@ -117,12 +127,27 @@ namespace PycLan
                 case ')':
                     Next();
                     return new Token() { View = ")", Value = null, Type = TokenType.LEFTSCOB };
+                case '[':
+                    Next();
+                    return new Token() { View = "[", Value = null, Type = TokenType.RCUBSCOB };
+                case ']':
+                    Next();
+                    return new Token() { View = "]", Value = null, Type = TokenType.LCUBSCOB };
+                case '{':
+                    Next();
+                    return new Token() { View = "{", Value = null, Type = TokenType.RTRISCOB };
+                case '}':
+                    Next();
+                    return new Token() { View = "}", Value = null, Type = TokenType.LTRISCOB };
                 case '"':
                     Next();
                     return new Token() { View = '"' + "", Value = null, Type = TokenType.QUOTE };
                 case '%':
                     Next();
                     return new Token() { View = "%", Value = null, Type = TokenType.MOD };
+                case '.':
+                    Next();
+                    return new Token() { View = ".", Value = null, Type = TokenType.DOT };
                 default:
                     throw new Exception("НЕ СУЩЕСТВУЮЩИЙ СИМВОЛ В ДАННОМ ЯЗЫКЕ");
             }

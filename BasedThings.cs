@@ -35,12 +35,21 @@ namespace PycLan
 
         //other
         SEMICOLON,
+        PLUSPLUS,
+        MINUSMINUS,
+
         RIGHTSCOB,
         LEFTSCOB,
+        RCUBSCOB,
+        LCUBSCOB,
+        RTRISCOB,
+        LTRISCOB,
+
         WHITESPACE,
         EXCLAMATION,
         DOG,
         QUOTE,
+        DOT,
 
         //words types
         WORD_IF,
