@@ -100,7 +100,10 @@ namespace PycLan
 
         public static void AddVariable(string key, object value)
         {
-            Variables[key] = value;
+            if (Variables.ContainsKey(key))
+                Variables[key] = value;
+            else
+                Variables.Add(key, value);
         } 
     }
 }

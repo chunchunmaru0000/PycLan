@@ -29,21 +29,16 @@ namespace PycLan
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine(string.Join("|", tokens.Select(t => Convert.ToString(t.Type)).ToArray()));
 
-                    var exps = new Parser(tokens).Parse();
-                    foreach (var exp in exps)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"{exp.Evaluated()} type {exp.Evaluated().GetType()}");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    var statements = new Parser(tokens).Parse();
 
+                    foreach (var variable in Objects.Variables)
+                    {
+                        Console.WriteLine($"{variable.Key} = {variable.Value}; type {variable.Value.GetType()};");
                     }
                     Console.ResetColor();
                 }
-                catch (Exception error) 
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(error.Message);
-                    Console.ResetColor();
-                }
+                catch (Exception error) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(error.Message); Console.ResetColor(); }
             }
         }
     }

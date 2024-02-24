@@ -23,4 +23,19 @@ namespace PycLan
             Objects.AddVariable(Variable, result);
         }
     }
+
+    class PrintNumberStatement : IStatement
+    {
+        public IExpression Expression;
+
+        public PrintNumberStatement(IExpression expression)
+        {
+            Expression = expression;
+        }
+
+        public void Execute()
+        {
+            Console.WriteLine(Expression.Evaluated());
+        }
+    }
 }

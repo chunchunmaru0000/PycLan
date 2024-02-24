@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -34,7 +35,16 @@ namespace PycLan
             return tokens.Last();
         }
 
-        private Token Current => Get(0); 
+        private Token Current => Get(0);
+
+        private Token Consume(TokenType type)
+        {
+            Token current = Current;
+            if (Current.Type != type)
+                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type}\nТЕКУЩИЙ: {Current.Type}");
+            position++;
+            return current;
+        }
 
         private bool Match(TokenType type)
         {
@@ -98,7 +108,7 @@ namespace PycLan
                 IExpression variable = new VariableExpression(current);
                 return ProceedMul(ref variable);
             }
-            throw new Exception($"НЕВОЗМОЖНОЕ ВЫРАЖЕНИЕ: {current.Value} {current.View} {current.Type}");
+            throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: {current.Value}/{current.View}/{current.Type}");
         }
 
         private IExpression Unary()
@@ -180,11 +190,30 @@ namespace PycLan
             return Addity();
         }
 
-        public IExpression[] Parse()
+        private IStatement Statement()
         {
-            List<IExpression> parsed = new List<IExpression>();
+            Token current = Current;
+            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DO_EQUAL)
+            {
+                Consume(TokenType.VARIABLE);
+                Consume(TokenType.DO_EQUAL);
+                return new AssignStatement(current.View, Expression());
+            }
+            if (current.Type == TokenType.INTEGER || current.Type == TokenType.DOUBLE || current.Type == TokenType.VARIABLE)
+                return new PrintNumberStatement(Expression());
+
+            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.View}/{current.Value}/{current.Type}");
+        }
+
+        public IStatement[] Parse()
+        {
+            List<IStatement> parsed = new List<IStatement>();
             while (!Match(TokenType.EOF))
-                parsed.Add(Expression());
+            {
+                parsed.Add(Statement());
+                parsed.Last().Execute();
+                Consume(TokenType.SEMICOLON);
+            }
             return parsed.ToArray();
         }
     }

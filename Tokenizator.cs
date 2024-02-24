@@ -12,7 +12,7 @@ namespace PycLan
         private int position;
         public Tokenizator(string code) 
         {
-            this.code = code;
+            this.code = code.Replace('\n', ' ');
             position = 0;
         }
 
