@@ -37,6 +37,7 @@ namespace PycLan
                     word.Type = TokenType.WORD_FALSE;
                     return word;
                 default:
+                    word.Type = TokenType.VARIABLE;
                     return word;
             }
         }

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.XPath;
@@ -16,6 +18,7 @@ namespace PycLan
         public Token[] tokens;
         public int lenght;
         public int position;
+        public static Token Mul = new Token() { View = "*", Value = null, Type = TokenType.MULTIPLICATION };
 
         public Parser(Token[] tokens) 
         {
@@ -53,13 +56,40 @@ namespace PycLan
         {
             Token current = Current;
             if (Match(TokenType.INTEGER, TokenType.DOUBLE))
+            {
+                Token variable = Current;
+                if (Match(TokenType.VARIABLE))
+                    return new BinExpression(new NumExpression(current.Value), Mul, new VariableExpression(variable));
+                if (Match(TokenType.LEFTSCOB))
+                {
+                    IExpression result = Expression();
+                    Match(TokenType.RIGHTSCOB);
+                    return new BinExpression(new NumExpression(current.Value), Mul, result);
+                }
+
                 return new NumExpression(current.Value);
+            }
             if (Match(TokenType.LEFTSCOB))
             {
                 IExpression result = Expression();
                 Match(TokenType.RIGHTSCOB);
+
+                Token now = Current;
+                if (Match(TokenType.INTEGER, TokenType.DOUBLE))
+                    return new BinExpression(result, Mul, new NumExpression(now.Value));
+                if (Match(TokenType.VARIABLE))
+                    return new BinExpression(result, Mul, new VariableExpression(now));
+                if (Match(TokenType.LEFTSCOB))
+                {
+                    IExpression resultation = Expression();
+                    Match(TokenType.RIGHTSCOB);
+                    return new BinExpression(result, Mul, resultation);
+                }
+
                 return result;
             }
+            if (Match(TokenType.VARIABLE))
+                return new VariableExpression(current);
             Console.WriteLine($"### {current.Value} {current.View} {current.Type}");
             throw new Exception("НЕВОЗМОЖНОЕ ВЫРАЖЕНИЕ");
         }

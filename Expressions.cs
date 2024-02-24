@@ -159,4 +159,21 @@ namespace PycLan
             }
         }
     }
+
+    public sealed class VariableExpression : IExpression
+    {
+        public string Name;
+        public object Value;
+
+        public VariableExpression(Token varivable)
+        {
+            Name = varivable.View;
+            Value = Objects.GetVariable(Name);
+        }
+
+        public object Evaluated() 
+        { 
+            return Value; 
+        }
+    }
 }

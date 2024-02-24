@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,7 +48,6 @@ namespace PycLan
         LTRISCOB,
 
         WHITESPACE,
-        EXCLAMATION,
         DOG,
         QUOTE,
         DOT,
@@ -72,5 +72,30 @@ namespace PycLan
     public interface IExpression
     {
         object Evaluated();
+    }
+
+    public interface IStatement
+    {
+        void Execute();
+    }
+
+    public static class Objects
+    {
+        public static Dictionary<string, object> Variables = new Dictionary<string, object>()
+        {
+            { "пи", Math.PI }
+        };
+
+        public static bool ContainsVariable(string key)
+        {
+            return Variables.ContainsKey(key);
+        }
+
+        public static object GetVariable(string key)
+        {
+            if (ContainsVariable(key))
+                return Variables[key];
+            throw new Exception($"НЕТ ТАКОЙ ПЕРЕМЕННОЙ В ДАННЫЙ МОМЕНТ ХОТЯ БЫ: {key}");
+        }
     }
 }
