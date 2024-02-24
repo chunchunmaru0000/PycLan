@@ -127,13 +127,6 @@ namespace PycLan
                     result = new BinExpression(result, current, Muly());
                     continue;
                 }
-                /*
-                if (Match(TokenType.MINUS))
-                {
-                    result = new BinExpression(result, current, Muly());
-                    continue;
-                }
-                */
                 break;
             }
             return result;
