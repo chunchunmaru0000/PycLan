@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Reflection.Emit;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
@@ -159,6 +160,30 @@ namespace PycLan
         {
             object olft = left.Evaluated();
             object orght = right.Evaluated();
+            if (olft is string || orght is string) 
+            {
+                string slft = left.ToString();
+                string srght = right.ToString();
+                int slftl = slft.Length;
+                int srghtl = srght.Length;
+                switch (comparation.Type)
+                {
+                    case TokenType.EQUALITY:
+                        return slft == srght;
+                    case TokenType.NOTEQUALITY:
+                        return slft != srght;
+                    case TokenType.LESS:
+                        return slftl < srghtl;
+                    case TokenType.LESSEQ:
+                        return slftl <= srghtl;
+                    case TokenType.MORE:
+                        return slftl > srghtl;
+                    case TokenType.MOREEQ:
+                        return slftl >= srghtl;
+                    default:
+                        throw new Exception($"ТАК НЕЛЬЗЯ СРАВНИВАТЬ СТРОКИ: {left}{comparation.toString()}{right}");
+                }
+            }
             if (!(olft is bool) && !(orght is bool))
             {
                 double lft = Convert.ToDouble(olft);
@@ -215,4 +240,6 @@ namespace PycLan
             return Value; 
         }
     }
+
+
 }

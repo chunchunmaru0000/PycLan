@@ -15,8 +15,17 @@ namespace PycLan
                 case "если":
                     word.Type = TokenType.WORD_IF;
                     return word;
+                case "коль":
+                    word.Type = TokenType.WORD_IF;
+                    return word;
+                case "ежели":
+                    word.Type = TokenType.WORD_IF;
+                    return word;
                 case "иначе":
                     word.Type = TokenType.WORD_ELSE;
+                    return word;
+                case "иначели":
+                    word.Type = TokenType.WORD_ELIF;
                     return word;
                 case "пока":
                     word.Type = TokenType.WHITESPACE;

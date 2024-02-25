@@ -220,6 +220,9 @@ namespace PycLan
                 case '\n':
                     Next();
                     return new Token() { View = "\n", Value = null, Type = TokenType.SLASH_N };
+                case ':':
+                    Next();
+                    return new Token() { View = ":", Value = null, Type = TokenType.COLON };
                 default:
                     throw new Exception("НЕ СУЩЕСТВУЮЩИЙ СИМВОЛ В ДАННОМ ЯЗЫКЕ");
             }

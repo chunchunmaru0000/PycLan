@@ -14,11 +14,12 @@ using System.Xml.XPath;
 
 namespace PycLan
 {
-    public class Parser
+    public partial class Parser
     {
         public Token[] tokens;
         public int lenght;
         public int position;
+        public int line = 0;
         public static Token Mul = new Token() { View = "*", Value = null, Type = TokenType.MULTIPLICATION };
 
         public Parser(Token[] tokens) 
@@ -41,7 +42,7 @@ namespace PycLan
         {
             Token current = Current;
             if (Current.Type != type)
-                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type}\nТЕКУЩИЙ: {Current.Type}");
+                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type}\nТЕКУЩИЙ: {Current.Type}\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
             position++;
             return current;
         }
@@ -94,7 +95,7 @@ namespace PycLan
             {
                 return new VariableExpression(current);
             }
-            throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: <{current.Value}> <{current.View}> <{current.Type}>");
+            throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: <{current.toString()}>\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
         }
 
         private IExpression Unary()
@@ -223,25 +224,68 @@ namespace PycLan
 
         private IStatement Statement()
         {
+            line++;
             Token current = Current;
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DO_EQUAL)
             {
                 Consume(TokenType.VARIABLE);
                 Consume(TokenType.DO_EQUAL);
-                return new AssignStatement(current.View, Expression());
+                IStatement result = new AssignStatement(current.View, Expression());
+                Consume(TokenType.SEMICOLON);
+                return result;
             }
-
-            if (Match(TokenType.WORD_FOR))
+            
+            if (Match(TokenType.WORD_IF))
             {
-                
+                IExpression condition = Expression();
+                List<IStatement> ifStatements = new List<IStatement>();
+                List<IStatement> elseStatements = new List<IStatement>();
+
+                if (Match(TokenType.LTRISCOB))
+                    while (!Match(TokenType.RTRISCOB))
+                        ifStatements.Add(Statement());
+                else
+                {
+                    Consume(TokenType.COLON);
+                    ifStatements.Add(Statement());
+                }
+
+                if (Match(TokenType.WORD_ELSE))
+                {
+                    if (Match(TokenType.LTRISCOB))
+                        while (!Match(TokenType.RTRISCOB))
+                            elseStatements.Add(Statement());
+                    else
+                    {
+                        Consume(TokenType.COLON);
+                        elseStatements.Add(Statement());
+                    }
+                }
+                IStatement ifStatement = new BlockStatement(ifStatements);
+                IStatement elseStatement = elseStatements.Count() > 0 ? new BlockStatement(elseStatements) : null;
+                IStatement result = new IfStatement(condition, ifStatement, elseStatement);
+                return result;
             }
 
             if (Match(TokenType.WORD_PRINT))
-                return new PrintStatement(Expression());
+            {
+                IStatement statement = new PrintStatement(Expression());
+                Consume(TokenType.SEMICOLON);
+                return statement;
+            }
             if (Printble(current.Type))
-                return new PrintStatement(Expression());
+            {
+                IStatement statement = new PrintStatement(Expression());
+                Consume(TokenType.SEMICOLON);
+                return statement;
+            }
 
-            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: <{current.View}> <{current.Value}> <{current.Type}>");
+            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.toString()}\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
+        }
+
+        private IStatement Block()
+        {
+            return null;
         }
 
         public IStatement[] Parse()
@@ -251,7 +295,6 @@ namespace PycLan
             {
                 parsed.Add(Statement());
                 parsed.Last().Execute();
-                Consume(TokenType.SEMICOLON);
             }
             return parsed.ToArray();
         }

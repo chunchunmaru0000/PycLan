@@ -16,7 +16,7 @@ namespace PycLan
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             foreach (var variable in Objects.Variables)
             {
-                Console.WriteLine($"{variable.Key} = {variable.Value}; type {variable.Value.GetType()};");
+                Console.WriteLine($"{variable.Key} = {variable.Value}; type {variable.Value.GetType()}; ");
             }
             Console.ResetColor();
         }
@@ -48,8 +48,7 @@ namespace PycLan
             {
                 Console.ResetColor();
                 Console.Write("> ");
-                string code = Console.ReadLine() ?? "";
-                PycOnceLoad(code);
+                PycOnceLoad(Console.ReadLine() ?? "");
             }
         }
     }

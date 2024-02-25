@@ -42,4 +42,48 @@ namespace PycLan
                 Console.WriteLine(Expression.Evaluated());
         }
     }
+
+    class IfStatement : IStatement
+    {
+        public IExpression Expression;
+        public IStatement ifStatement;
+        public IStatement elseStatement;
+        public IfStatement(IExpression expression, IStatement ifStatement, IStatement elseStatement)
+        {
+            Expression = expression;
+            this.ifStatement = ifStatement;
+            this.elseStatement = elseStatement;
+        }
+
+        public void Execute()
+        {
+            if (Convert.ToBoolean(Expression.Evaluated()))
+                ifStatement.Execute();
+            else if (!(elseStatement == null))
+            {
+                elseStatement.Execute();
+            }
+        }
+    }
+
+    class BlockStatement : IStatement
+    {
+        public List<IStatement> Statements;
+
+        public BlockStatement(List<IStatement> statements)
+        {
+            Statements = statements;
+        }
+
+        public void Execute()
+        {
+            foreach (IStatement statement in Statements)
+                statement.Execute();
+        }
+
+        public void AddStatement(IStatement statement)
+        {
+            Statements.Add(statement);
+        }
+    }
 }
