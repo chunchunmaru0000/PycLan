@@ -21,6 +21,13 @@ namespace PycLan
         {
             return Value;
         } 
+
+        public string toString()
+        {
+            if (Value is bool)
+                return (bool)Value ? "Истина" : "Ложь";
+            return Convert.ToString(Value);
+        }
     }
 
     public sealed class UnaryExpression : IExpression
@@ -72,7 +79,27 @@ namespace PycLan
         {
             object lft = left.Evaluated();
             object rght = right.Evaluated();
-            switch (operation.Type)
+            if (lft is string || rght is string)
+            {
+                string slft = lft.ToString();
+                string srght = rght.ToString();
+                switch (operation.Type)
+                {
+                    case TokenType.PLUS:
+                        return slft + srght;
+                    case TokenType.MINUS:
+                        string str = slft;
+                        return str.Replace(srght, "");
+                    case TokenType.MULTIPLICATION:
+                        string result = "";
+                        for (int i = 0; i < srght.Length; i++)
+                            result += slft + srght;
+                        return result;
+                    default:
+                        throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ ДЛЯ СТРОКИ: {lft} {operation.Type} {rght} | {left} {operation} {right}");
+                }
+            }
+            else switch (operation.Type)
             {
                 case TokenType.PLUS:
                     if (lft is double || rght is double) 
@@ -130,29 +157,45 @@ namespace PycLan
 
         public object Evaluated()
         {
-            object lft = left.Evaluated();
-            if (!(lft is bool))
-                lft = Convert.ToDouble(lft);
-            object rght = right.Evaluated();
-            if (!(rght is bool))
-                rght = Convert.ToDouble(rght);
-            switch (comparation.Type)
+            object olft = left.Evaluated();
+            object orght = right.Evaluated();
+            if (!(olft is bool) && !(orght is bool))
             {
-                case TokenType.EQUALITY:
-                    return (bool)lft == (bool)rght;
-                case TokenType.NOTEQUALITY:
-                    return (bool)lft != (bool)rght;
-                case TokenType.LESS:
-                    return (double)lft < (double)rght;
-                case TokenType.LESSEQ:
-                    return (double)lft <= (double)rght;
-                case TokenType.MORE:
-                    return (double)lft > (double)rght;
-                case TokenType.MOREEQ:
-                    return (double)lft >= (double)rght;
-                default:
-                    throw new Exception($"НЕСРАВНЕННО: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
+                double lft = Convert.ToDouble(olft);
+                double rght = Convert.ToDouble(orght);
+                switch (comparation.Type)
+                {
+                    case TokenType.EQUALITY:
+                        return lft == rght;
+                    case TokenType.NOTEQUALITY:
+                        return lft != rght;
+                    case TokenType.LESS:
+                        return lft < rght;
+                    case TokenType.LESSEQ:
+                        return lft <= rght;
+                    case TokenType.MORE:
+                        return lft > rght;
+                    case TokenType.MOREEQ:
+                        return lft >= rght;
+                    default:
+                        throw new Exception($"НЕСРАВНЕННЫЕ ЧИСЛА: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
+                }
             }
+            else if (olft is bool && orght is bool)
+            {
+                bool lft = Convert.ToBoolean(olft);
+                bool rght = Convert.ToBoolean(orght);
+                switch (comparation.Type)
+                {
+                    case TokenType.EQUALITY:
+                        return lft == rght;
+                    case TokenType.NOTEQUALITY:
+                        return lft != rght;
+                    default:
+                        throw new Exception($"НЕСРАВНЕННЫЕ УСЛОВИЯ: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
+                }
+            }
+            throw new Exception($"НЕЛЬЗЯ СРАВНИВАТЬ РАЗНЫЕ ТИПЫ: {olft} {comparation.Type} {orght} | {olft.GetType()}{comparation.View}{orght.GetType()}");
         }
     }
 

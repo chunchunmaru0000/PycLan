@@ -24,11 +24,11 @@ namespace PycLan
         }
     }
 
-    class PrintNumberStatement : IStatement
+    class PrintStatement : IStatement
     {
         public IExpression Expression;
 
-        public PrintNumberStatement(IExpression expression)
+        public PrintStatement(IExpression expression)
         {
             Expression = expression;
         }

@@ -52,6 +52,8 @@ namespace PycLan
         RTRISCOB,
         LTRISCOB,
 
+        SLASH_N,
+        COMMENTO,
         WHITESPACE,
         DOG,
         QUOTE,

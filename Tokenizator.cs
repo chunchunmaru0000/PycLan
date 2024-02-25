@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace PycLan
         private int position;
         public Tokenizator(string code) 
         {
-            this.code = code.Replace('\n', ' ');
+            this.code = code;
             position = 0;
         }
 
@@ -39,6 +40,44 @@ namespace PycLan
                     Next();
                 string word = code.Substring(start, position - start);
                 return new Token() { View = word, Value = null, Type = TokenType.WHITESPACE };
+            }
+            if (Current == '"')
+            {
+                Next();
+                string buffer = "";
+                while (Current != '"')
+                {
+                    while (true) { 
+                        if (Current == '\\')
+                        {
+                            Next();
+                            if (Current == 'н')
+                            {
+                                Next();
+                                buffer += '\n';
+                            }
+                            else if (Current == 'т')
+                            {
+                                Next();
+                                buffer += '\t';
+                            }
+                            else
+                                Next();
+                            continue;
+                        }
+                        break;
+                    }
+                    if (Current == '"')
+                        break;
+
+                    buffer += Current;
+                    Next();
+
+                    if (Current == '\0')
+                        throw new Exception($"НЕЗАКОНЧЕНА СТРОКА: позиция<{position}> буфер<{buffer}>");
+                }
+                Next();
+                return new Token() { View = buffer, Value = buffer, Type = TokenType.STRING };
             }
             if (char.IsDigit(Current))
             {
@@ -155,9 +194,6 @@ namespace PycLan
                 case '}':
                     Next();
                     return new Token() { View = "}", Value = null, Type = TokenType.RTRISCOB };
-                case '"':
-                    Next();
-                    return new Token() { View = '"' + "", Value = null, Type = TokenType.QUOTE };
                 case '%':
                     Next();
                     return new Token() { View = "%", Value = null, Type = TokenType.MOD };
@@ -167,6 +203,12 @@ namespace PycLan
                 case ',':
                     Next();
                     return new Token() { View = ",", Value = null, Type = TokenType.COMMA };
+                case 'Ё':
+                    Next();
+                    return new Token() { View = "Ё", Value = null, Type = TokenType.COMMENTO };
+                case '\n':
+                    Next();
+                    return new Token() { View = "\n", Value = null, Type = TokenType.SLASH_N };
                 default:
                     throw new Exception("НЕ СУЩЕСТВУЮЩИЙ СИМВОЛ В ДАННОМ ЯЗЫКЕ");
             }
@@ -178,6 +220,16 @@ namespace PycLan
             while (true)
             {
                 Token token = NextToken();
+                if (token.Type == TokenType.COMMENTO)
+                    while (true)
+                    {
+                        token = NextToken();
+                        if (token.Type == TokenType.SLASH_N || token.Type == TokenType.EOF || token.Type == TokenType.COMMENTO)
+                        {
+                            token = NextToken();
+                            break;
+                        }
+                    }
                 if (token.Type != TokenType.WHITESPACE)
                     tokens.Add(token);
                 if (token.Type == TokenType.EOF)
