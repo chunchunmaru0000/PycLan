@@ -46,8 +46,7 @@ namespace PycLan
             }
             if (Current == '"')
             {
-                try
-                {
+                if (!commented) {
                     Next();
                     string buffer = "";
                     while (Current != '"')
@@ -83,11 +82,11 @@ namespace PycLan
                     }
                     Next();
                     return new Token() { View = buffer, Value = buffer, Type = TokenType.STRING };
-                } catch (Exception error)
+                }
+                else
                 {
-                    if (commented)
-                        return Nothing;
-                    throw error;
+                    Next();
+                    return Nothing;
                 }
             }
             if (char.IsDigit(Current))
@@ -236,7 +235,7 @@ namespace PycLan
                     while (true)
                     {
                         token = NextToken();
-                        if (token.Type == TokenType.SLASH_N || token.Type == TokenType.EOF || token.Type == TokenType.COMMENTO)
+                        if (token.Type == TokenType.EOF || token.Type == TokenType.COMMENTO)
                         {
                             token = NextToken();
                             break;
