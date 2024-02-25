@@ -11,6 +11,9 @@ namespace PycLan
     {
         private string code;
         private int position;
+        private bool commented = false;
+        private static Token Nothing = new Token() { View = "", Value = null, Type = TokenType.WHITESPACE };
+
         public Tokenizator(string code) 
         {
             this.code = code;
@@ -43,41 +46,49 @@ namespace PycLan
             }
             if (Current == '"')
             {
-                Next();
-                string buffer = "";
-                while (Current != '"')
+                try
                 {
-                    while (true) { 
-                        if (Current == '\\')
-                        {
-                            Next();
-                            if (Current == 'н')
-                            {
-                                Next();
-                                buffer += '\n';
-                            }
-                            else if (Current == 'т')
-                            {
-                                Next();
-                                buffer += '\t';
-                            }
-                            else
-                                Next();
-                            continue;
-                        }
-                        break;
-                    }
-                    if (Current == '"')
-                        break;
-
-                    buffer += Current;
                     Next();
+                    string buffer = "";
+                    while (Current != '"')
+                    {
+                        while (true) { 
+                            if (Current == '\\')
+                            {
+                                Next();
+                                if (Current == 'н')
+                                {
+                                    Next();
+                                    buffer += '\n';
+                                }
+                                else if (Current == 'т')
+                                {
+                                    Next();
+                                    buffer += '\t';
+                                }
+                                else
+                                    Next();
+                                continue;
+                            }
+                            break; 
+                        }
+                        if (Current == '"')
+                            break;
 
-                    if (Current == '\0')
-                        throw new Exception($"НЕЗАКОНЧЕНА СТРОКА: позиция<{position}> буфер<{buffer}>");
+                        buffer += Current;
+                        Next();
+
+                        if (Current == '\0')
+                            throw new Exception($"НЕЗАКОНЧЕНА СТРОКА: позиция<{position}> буфер<{buffer}>");
+                    }
+                    Next();
+                    return new Token() { View = buffer, Value = buffer, Type = TokenType.STRING };
+                } catch (Exception error)
+                {
+                    if (commented)
+                        return Nothing;
+                    throw error;
                 }
-                Next();
-                return new Token() { View = buffer, Value = buffer, Type = TokenType.STRING };
             }
             if (char.IsDigit(Current))
             {
@@ -205,6 +216,7 @@ namespace PycLan
                     return new Token() { View = ",", Value = null, Type = TokenType.COMMA };
                 case 'Ё':
                     Next();
+                    commented = !commented;
                     return new Token() { View = "Ё", Value = null, Type = TokenType.COMMENTO };
                 case '\n':
                     Next();
