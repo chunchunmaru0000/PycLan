@@ -190,6 +190,10 @@ namespace PycLan
                         return slftl > srghtl;
                     case TokenType.MOREEQ:
                         return slftl >= srghtl;
+                    case TokenType.AND:
+                        return slftl > 0 && srghtl > 0;
+                    case TokenType.OR:
+                        return slftl > 0 || srghtl > 0;
                     default:
                         throw new Exception($"ТАК НЕЛЬЗЯ СРАВНИВАТЬ СТРОКИ: {left}{comparation.toString()}{right}");
                 }
@@ -212,6 +216,10 @@ namespace PycLan
                         return lft > rght;
                     case TokenType.MOREEQ:
                         return lft >= rght;
+                    case TokenType.AND:
+                        return lft != 0 && rght != 0;
+                    case TokenType.OR:
+                        return lft != 0 || rght != 0;
                     default:
                         throw new Exception($"НЕСРАВНЕННЫЕ ЧИСЛА: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
                 }
@@ -226,6 +234,10 @@ namespace PycLan
                         return lft == rght;
                     case TokenType.NOTEQUALITY:
                         return lft != rght;
+                    case TokenType.AND:
+                        return lft && rght;
+                    case TokenType.OR:
+                        return lft || rght;
                     default:
                         throw new Exception($"НЕСРАВНЕННЫЕ УСЛОВИЯ: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
                 }
@@ -235,7 +247,7 @@ namespace PycLan
 
         public override string ToString()
         {
-            return $"{left} {comparation.View} {right};";
+            return $"{left} {comparation.View} {right}";
         }
     }
 

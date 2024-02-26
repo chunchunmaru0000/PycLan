@@ -27,6 +27,9 @@ namespace PycLan
                 case "иначели":
                     word.Type = TokenType.WORD_ELIF;
                     return word;
+                case "не":
+                    word.Type = TokenType.NOT;
+                    return word;
                 case "пока":
                     word.Type = TokenType.WORD_WHILE;
                     return word;
@@ -47,6 +50,18 @@ namespace PycLan
                 case "ложь":
                     word.Value = false;
                     word.Type = TokenType.WORD_FALSE;
+                    return word;
+                case "и":
+                    word.Type = TokenType.AND;
+                    return word;
+                case "&&":
+                    word.Type = TokenType.AND;
+                    return word;
+                case "или":
+                    word.Type = TokenType.OR;
+                    return word;
+                case "||":
+                    word.Type = TokenType.OR;
                     return word;
                 default:
                     word.Type = TokenType.VARIABLE;

@@ -146,7 +146,6 @@ namespace PycLan
 
         public void Execute()
         {
-            Definition.Execute();
             for (Definition.Execute(); Convert.ToBoolean(Condition.Evaluated()); Alter.Execute())
                 Statement.Execute();
         }

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BasedThings.cs" />
     <Compile Include="Expressions.cs" />
+    <Compile Include="ExpressionsParse.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="PycLang.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -61,10 +61,10 @@ namespace PycLan
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
             IStatement definition = new AssignStatement(current.View, Expression());
-            Consume(TokenType.SEMICOLON);
+            Consume(TokenType.SEMICOLON, TokenType.COMMA);
 
             IExpression condition = Expression();
-            Consume(TokenType.SEMICOLON);
+            Consume(TokenType.SEMICOLON, TokenType.COMMA);
 
             current = Current;
             Consume(TokenType.VARIABLE);

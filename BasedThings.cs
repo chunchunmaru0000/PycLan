@@ -79,6 +79,10 @@ namespace PycLan
         LESSEQ,
         [StringValue("НЕ")]
         NOT,
+        [StringValue("И")]
+        AND,
+        [StringValue("ИЛИ")]
+        OR,
 
         //other
         [StringValue("ПЕРЕМЕННАЯ")]
