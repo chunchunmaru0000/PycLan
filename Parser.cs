@@ -92,9 +92,7 @@ namespace PycLan
                 return result;
             }
             if (Match(TokenType.VARIABLE))
-            {
                 return new VariableExpression(current);
-            }
             throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: <{current.toString()}>\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
         }
 
@@ -227,23 +225,20 @@ namespace PycLan
             line++;
             Token current = Current;
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DO_EQUAL)
-            {
-                Consume(TokenType.VARIABLE);
-                Consume(TokenType.DO_EQUAL);
-                IStatement result = new AssignStatement(current.View, Expression());
-                Consume(TokenType.SEMICOLON);
-                return result;
-            }
+                return Assigny(current);
             
             if (Match(TokenType.WORD_IF))
-            {
+                return IfElsy();
+                /*
                 IExpression condition = Expression();
                 List<IStatement> ifStatements = new List<IStatement>();
                 List<IStatement> elseStatements = new List<IStatement>();
 
                 if (Match(TokenType.LTRISCOB))
                     while (!Match(TokenType.RTRISCOB))
+                    {
                         ifStatements.Add(Statement());
+                    }
                 else
                 {
                     Consume(TokenType.COLON);
@@ -254,7 +249,9 @@ namespace PycLan
                 {
                     if (Match(TokenType.LTRISCOB))
                         while (!Match(TokenType.RTRISCOB))
+                        {
                             elseStatements.Add(Statement());
+                        }
                     else
                     {
                         Consume(TokenType.COLON);
@@ -264,39 +261,38 @@ namespace PycLan
                 IStatement ifStatement = new BlockStatement(ifStatements);
                 IStatement elseStatement = elseStatements.Count() > 0 ? new BlockStatement(elseStatements) : null;
                 IStatement result = new IfStatement(condition, ifStatement, elseStatement);
-                return result;
-            }
+                return result;*/
 
             if (Match(TokenType.WORD_PRINT))
-            {
-                IStatement statement = new PrintStatement(Expression());
-                Consume(TokenType.SEMICOLON);
-                return statement;
-            }
+                return Printy();
+
             if (Printble(current.Type))
-            {
-                IStatement statement = new PrintStatement(Expression());
-                Consume(TokenType.SEMICOLON);
-                return statement;
-            }
+                return Printy();
 
             throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.toString()}\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
         }
 
         private IStatement Block()
         {
-            return null;
+            BlockStatement block = new BlockStatement();
+            while (!Match(TokenType.RTRISCOB))
+                block.AddStatement(Statement());
+            return block;
         }
 
-        public IStatement[] Parse()
+        public IStatement Parse()
         {
-            List<IStatement> parsed = new List<IStatement>();
+            BlockStatement parsed = new BlockStatement();
             while (!Match(TokenType.EOF))
             {
-                parsed.Add(Statement());
-                parsed.Last().Execute();
+                parsed.AddStatement(Statement());
+                Console.WriteLine(parsed.Statements.Last().ToString());
+                Console.WriteLine("123");
+                Console.WriteLine(parsed.ToString());
+                PycLang.PrintVariables();
+         //       parsed.Statements.Last().Execute();
             }
-            return parsed.ToArray();
+            return parsed;
         }
     }
 }

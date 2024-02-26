@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace PycLan
 
         public static void PycOnceLoad(string code)
         {
+            IStatement program = null;
             try
             {
                 var tokens = new Tokenizator(code).Tokenize();
@@ -33,11 +35,19 @@ namespace PycLan
                 Console.WriteLine(string.Join("|", tokens.Select(t => Convert.ToString(t.Value)).ToArray()));
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine(string.Join("|", tokens.Select(t => Convert.ToString(t.Type)).ToArray()));
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                var statements = new Parser(tokens).Parse();
+
+                program = new Parser(tokens).Parse();
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine(program.ToString());
+                Console.ForegroundColor = ConsoleColor.Yellow;
+
+                program.Execute();
             }
-            catch (Exception error) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(error.Message); Console.ResetColor(); }
+            catch (Exception error) {
+     //           Console.ForegroundColor = ConsoleColor.DarkYellow;
+       //         Console.WriteLine(program.ToString());
+                Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(error.Message); Console.ResetColor(); }
 
             PrintVariables();
         }

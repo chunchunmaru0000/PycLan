@@ -154,14 +154,18 @@ namespace PycLan
     public interface IExpression
     {
         object Evaluated();
+
+        string ToString();
     }
 
     public interface IStatement
     {
         void Execute();
+
+        string ToString();
     }
 
-    public static class Objects
+    public class Objects
     {
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {

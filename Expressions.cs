@@ -23,7 +23,7 @@ namespace PycLan
             return Value;
         } 
 
-        public string toString()
+        public override string ToString()
         {
             if (Value is bool)
                 return (bool)Value ? "Истина" : "Ложь";
@@ -60,6 +60,11 @@ namespace PycLan
                     Console.WriteLine($"value {Value.Evaluated()}|Value {Value}|op {Operation.Type}|Op {Operation.View}");
                     throw new Exception("ДА КАК ТАК ВООБЩЕ ВОЗМОЖНО ЧТО ЛИБО ПОСТАВИТЬ КРОМЕ + ИЛИ - ПЕРЕД ЧИСЛОМ");
             }
+        }
+
+        public override string ToString()
+        {
+            return Operation.View + ' ' + Value.ToString();
         }
     }
 
@@ -140,6 +145,11 @@ namespace PycLan
                 default:
                     throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ: {lft} {operation.Type} {rght} | {left} {operation} {right}");
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{left} {operation.View} {right};";
         }
     }
 
@@ -222,6 +232,11 @@ namespace PycLan
             }
             throw new Exception($"НЕЛЬЗЯ СРАВНИВАТЬ РАЗНЫЕ ТИПЫ: {olft} {comparation.Type} {orght} | {olft.GetType()}{comparation.View}{orght.GetType()}");
         }
+
+        public override string ToString()
+        {
+            return $"{left} {comparation.View} {right};";
+        }
     }
 
     public sealed class VariableExpression : IExpression
@@ -237,9 +252,12 @@ namespace PycLan
 
         public object Evaluated() 
         { 
-            return Value; 
+            return Objects.GetVariable(Name); 
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} ИМЕЕТ ЗНАЧЕНИЕ {Value}";
         }
     }
-
-
 }

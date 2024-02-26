@@ -22,6 +22,11 @@ namespace PycLan
             object result = Expression.Evaluated();
             Objects.AddVariable(Variable, result);
         }
+
+        public override string ToString()
+        {
+            return $"{Variable} = {Expression};";
+        }
     }
 
     class PrintStatement : IStatement
@@ -39,30 +44,39 @@ namespace PycLan
             if (value is bool)
                 Console.WriteLine((bool)value ? "Истина" : "Ложь");
             else
-                Console.WriteLine(Expression.Evaluated());
+                Console.WriteLine(value);
+        }
+
+        public override string ToString()
+        {
+            return $"НАЧРЕТАТЬ {Expression};";
         }
     }
 
     class IfStatement : IStatement
     {
         public IExpression Expression;
-        public IStatement ifStatement;
-        public IStatement elseStatement;
+        public IStatement IfPart;
+        public IStatement ElsePart;
         public IfStatement(IExpression expression, IStatement ifStatement, IStatement elseStatement)
         {
             Expression = expression;
-            this.ifStatement = ifStatement;
-            this.elseStatement = elseStatement;
+            IfPart = ifStatement;
+            ElsePart = elseStatement;
         }
 
         public void Execute()
         {
-            if (Convert.ToBoolean(Expression.Evaluated()))
-                ifStatement.Execute();
-            else if (!(elseStatement == null))
-            {
-                elseStatement.Execute();
-            }
+            bool result = Convert.ToBoolean(Expression.Evaluated());
+            if (result)
+                IfPart.Execute();
+            else if (ElsePart != null)
+                ElsePart.Execute();
+        }
+
+        public override string ToString()
+        {
+            return $"ЕСЛИ {Expression} ТОГДА {{{IfPart}}} ИНАЧЕ {{{ElsePart}}}";
         }
     }
 
@@ -70,20 +84,25 @@ namespace PycLan
     {
         public List<IStatement> Statements;
 
-        public BlockStatement(List<IStatement> statements)
+        public BlockStatement()
         {
-            Statements = statements;
+            Statements = new List<IStatement>();
         }
 
         public void Execute()
         {
-            foreach (IStatement statement in Statements)
-                statement.Execute();
+            for (int i = 0; i < Statements.Count(); i++)
+                Statements[i].Execute();
         }
 
         public void AddStatement(IStatement statement)
         {
             Statements.Add(statement);
+        }
+
+        public override string ToString()
+        {
+            return string.Join("|", Statements.Select(s =>'<' + s.ToString() + '>').ToArray());
         }
     }
 }
