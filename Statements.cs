@@ -122,5 +122,38 @@ namespace PycLan
             while(Convert.ToBoolean(Expression.Evaluated()))
                 Statement.Execute();
         }
+
+        public override string ToString()
+        {
+            return $"{Expression}: {{{Statement}}}";
+        }
+    }
+
+    class ForStatement : IStatement
+    {
+        IStatement Definition;
+        IExpression Condition;
+        IStatement Alter;
+        IStatement Statement;
+
+        public ForStatement(IStatement definition, IExpression condition, IStatement alter, IStatement statement)
+        {
+            Definition = definition;
+            Condition = condition;
+            Alter = alter;
+            Statement = statement;
+        }
+
+        public void Execute()
+        {
+            Definition.Execute();
+            for (Definition.Execute(); Convert.ToBoolean(Condition.Evaluated()); Alter.Execute())
+                Statement.Execute();
+        }
+
+        public override string ToString()
+        {
+            return $"ДЛЯ {Definition} {Condition} {Alter}: {Statement}";
+        }
     }
 }

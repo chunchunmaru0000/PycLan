@@ -47,11 +47,32 @@ namespace PycLan
                 return Statement();
             }
         }
+
         private IStatement Whily()
         {
             IExpression condition = Expression();
             IStatement statement = OneOrBlock();
             return new WhileStatement(condition, statement);
+        }
+
+        private IStatement Fory()
+        {
+            Token current = Current;
+            Consume(TokenType.VARIABLE);
+            Consume(TokenType.DO_EQUAL);
+            IStatement definition = new AssignStatement(current.View, Expression());
+            Consume(TokenType.SEMICOLON);
+
+            IExpression condition = Expression();
+            Consume(TokenType.SEMICOLON);
+
+            current = Current;
+            Consume(TokenType.VARIABLE);
+            Consume(TokenType.DO_EQUAL);
+            IStatement alter = new AssignStatement(current.View, Expression());
+
+            IStatement statement = OneOrBlock();
+            return new ForStatement(definition, condition, alter, statement);
         }
     }
 }

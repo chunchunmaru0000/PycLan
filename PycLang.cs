@@ -40,7 +40,6 @@ namespace PycLan
             {
                 var tokens = new Tokenizator(code).Tokenize();
                 //LogTokens(ref tokens);
-
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 

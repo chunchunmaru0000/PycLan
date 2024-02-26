@@ -42,7 +42,16 @@ namespace PycLan
         {
             Token current = Current;
             if (Current.Type != type)
-                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type}\nТЕКУЩИЙ: {Current.Type}\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
+                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type}\nТЕКУЩИЙ: {Current.Type}\nПОЗИЦИЯ: КОМАНДА<{line}> СЛОВО<{position}>");
+            position++;
+            return current;
+        }
+
+        private Token Consume(TokenType type0, TokenType type1)
+        {
+            Token current = Current;
+            if (Current.Type != type0 && Current.Type != type1)
+                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type0} ИЛИ {type1}\nТЕКУЩИЙ: {Current.Type}\nПОЗИЦИЯ: КОМАНДА<{line}> СЛОВО<{position}>");
             position++;
             return current;
         }
@@ -233,6 +242,9 @@ namespace PycLan
             if (Match(TokenType.WORD_WHILE))
                 return Whily();
 
+            if (Match(TokenType.WORD_FOR))
+                return Fory();
+
             if (Match(TokenType.WORD_PRINT))
                 return Printy();
 
@@ -249,22 +261,7 @@ namespace PycLan
                 block.AddStatement(Statement());
             return block;
         }
-        /*
-        public IStatement Parse()
-        {
-            BlockStatement parsed = new BlockStatement();
-            while (!Match(TokenType.EOF))
-            {
-                parsed.AddStatement(Statement());
-                Console.WriteLine(parsed.Statements.Last().ToString());
-                Console.WriteLine("123");
-                Console.WriteLine(parsed.ToString());
-                PycLang.PrintVariables();
-                parsed.Statements.Last().Execute();
-            }
-            return parsed;
-        }
-        */
+
         public void Run()
         {
             while (!Match(TokenType.EOF))
