@@ -28,7 +28,7 @@ namespace PycLan
                     word.Type = TokenType.WORD_ELIF;
                     return word;
                 case "пока":
-                    word.Type = TokenType.WHITESPACE;
+                    word.Type = TokenType.WORD_WHILE;
                     return word;
                 case "для":
                     word.Type = TokenType.WORD_FOR;

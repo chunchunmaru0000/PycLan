@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -12,6 +13,17 @@ namespace PycLan
 {
     public static class PycLang
     {
+        public static void LogTokens(ref Token[] tokens)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(string.Join("|", tokens.Select(t => t.View).ToArray()));
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(string.Join("|", tokens.Select(t => Convert.ToString(t.Value)).ToArray()));
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine(string.Join("|", tokens.Select(t => Convert.ToString(t.Type)).ToArray()));
+            Console.ForegroundColor = ConsoleColor.Yellow;
+        }
+
         public static void PrintVariables()
         {
             Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -24,30 +36,20 @@ namespace PycLan
 
         public static void PycOnceLoad(string code)
         {
-            IStatement program = null;
             try
             {
                 var tokens = new Tokenizator(code).Tokenize();
+                //LogTokens(ref tokens);
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine(string.Join("|", tokens.Select(t => t.View).ToArray()));
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(string.Join("|", tokens.Select(t => Convert.ToString(t.Value)).ToArray()));
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine(string.Join("|", tokens.Select(t => Convert.ToString(t.Type)).ToArray()));
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-                program = new Parser(tokens).Parse();
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine(program.ToString());
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                new Parser(tokens).Run();
 
-                program.Execute();
+                stopwatch.Stop();
+                Console.WriteLine(stopwatch.Elapsed);
             }
-            catch (Exception error) {
-     //           Console.ForegroundColor = ConsoleColor.DarkYellow;
-       //         Console.WriteLine(program.ToString());
-                Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(error.Message); Console.ResetColor(); }
+            catch (Exception error) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(error.Message); Console.ResetColor(); }
 
             PrintVariables();
         }

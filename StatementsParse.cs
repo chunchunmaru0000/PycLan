@@ -15,7 +15,6 @@ namespace PycLan
             Consume(TokenType.DO_EQUAL);
             IStatement result = new AssignStatement(current.View, Expression());
             Consume(TokenType.SEMICOLON);
-            result.Execute();  //
             return result;
         }
 
@@ -47,6 +46,12 @@ namespace PycLan
                 Consume(TokenType.COLON);
                 return Statement();
             }
+        }
+        private IStatement Whily()
+        {
+            IExpression condition = Expression();
+            IStatement statement = OneOrBlock();
+            return new WhileStatement(condition, statement);
         }
     }
 }

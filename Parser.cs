@@ -229,39 +229,9 @@ namespace PycLan
             
             if (Match(TokenType.WORD_IF))
                 return IfElsy();
-                /*
-                IExpression condition = Expression();
-                List<IStatement> ifStatements = new List<IStatement>();
-                List<IStatement> elseStatements = new List<IStatement>();
 
-                if (Match(TokenType.LTRISCOB))
-                    while (!Match(TokenType.RTRISCOB))
-                    {
-                        ifStatements.Add(Statement());
-                    }
-                else
-                {
-                    Consume(TokenType.COLON);
-                    ifStatements.Add(Statement());
-                }
-
-                if (Match(TokenType.WORD_ELSE))
-                {
-                    if (Match(TokenType.LTRISCOB))
-                        while (!Match(TokenType.RTRISCOB))
-                        {
-                            elseStatements.Add(Statement());
-                        }
-                    else
-                    {
-                        Consume(TokenType.COLON);
-                        elseStatements.Add(Statement());
-                    }
-                }
-                IStatement ifStatement = new BlockStatement(ifStatements);
-                IStatement elseStatement = elseStatements.Count() > 0 ? new BlockStatement(elseStatements) : null;
-                IStatement result = new IfStatement(condition, ifStatement, elseStatement);
-                return result;*/
+            if (Match(TokenType.WORD_WHILE))
+                return Whily();
 
             if (Match(TokenType.WORD_PRINT))
                 return Printy();
@@ -269,7 +239,7 @@ namespace PycLan
             if (Printble(current.Type))
                 return Printy();
 
-            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.toString()}\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
+            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.toString()}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");
         }
 
         private IStatement Block()
@@ -279,7 +249,7 @@ namespace PycLan
                 block.AddStatement(Statement());
             return block;
         }
-
+        /*
         public IStatement Parse()
         {
             BlockStatement parsed = new BlockStatement();
@@ -290,9 +260,22 @@ namespace PycLan
                 Console.WriteLine("123");
                 Console.WriteLine(parsed.ToString());
                 PycLang.PrintVariables();
-         //       parsed.Statements.Last().Execute();
+                parsed.Statements.Last().Execute();
             }
             return parsed;
+        }
+        */
+        public void Run()
+        {
+            while (!Match(TokenType.EOF))
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                IStatement statement = Statement();
+                Console.WriteLine(statement.ToString());
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                if (!(statement is BlockStatement))
+                    statement.Execute();
+            }
         }
     }
 }

@@ -91,8 +91,8 @@ namespace PycLan
 
         public void Execute()
         {
-            for (int i = 0; i < Statements.Count(); i++)
-                Statements[i].Execute();
+            foreach (IStatement statement in Statements)
+                statement.Execute();
         }
 
         public void AddStatement(IStatement statement)
@@ -103,6 +103,24 @@ namespace PycLan
         public override string ToString()
         {
             return string.Join("|", Statements.Select(s =>'<' + s.ToString() + '>').ToArray());
+        }
+    }
+
+    class WhileStatement : IStatement
+    {
+        IExpression Expression;
+        IStatement Statement;
+
+        public WhileStatement(IExpression expression, IStatement statement)
+        {
+            Expression = expression;
+            Statement = statement;
+        }
+
+        public void Execute()
+        {
+            while(Convert.ToBoolean(Expression.Evaluated()))
+                Statement.Execute();
         }
     }
 }
