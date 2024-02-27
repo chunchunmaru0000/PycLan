@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Linq;
 
 namespace PycLan
 {
@@ -352,6 +353,28 @@ namespace PycLan
         public override string ToString()
         {
             return '<' + Operation.ToString() + Name + '>';
+        }
+    }
+
+    public sealed class InputExpression : IExpression
+    {
+        public string Message;
+        public InputExpression() { }
+
+        public InputExpression(string message)
+        {
+            Message = message;
+        }
+
+        public object Evaluated()
+        {
+            Console.Write(Message??"");
+            return Console.ReadLine();
+        }
+
+        public override string ToString()
+        {
+            return $"<{Message??""}>";
         }
     }
 }

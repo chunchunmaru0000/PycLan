@@ -51,18 +51,20 @@ namespace PycLan
                             if (Current == '\\')
                             {
                                 Next();
-                                if (Current == 'н')
+                                switch (Current)
                                 {
-                                    Next();
-                                    buffer += '\n';
+                                    case 'н':
+                                        Next();
+                                        buffer += '\n';
+                                        break;
+                                    case 'т':
+                                        Next();
+                                        buffer += '\t';
+                                        break;
+                                    default:
+                                        Next();
+                                        break;
                                 }
-                                else if (Current == 'т')
-                                {
-                                    Next();
-                                    buffer += '\t';
-                                }
-                                else
-                                    Next();
                                 continue;
                             }
                             break; 

@@ -140,7 +140,9 @@ namespace PycLan
         [StringValue("ПРОДОЛЖИТЬ")]
         CONTINUE,
         [StringValue("ВЫЙТИ")]
-        BREAK
+        BREAK,
+        [StringValue("НАПИСТЬ")]
+        INPUT
     }
 
     public class Token

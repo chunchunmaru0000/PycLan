@@ -180,7 +180,7 @@ namespace PycLan
         }
     }
 
-    public sealed class BreakStatementException : Exception {}
+    public sealed class BreakStatementException : Exception { }
 
     public sealed class BreakStatement : Exception, IStatement
     {

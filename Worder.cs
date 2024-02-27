@@ -101,6 +101,13 @@
                 case "выйти":
                     word.Type = TokenType.BREAK;
                     return word;
+
+                case "харатья":
+                    word.Type = TokenType.INPUT;
+                    return word;
+                case "хартия":
+                    word.Type = TokenType.INPUT;
+                    return word;
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

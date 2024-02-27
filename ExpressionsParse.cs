@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.Remoting.Messaging;
+using System.Text.RegularExpressions;
 
 namespace PycLan
 {
@@ -7,6 +9,16 @@ namespace PycLan
         private IExpression Primary()
         {
             Token current = Current;
+            if (Match(TokenType.INPUT))
+            {
+                if (Match(TokenType.LEFTSCOB))
+                {
+                    string message = Expression().Evaluated().ToString();
+                    Consume(TokenType.RIGHTSCOB);
+                    return new InputExpression(message);
+                }
+                return new InputExpression();
+            }
             if (Match(TokenType.STRING))
                 return new NumExpression(current.Value);
             if (Match(TokenType.WORD_TRUE, TokenType.WORD_FALSE))

@@ -56,7 +56,8 @@ namespace PycLan
                    type == TokenType.MINUS      ||
                    type == TokenType.NOT        ||
                    type == TokenType.STRING     ||
-                   type == TokenType.LEFTSCOB   ;
+                   type == TokenType.LEFTSCOB   ||
+                   type == TokenType.INPUT      ;
         }
 
         private bool Match(TokenType type)
