@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace PycLan
 {
@@ -53,6 +54,8 @@ namespace PycLan
         DIVISION,
         [StringValue("СДЕЛАТЬ РАВНЫМ")]
         DO_EQUAL,
+        [StringValue("СТРЕЛКА")]
+        ARROW,
         [StringValue("БЕЗ ОСТАТКА")]
         DIV,
         [StringValue("ОСТАТОК")]
@@ -83,6 +86,8 @@ namespace PycLan
         //other
         [StringValue("ПЕРЕМЕННАЯ")]
         VARIABLE,
+        [StringValue("ФУНКЦИЯ")]
+        FUNCTION,
         [StringValue(";")]
         SEMICOLON,
         [StringValue(":")]
@@ -171,9 +176,17 @@ namespace PycLan
         string ToString();
     }
 
+    public interface IFunction
+    {
+        object Execute(params object[] obj);
+    }
+
     public class Objects
     {
-        public static object NOTHING = 0; // need improving
+        /*        VARIABLES          */
+
+        public static object NOTHING = 0; // need improving i believe
+
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {
             { "пи", Math.PI }
@@ -198,6 +211,38 @@ namespace PycLan
                 Variables[key] = value;
             else
                 Variables.Add(key, value);
-        } 
+        }
+
+        /*        FUNCTIONS          */
+
+        public static IFunction DO_NOTHING;
+        public static IFunction Sinus = new Sinus();
+        public static IFunction Cosinus = new Cosinus();
+
+        public static Dictionary<string, IFunction> Functions = new Dictionary<string, IFunction>()
+        {
+            { "синус", Sinus },
+            { "косинус", Cosinus }
+        };
+
+        public static bool ContainsFunction(string key)
+        {
+            return Functions.ContainsKey(key);
+        }
+
+        public static IFunction GetFunction(string key)
+        {
+            if (ContainsFunction(key))
+                return Functions[key];
+            return DO_NOTHING;
+        }
+
+        public static void AddFunction(string key, IFunction value)
+        {
+            if (Functions.ContainsKey(key))
+                Functions[key] = value;
+            else
+                Functions.Add(key, value);
+        }
     }
 }

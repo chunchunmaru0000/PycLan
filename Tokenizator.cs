@@ -121,6 +121,11 @@ namespace PycLan
                         Next();
                         return new Token() { View = "==", Value = null, Type = TokenType.EQUALITY };
                     }
+                    if (Current == '>')
+                    {
+                        Next();
+                        return new Token() { View = "=>", Value = null, Type = TokenType.ARROW };
+                    }
                     return new Token() { View = "=", Value = null, Type = TokenType.DO_EQUAL };
                 case '/':
                     Next();

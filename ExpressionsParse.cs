@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
 
@@ -9,6 +10,19 @@ namespace PycLan
         private IExpression Primary()
         {
             Token current = Current;
+            if (Match(TokenType.FUNCTION))
+            {
+                string name = current.View;
+                Consume(TokenType.LEFTSCOB);
+                FunctionExpression function = new FunctionExpression(name);
+                List<object> args = new List<object>();
+                while (!Match(TokenType.RIGHTSCOB))
+                {
+                    function.AddArg(Expression());
+                    Match(TokenType.COMMA, TokenType.SEMICOLON);
+                }
+                return function;
+            }
             if (Match(TokenType.INPUT))
             {
                 if (Match(TokenType.LEFTSCOB))

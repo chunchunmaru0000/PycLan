@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace PycLan
 {
@@ -207,6 +208,30 @@ namespace PycLan
         public override string ToString()
         {
             return "ПРОДОЛЖИТЬ;";
+        }
+    }
+
+    class DeclareFunctionStatement : IStatement
+    {
+        public string Name;
+        public Dictionary<string, IExpression> Args;
+        public IFunction Body;
+
+        public DeclareFunctionStatement(string name, Dictionary<string, IExpression> args, IFunction body)
+        {
+            Name = name;
+            Args = args;
+            Body = body;
+        }
+
+        public void Execute()
+        {
+            Objects.AddFunction(Name, Body);
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} => ({string.Join("|", Args.Keys.Select(a => a).ToArray())}) {Body};";
         }
     }
 }

@@ -4,6 +4,11 @@
     {
         public static Token Wordizator(Token word)
         {
+            if (Objects.ContainsFunction(word.View))
+            {
+                word.Type = TokenType.FUNCTION;
+                return word;
+            }
             switch (word.View.ToLower())
             {
                 case "егда":
@@ -91,6 +96,10 @@
                 case "паче":
                     word.Type = TokenType.MORE;
                     return word;
+                case "вяще":
+                    word.Type = TokenType.MORE;
+                    return word;
+
                 case "меньше":
                     word.Type = TokenType.LESS;
                     return word;

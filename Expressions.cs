@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Linq;
 
 namespace PycLan
@@ -375,6 +377,43 @@ namespace PycLan
         public override string ToString()
         {
             return $"<{Message??""}>";
+        }
+    }
+
+    public sealed class FunctionExpression : IExpression 
+    {
+        public string Name;
+        public List<IExpression> Args;
+
+        public FunctionExpression(string name)
+        {
+            Name = name;
+            Args = new List<IExpression>();
+        }
+
+        public FunctionExpression(string name, List<IExpression> args) 
+        {
+            Name = name;
+            Args = args;
+        }
+
+        public void AddArg(IExpression arg)
+        {
+            Args.Add(arg);
+        }
+
+        public object Evaluated()
+        {
+            int argov = Args.Count;
+            object[] args = new object[argov];
+            for (int i = 0; i < argov; i++)
+                args[i] = Args[i].Evaluated();
+            return Objects.GetFunction(Name).Execute(args);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
 }
