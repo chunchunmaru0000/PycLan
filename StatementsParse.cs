@@ -2,8 +2,9 @@
 {
     public partial class Parser
     {
-        private IStatement Assigny(Token current)
+        private IStatement Assigny()
         {
+            Token current = Current;
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
             IStatement result = new AssignStatement(current.View, Expression());
@@ -60,12 +61,24 @@
             Consume(TokenType.SEMICOLON, TokenType.COMMA);
 
             current = Current;
+            
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
             IStatement alter = new AssignStatement(current.View, Expression());
 
             IStatement statement = OneOrBlock();
             return new ForStatement(definition, condition, alter, statement);
+        }
+
+        public IStatement BeforeIncDecy()
+        {
+            Token current = Current;
+            Consume(TokenType.PLUSPLUS, TokenType.MINUSMINUS);
+            string name = Current.View;
+            Consume(TokenType.VARIABLE);
+            IStatement statement = new IncDecBefore(current, name);
+            Consume(TokenType.SEMICOLON);
+            return statement;
         }
     }
 }

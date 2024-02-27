@@ -21,6 +21,13 @@ namespace PycLan
             }
             if (Match(TokenType.VARIABLE))
                 return new VariableExpression(current);
+            if (Match(TokenType.PLUSPLUS, TokenType.MINUSMINUS))
+            {
+                string name = Current.View;
+                IExpression result = new IncDecBefore(current, name);
+                Consume(TokenType.VARIABLE);
+                return result;
+            }
             throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: <{current.toString()}>\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
         }
 

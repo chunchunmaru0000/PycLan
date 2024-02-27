@@ -57,6 +57,12 @@
                 case "||":
                     word.Type = TokenType.OR;
                     return word;
+                case "больше":
+                    word.Type = TokenType.MORE;
+                    return word;
+                case "меньше":
+                    word.Type = TokenType.LESS;
+                    return word;
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

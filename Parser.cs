@@ -55,7 +55,8 @@ namespace PycLan
                    type == TokenType.PLUS       ||
                    type == TokenType.MINUS      ||
                    type == TokenType.NOT        ||
-                   type == TokenType.STRING     ;
+                   type == TokenType.STRING     ||
+                   type == TokenType.LEFTSCOB   ;
         }
 
         private bool Match(TokenType type)
@@ -84,8 +85,11 @@ namespace PycLan
             line++;
             Token current = Current;
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DO_EQUAL)
-                return Assigny(current);
-            
+                return Assigny();
+
+            if (current.Type == TokenType.PLUSPLUS || current.Type == TokenType.MINUSMINUS && Get(1).Type == TokenType.VARIABLE)
+                return BeforeIncDecy();
+
             if (Match(TokenType.WORD_IF))
                 return IfElsy();
 

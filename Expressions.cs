@@ -265,4 +265,93 @@ namespace PycLan
             return $"{Name} ИМЕЕТ ЗНАЧЕНИЕ {Value}";
         }
     }
+
+    public sealed class IncDecBefore : IExpression, IStatement
+    {
+        public Token Operation;
+        public string Name;
+
+        public IncDecBefore(Token operation, string name)
+        {
+            Operation = operation;
+            Name = name;
+        }
+
+        public object Evaluated()
+        {
+            object value = Objects.GetVariable(Name);
+            if (value is int || value is bool)
+            {
+                int temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt32(value);
+                switch (Operation.Type)
+                {
+                    case TokenType.PLUSPLUS:
+                        Objects.AddVariable(Name, ++temp);
+                        return ++temp;
+                    case TokenType.MINUSMINUS:
+                        Objects.AddVariable(Name, --temp);
+                        return --temp;
+                    default:
+                        throw new Exception("НЕВОЗМОЖНО");
+                }
+            }
+            if (value is double)
+            {
+                double temp = Convert.ToDouble(value);
+                switch (Operation.Type)
+                {
+                    case TokenType.PLUSPLUS:
+                        Objects.AddVariable(Name, ++temp);
+                        return ++temp;
+                    case TokenType.MINUSMINUS:
+                        Objects.AddVariable(Name, --temp);
+                        return --temp;
+                    default:
+                        throw new Exception("НЕВОЗМОЖНО");
+                }
+            }
+            throw new Exception($"С ДАННЫМ ЗНАЧЕНИЕМ {value} ДАННОЕ ДЕЙСТВИЕ ({Operation.View}) НЕВОЗМОЖНО");
+        }
+
+        public void Execute()
+        {
+            object value = Objects.GetVariable(Name);
+            if (value is int || value is bool)
+            {
+                int temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt32(value);
+                switch (Operation.Type)
+                {
+                    case TokenType.PLUSPLUS:
+                        Objects.AddVariable(Name, ++temp);
+                        return;
+                    case TokenType.MINUSMINUS:
+                        Objects.AddVariable(Name, --temp);
+                        return;
+                    default:
+                        throw new Exception("НЕВОЗМОЖНО");
+                }
+            }
+            if (value is double)
+            {
+                double temp = Convert.ToDouble(value);
+                switch (Operation.Type)
+                {
+                    case TokenType.PLUSPLUS:
+                        Objects.AddVariable(Name, ++temp);
+                        return;
+                    case TokenType.MINUSMINUS:
+                        Objects.AddVariable(Name, --temp);
+                        return;
+                    default:
+                        throw new Exception("НЕВОЗМОЖНО");
+                }
+            }
+            throw new Exception($"С ДАННЫМ ЗНАЧЕНИЕМ {value} ДАННОЕ ДЕЙСТВИЕ ({Operation.View}) НЕВОЗМОЖНО");
+        }
+
+        public override string ToString()
+        {
+            return '<' + Operation.ToString() + Name + '>';
+        }
+    }
 }
