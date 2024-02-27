@@ -61,10 +61,21 @@
             Consume(TokenType.SEMICOLON, TokenType.COMMA);
 
             current = Current;
-            
-            Consume(TokenType.VARIABLE);
-            Consume(TokenType.DO_EQUAL);
-            IStatement alter = new AssignStatement(current.View, Expression());
+
+            IStatement alter = null;
+            if (Match(TokenType.VARIABLE))
+            {
+                Consume(TokenType.DO_EQUAL);
+                alter = new AssignStatement(current.View, Expression());
+            }
+            else if (Current.Type == TokenType.PLUSPLUS || Current.Type == TokenType.MINUSMINUS)
+            {
+                Token operation = Current;
+                Consume(TokenType.PLUSPLUS, TokenType.MINUSMINUS);
+                string name = Current.View;
+                Consume(TokenType.VARIABLE);
+                alter = new IncDecBefore(operation, name);
+            }
 
             IStatement statement = OneOrBlock();
             return new ForStatement(definition, condition, alter, statement);
