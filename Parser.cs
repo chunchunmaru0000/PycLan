@@ -1,16 +1,5 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection.Emit;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.XPath;
 
 namespace PycLan
 {
@@ -121,6 +110,14 @@ namespace PycLan
             while (!Match(TokenType.RTRISCOB))
                 block.AddStatement(Statement());
             return block;
+        }
+
+        public IStatement Parse()
+        {
+            BlockStatement parsed = new BlockStatement();
+            while(!Match(TokenType.EOF))
+                parsed.Statements.Add(Statement());
+            return parsed;
         }
 
         public void Run()

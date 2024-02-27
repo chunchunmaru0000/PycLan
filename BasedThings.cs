@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PycLan
 {
@@ -171,6 +167,7 @@ namespace PycLan
 
     public class Objects
     {
+        public static object NOTHING = 0; // need improving
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {
             { "пи", Math.PI }
@@ -185,7 +182,8 @@ namespace PycLan
         {
             if (ContainsVariable(key))
                 return Variables[key];
-            throw new Exception($"НЕТ ТАКОЙ ПЕРЕМЕННОЙ В ДАННЫЙ МОМЕНТ ХОТЯ БЫ: {key}");
+            return NOTHING;
+            //throw new Exception($"НЕТ ТАКОЙ ПЕРЕМЕННОЙ В ДАННЫЙ МОМЕНТ ХОТЯ БЫ: {key}");
         }
 
         public static void AddVariable(string key, object value)

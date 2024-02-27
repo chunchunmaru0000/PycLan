@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static PycLan.PycLang;
 
 namespace PycLan
 {
@@ -38,12 +31,15 @@ namespace PycLan
         {
             try
             {
+                Stopwatch stopwatch = new Stopwatch();
                 var tokens = new Tokenizator(code).Tokenize();
                 //LogTokens(ref tokens);
-                Stopwatch stopwatch = new Stopwatch();
+
                 stopwatch.Start();
 
                 new Parser(tokens).Run();
+                //IStatement program = new Parser(tokens).Parse();
+                //program.Execute();
 
                 stopwatch.Stop();
                 Console.WriteLine(stopwatch.Elapsed);
