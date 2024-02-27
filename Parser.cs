@@ -96,6 +96,12 @@ namespace PycLan
             if (Match(TokenType.WORD_WHILE))
                 return Whily();
 
+            if (Match(TokenType.BREAK))
+                return Breaky();
+
+            if (Match(TokenType.CONTINUE))
+                return Continuy();
+
             if (Match(TokenType.WORD_FOR))
                 return Fory();
 

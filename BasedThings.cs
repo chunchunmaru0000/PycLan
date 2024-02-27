@@ -136,7 +136,11 @@ namespace PycLan
         [StringValue("ИСТИНА")]
         WORD_TRUE,
         [StringValue("ЛОЖЬ")]
-        WORD_FALSE
+        WORD_FALSE,
+        [StringValue("ПРОДОЛЖИТЬ")]
+        CONTINUE,
+        [StringValue("ВЫЙТИ")]
+        BREAK
     }
 
     public class Token

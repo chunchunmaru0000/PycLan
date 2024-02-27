@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PycLan
 {
-    class AssignStatement : IStatement
+    public sealed class AssignStatement : IStatement
     {
         public string Variable;
         public IExpression Expression;
@@ -27,7 +27,7 @@ namespace PycLan
         }
     }
 
-    class PrintStatement : IStatement
+    public sealed class PrintStatement : IStatement
     {
         public IExpression Expression;
 
@@ -51,7 +51,7 @@ namespace PycLan
         }
     }
 
-    class IfStatement : IStatement
+    public sealed class IfStatement : IStatement
     {
         public IExpression Expression;
         public IStatement IfPart;
@@ -78,7 +78,7 @@ namespace PycLan
         }
     }
 
-    class BlockStatement : IStatement
+    public sealed class BlockStatement : IStatement
     {
         public List<IStatement> Statements;
 
@@ -104,7 +104,7 @@ namespace PycLan
         }
     }
 
-    class WhileStatement : IStatement
+    public sealed class WhileStatement : IStatement
     {
         IExpression Expression;
         IStatement Statement;
@@ -118,7 +118,20 @@ namespace PycLan
         public void Execute()
         {
             while(Convert.ToBoolean(Expression.Evaluated()))
-                Statement.Execute();
+            {
+                try
+                {
+                    Statement.Execute();
+                }
+                catch (BreakStatementException)
+                {
+                    break;
+                }
+                catch (ContinueStatementException)
+                {
+                    // contonue by itself
+                }
+            }
         }
 
         public override string ToString()
@@ -127,7 +140,7 @@ namespace PycLan
         }
     }
 
-    class ForStatement : IStatement
+    public sealed class ForStatement : IStatement
     {
         IStatement Definition;
         IExpression Condition;
@@ -145,12 +158,55 @@ namespace PycLan
         public void Execute()
         {
             for (Definition.Execute(); Convert.ToBoolean(Condition.Evaluated()); Alter.Execute())
-                Statement.Execute();
+            {
+                try
+                {
+                    Statement.Execute();
+                }
+                catch (BreakStatementException)
+                {
+                    break;
+                }
+                catch (ContinueStatementException)
+                {
+                    // contonue by itself
+                }
+            }
         }
 
         public override string ToString()
         {
             return $"ДЛЯ {Definition} {Condition} {Alter}: {Statement}";
+        }
+    }
+
+    public sealed class BreakStatementException : Exception {}
+
+    public sealed class BreakStatement : Exception, IStatement
+    {
+        public void Execute()
+        {
+            throw new BreakStatementException();
+        }
+
+        public override string ToString()
+        {
+            return "ВЫЙТИ;";
+        }
+    }
+
+    public sealed class ContinueStatementException : Exception { }
+
+    class ContinueStatement : Exception, IStatement
+    {
+        public void Execute()
+        {
+            throw new ContinueStatementException();
+        }
+
+        public override string ToString()
+        {
+            return "ПРОДОЛЖИТЬ;";
         }
     }
 }

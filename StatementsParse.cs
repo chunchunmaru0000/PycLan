@@ -91,5 +91,19 @@
             Consume(TokenType.SEMICOLON);
             return statement;
         }
+
+        public IStatement Breaky()
+        {
+            IStatement statement = new BreakStatement();
+            Consume(TokenType.SEMICOLON);
+            return statement;
+        }
+
+        public IStatement Continuy()
+        {
+            IStatement statement = new ContinueStatement();
+            Consume(TokenType.SEMICOLON);
+            return statement;
+        }
     }
 }
