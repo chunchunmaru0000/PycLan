@@ -149,7 +149,9 @@ namespace PycLan
         [StringValue("НАПИСТЬ")]
         INPUT,
         [StringValue("ВЕРНУТЬ")]
-        RETURN
+        RETURN,
+        [StringValue("ВЫПОЛНИТЬ ПРОЦЕДУРУ")]
+        PROCEDURE
     }
 
     public class Token
@@ -191,7 +193,7 @@ namespace PycLan
         public static Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {
-            { "пи", Math.PI },
+            { "ПИ", Math.PI },
             { "Е", Math.E }
         };
 

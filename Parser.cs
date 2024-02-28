@@ -95,6 +95,9 @@ namespace PycLan
             if (current.Type == TokenType.PLUSPLUS || current.Type == TokenType.MINUSMINUS && Get(1).Type == TokenType.VARIABLE)
                 return BeforeIncDecy();
 
+            if (Match(TokenType.PROCEDURE))
+                return Procedury();
+
             if (Match(TokenType.WORD_IF))
                 return IfElsy();
 

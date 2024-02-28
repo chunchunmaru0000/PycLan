@@ -130,5 +130,12 @@ namespace PycLan
             IStatement body = OneOrBlock();
             return new DeclareFunctionStatement(name, args.ToArray(), body);
         }
+
+        public IStatement Procedury()
+        {
+            IExpression expression = Expression();
+            Consume(TokenType.SEMICOLON);
+            return new ProcedureStatement(expression);
+        }
     }
 }

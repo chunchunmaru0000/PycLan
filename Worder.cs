@@ -143,6 +143,20 @@
                 case "чтить":
                     word.Type = TokenType.RETURN;
                     return word;
+
+                case "деяти":
+                    word.Type = TokenType.PROCEDURE;
+                    return word;
+                case "выполнить":
+                    word.Type = TokenType.PROCEDURE;
+                    return word;
+                case "процедура":
+                    word.Type = TokenType.PROCEDURE;
+                    return word;
+                case "процедуру":
+                    word.Type = TokenType.PROCEDURE;
+                    return word;
+
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

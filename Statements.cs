@@ -194,7 +194,7 @@ namespace PycLan
         }
     }
 
-    class ContinueStatement : Exception, IStatement
+    public sealed class ContinueStatement : Exception, IStatement
     {
         public void Execute()
         {
@@ -234,7 +234,7 @@ namespace PycLan
         }
     }
 
-    class DeclareFunctionStatement : IStatement
+    public sealed class DeclareFunctionStatement : IStatement
     {
         public string Name;
         public string[] Args;
@@ -255,6 +255,26 @@ namespace PycLan
         public override string ToString()
         {
             return $"{Name} => ({string.Join("|", Args)}) {Body};";
+        }
+    }
+
+    public sealed class ProcedureStatement : IStatement
+    {
+        public IExpression Function;
+
+        public ProcedureStatement(IExpression function)
+        {
+            Function = function;
+        }
+
+        public void Execute()
+        {
+            Function.Evaluated();
+        }
+
+        public override string ToString()
+        {
+            return $"ВЫПОЛНИТЬ ПРЕЦЕДУРУ {Function}";
         }
     }
 }
