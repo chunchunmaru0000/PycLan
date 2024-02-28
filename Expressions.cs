@@ -290,10 +290,10 @@ namespace PycLan
                 {
                     case TokenType.PLUSPLUS:
                         Objects.AddVariable(Name, ++temp);
-                        return ++temp;
+                        return temp;
                     case TokenType.MINUSMINUS:
                         Objects.AddVariable(Name, --temp);
-                        return --temp;
+                        return temp;
                     default:
                         throw new Exception("НЕВОЗМОЖНО");
                 }
@@ -305,10 +305,10 @@ namespace PycLan
                 {
                     case TokenType.PLUSPLUS:
                         Objects.AddVariable(Name, ++temp);
-                        return ++temp;
+                        return temp;
                     case TokenType.MINUSMINUS:
                         Objects.AddVariable(Name, --temp);
-                        return --temp;
+                        return temp;
                     default:
                         throw new Exception("НЕВОЗМОЖНО");
                 }
@@ -408,7 +408,8 @@ namespace PycLan
             object[] args = new object[argov];
             for (int i = 0; i < argov; i++)
                 args[i] = Args[i].Evaluated();
-            return Objects.GetFunction(Name).Execute(args);
+            IFunction function = (IFunction)Objects.GetFunction(Name);
+            return function.Execute(args);
         }
 
         public override string ToString()

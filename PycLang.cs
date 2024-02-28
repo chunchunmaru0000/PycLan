@@ -24,6 +24,11 @@ namespace PycLan
             {
                 Console.WriteLine($"{variable.Key} = {variable.Value}; type {variable.Value.GetType()}; ");
             }
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            foreach (var function in Objects.Functions)
+            {
+                Console.WriteLine($"{function.Key} = {function.Value}; type {function.Value.GetType()}; ");
+            }
             Console.ResetColor();
         }
 
@@ -33,7 +38,7 @@ namespace PycLan
             {
                 Stopwatch stopwatch = new Stopwatch();
                 var tokens = new Tokenizator(code).Tokenize();
-                //LogTokens(ref tokens);
+                LogTokens(ref tokens);
 
                 stopwatch.Start();
 

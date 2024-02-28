@@ -1,7 +1,20 @@
-﻿namespace PycLan
+﻿using System.Collections.Generic;
+
+namespace PycLan
 {
     public partial class Parser
     {
+        private IStatement OneOrBlock()
+        {
+            if (Match(TokenType.LTRISCOB))
+                return Block();
+            else
+            {
+                Consume(TokenType.COLON);
+                return Statement();
+            }
+        }
+
         private IStatement Assigny()
         {
             Token current = Current;
@@ -29,17 +42,6 @@
             else
                 elseStatements = null;
             return new IfStatement(condition, ifStatements, elseStatements);
-        }
-
-        private IStatement OneOrBlock()
-        {
-            if (Match(TokenType.LTRISCOB))
-                return Block();
-            else
-            {
-                Consume(TokenType.COLON);
-                return Statement();
-            }
         }
 
         private IStatement Whily()
@@ -104,6 +106,22 @@
             IStatement statement = new ContinueStatement();
             Consume(TokenType.SEMICOLON);
             return statement;
+        }
+
+        public IStatement Functiony()
+        {
+            string name = Current.View;
+            Consume(TokenType.VARIABLE);
+            List<string> args = new List<string>();
+            Consume(TokenType.ARROW);
+            Consume(TokenType.LEFTSCOB);
+            while (!Match(TokenType.RIGHTSCOB))
+            {
+                args.Add(Consume(TokenType.VARIABLE).View);
+                Match(TokenType.COMMA, TokenType.SEMICOLON);
+            }
+            IStatement body = OneOrBlock();
+            return new DeclareFunctionStatement(name, args.ToArray(), body);
         }
     }
 }

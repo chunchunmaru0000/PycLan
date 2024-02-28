@@ -10,12 +10,15 @@ namespace PycLan
         private IExpression Primary()
         {
             Token current = Current;
-            if (Match(TokenType.FUNCTION))
+            //  if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DOT && Get(1).Type == TokenType.LEFTSCOB || Match(TokenType.FUNCTION))
+            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || Match(TokenType.FUNCTION))
+
             {
                 string name = current.View;
+                Consume(TokenType.FUNCTION, TokenType.VARIABLE);
+            //    Consume(TokenType.DOT);
                 Consume(TokenType.LEFTSCOB);
                 FunctionExpression function = new FunctionExpression(name);
-                List<object> args = new List<object>();
                 while (!Match(TokenType.RIGHTSCOB))
                 {
                     function.AddArg(Expression());

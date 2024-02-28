@@ -89,6 +89,9 @@ namespace PycLan
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DO_EQUAL)
                 return Assigny();
 
+            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.ARROW)
+                return Functiony();
+
             if (current.Type == TokenType.PLUSPLUS || current.Type == TokenType.MINUSMINUS && Get(1).Type == TokenType.VARIABLE)
                 return BeforeIncDecy();
 
@@ -139,6 +142,7 @@ namespace PycLan
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 IStatement statement = Statement();
                 Console.WriteLine(statement.ToString());
+              //  PycLang.PrintVariables();
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 if (!(statement is BlockStatement))
                     statement.Execute();

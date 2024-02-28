@@ -1,7 +1,40 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PycLan
 {
+    public sealed class UserFunction : IFunction
+    {
+        public string[] Args;
+        public IStatement Body;
+
+        public UserFunction(string[] args, IStatement body)
+        {
+            Args = args;
+            Body = body;
+        }
+
+        public int ArgsCount()
+        {
+            return Args.Length;
+        }
+
+        public string GetArgName(int i)
+        {
+            if (i < 0 || i >= ArgsCount())
+                return "";
+            return Args[i];
+        }
+
+        public object Execute(params object[] args)
+        {
+            for(int i = 0; i < ArgsCount(); i++)
+                Objects.AddVariable(GetArgName(i), args[i]);
+            Body.Execute();
+            return Objects.NOTHING;
+        }
+    }
+
     public sealed class Sinus : IFunction
     {
         public object Execute(object[] x)

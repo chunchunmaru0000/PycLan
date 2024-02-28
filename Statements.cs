@@ -48,7 +48,7 @@ namespace PycLan
 
         public override string ToString()
         {
-            return $"НАЧРЕТАТЬ {Expression};";
+            return $"НАЧЕРТАТЬ {Expression};";
         }
     }
 
@@ -214,10 +214,10 @@ namespace PycLan
     class DeclareFunctionStatement : IStatement
     {
         public string Name;
-        public Dictionary<string, IExpression> Args;
-        public IFunction Body;
+        public string[] Args;
+        public IStatement Body;
 
-        public DeclareFunctionStatement(string name, Dictionary<string, IExpression> args, IFunction body)
+        public DeclareFunctionStatement(string name, string[] args, IStatement body)
         {
             Name = name;
             Args = args;
@@ -226,12 +226,12 @@ namespace PycLan
 
         public void Execute()
         {
-            Objects.AddFunction(Name, Body);
+            Objects.AddFunction(Name, new UserFunction(Args, Body));
         }
 
         public override string ToString()
         {
-            return $"{Name} => ({string.Join("|", Args.Keys.Select(a => a).ToArray())}) {Body};";
+            return $"{Name} => ({string.Join("|", Args)}) {Body};";
         }
     }
 }
