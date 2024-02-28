@@ -107,6 +107,9 @@ namespace PycLan
             if (Match(TokenType.CONTINUE))
                 return Continuy();
 
+            if (Match(TokenType.RETURN))
+                return Returny();
+
             if (Match(TokenType.WORD_FOR))
                 return Fory();
 

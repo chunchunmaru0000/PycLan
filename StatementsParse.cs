@@ -108,6 +108,13 @@ namespace PycLan
             return statement;
         }
 
+        public IStatement Returny() 
+        {
+            IExpression expression = Expression();
+            Consume(TokenType.SEMICOLON);
+            return new ReturnStatement(expression);
+        }
+
         public IStatement Functiony()
         {
             string name = Current.View;

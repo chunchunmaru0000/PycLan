@@ -28,10 +28,22 @@ namespace PycLan
 
         public object Execute(params object[] args)
         {
-            for(int i = 0; i < ArgsCount(); i++)
-                Objects.AddVariable(GetArgName(i), args[i]);
-            Body.Execute();
+        //    for(int i = 0; i < ArgsCount(); i++)
+          //      Objects.AddVariable(GetArgName(i), args[i]);
+            try
+            {
+                Body.Execute();
+            }
+            catch (ReturnStatement result)
+            {
+                return result.GetResult();
+            }
             return Objects.NOTHING;
+        }
+
+        public override string ToString()
+        {
+            return $"({string.Join(", ", Args)}){{{Body}}}";
         }
     }
 

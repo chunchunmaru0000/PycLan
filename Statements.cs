@@ -124,11 +124,11 @@ namespace PycLan
                 {
                     Statement.Execute();
                 }
-                catch (BreakStatementException)
+                catch (BreakStatement)
                 {
                     break;
                 }
-                catch (ContinueStatementException)
+                catch (ContinueStatement)
                 {
                     // contonue by itself
                 }
@@ -164,11 +164,11 @@ namespace PycLan
                 {
                     Statement.Execute();
                 }
-                catch (BreakStatementException)
+                catch (BreakStatement)
                 {
                     break;
                 }
-                catch (ContinueStatementException)
+                catch (ContinueStatement)
                 {
                     // contonue by itself
                 }
@@ -181,13 +181,11 @@ namespace PycLan
         }
     }
 
-    public sealed class BreakStatementException : Exception { }
-
     public sealed class BreakStatement : Exception, IStatement
     {
         public void Execute()
         {
-            throw new BreakStatementException();
+            throw this;
         }
 
         public override string ToString()
@@ -196,18 +194,43 @@ namespace PycLan
         }
     }
 
-    public sealed class ContinueStatementException : Exception { }
-
     class ContinueStatement : Exception, IStatement
     {
         public void Execute()
         {
-            throw new ContinueStatementException();
+            throw this;
         }
 
         public override string ToString()
         {
             return "ПРОДОЛЖИТЬ;";
+        }
+    }
+
+    public sealed class ReturnStatement : Exception, IStatement
+    {
+        public IExpression Expression;
+        public object Value;
+
+        public ReturnStatement(IExpression expression)
+        {
+            Expression = expression;
+        }
+
+        public void Execute()
+        {
+            Value = Expression.Evaluated();
+            throw this;
+        }
+
+        public object GetResult()
+        {
+            return Value;
+        }
+
+        public override string ToString()
+        {
+            return $"ВЕРНУТЬ {Value};";
         }
     }
 

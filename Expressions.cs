@@ -408,7 +408,19 @@ namespace PycLan
             object[] args = new object[argov];
             for (int i = 0; i < argov; i++)
                 args[i] = Args[i].Evaluated();
-            IFunction function = (IFunction)Objects.GetFunction(Name);
+            IFunction function = Objects.GetFunction(Name);
+            if (function is UserFunction)
+            {
+                UserFunction userFunction = (UserFunction)function;
+                if (argov != userFunction.ArgsCount())
+                    throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{argov}> ОЖИДАЛОСЬ<{userFunction.ArgsCount()}>");
+                Objects.Push();
+                for (int i = 0; i < argov; i++)
+                    Objects.AddVariable(userFunction.GetArgName(i), args[i]);
+                object result = userFunction.Execute();
+                Objects.Pop();
+                return result;
+            }
             return function.Execute(args);
         }
 

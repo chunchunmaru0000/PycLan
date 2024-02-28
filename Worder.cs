@@ -70,6 +70,10 @@
                     word.Value = true;
                     word.Type = TokenType.WORD_TRUE;
                     return word;
+                case "аминь":
+                    word.Value = true;
+                    word.Type = TokenType.WORD_TRUE;
+                    return word;
 
                 case "ложь":
                     word.Value = false;
@@ -116,6 +120,28 @@
                     return word;
                 case "хартия":
                     word.Type = TokenType.INPUT;
+                    return word;
+                case "ввод":
+                    word.Type = TokenType.INPUT;
+                    return word;
+                case "ввести":
+                    word.Type = TokenType.INPUT;
+                    return word;
+
+                case "вернуть":
+                    word.Type = TokenType.RETURN;
+                    return word;
+                case "воздать":
+                    word.Type = TokenType.RETURN;
+                    return word;
+                case "пояти":
+                    word.Type = TokenType.RETURN;
+                    return word;
+                case "яти":
+                    word.Type = TokenType.RETURN;
+                    return word;
+                case "чтить":
+                    word.Type = TokenType.RETURN;
                     return word;
                 default:
                     word.Type = TokenType.VARIABLE;

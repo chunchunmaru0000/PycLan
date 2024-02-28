@@ -147,7 +147,9 @@ namespace PycLan
         [StringValue("ВЫЙТИ")]
         BREAK,
         [StringValue("НАПИСТЬ")]
-        INPUT
+        INPUT,
+        [StringValue("ВЕРНУТЬ")]
+        RETURN
     }
 
     public class Token
@@ -186,10 +188,11 @@ namespace PycLan
         /*        VARIABLES          */
 
         public static object NOTHING = 0; // need improving i believe
-
+        public static Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {
-            { "пи", Math.PI }
+            { "пи", Math.PI },
+            { "Е", Math.E }
         };
 
         public static bool ContainsVariable(string key)
@@ -202,7 +205,6 @@ namespace PycLan
             if (ContainsVariable(key))
                 return Variables[key];
             return NOTHING;
-            //throw new Exception($"НЕТ ТАКОЙ ПЕРЕМЕННОЙ В ДАННЫЙ МОМЕНТ ХОТЯ БЫ: {key}");
         }
 
         public static void AddVariable(string key, object value)
@@ -211,6 +213,16 @@ namespace PycLan
                 Variables[key] = value;
             else
                 Variables.Add(key, value);
+        }
+
+        public static void Push()
+        {
+            Registers.Push(new Dictionary<string, object>(Variables));
+        }
+
+        public static void Pop()
+        {
+            Variables = Registers.Pop();
         }
 
         /*        FUNCTIONS          */
