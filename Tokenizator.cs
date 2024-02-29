@@ -99,7 +99,7 @@ namespace PycLan
                 }
                 string word = code.Substring(start, position - start).Replace('.', ',');
                 if (dots == 0)
-                    return new Token() { View = word, Value = Convert.ToInt32(word), Type = TokenType.INTEGER };
+                    return new Token() { View = word, Value = Convert.ToInt64(word), Type = TokenType.INTEGER };
                 if (dots == 1)
                     return new Token() { View = word, Value = Convert.ToDouble(word), Type = TokenType.DOUBLE };
                 throw new Exception("МНОГА ТОЧЕК ДЛЯ ЧИСЛА");

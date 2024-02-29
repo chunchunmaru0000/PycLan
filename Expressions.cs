@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Xml.Linq;
 
 namespace PycLan
@@ -46,8 +47,8 @@ namespace PycLan
                 case TokenType.PLUS:
                     return value;
                 case TokenType.MINUS:
-                    if (value is int)
-                        return -(int)value;
+                    if (value is long)
+                        return -(long)value;
                     else 
                         return -(double)value;
                 case TokenType.NOT:
@@ -106,21 +107,21 @@ namespace PycLan
                 case TokenType.PLUS:
                     if (lft is double || rght is double) 
                         return Convert.ToDouble(lft) + Convert.ToDouble(rght);
-                    return (int)lft + (int)rght;
+                    return (long)lft + (long)rght;
                 case TokenType.MINUS:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) - Convert.ToDouble(rght);
-                    return (int)lft - (int)rght;
+                    return (long)lft - (long)rght;
                 case TokenType.MULTIPLICATION:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) * Convert.ToDouble(rght);
-                    return (int)lft * (int)rght;
+                    return (long)lft * (long)rght;
                 case TokenType.DIVISION:
                     if (Convert.ToDouble(rght) != 0)
                     {
                         if (lft is double || rght is double)
                             return Convert.ToDouble(lft) / Convert.ToDouble(rght);
-                        return (int)lft / (int)rght;
+                        return (long)lft / (long)rght;
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
                 case TokenType.POWER:
@@ -129,15 +130,15 @@ namespace PycLan
                             throw new Exception($"НЕЛЬЗЯ ПРИ ВОЗВЕДЕНИИ В СТЕПЕНЬ ОРИЦАТЕЛЬНОГО ЧИСЛА ИСПОЛЬЗОВАТЬ В СТЕПЕНИ НЕ ЦЕЛОЕ ЧИСЛО:\n{lft}/{operation.Type}/{rght}/{left}/{operation}/{right}");
                         else
                             return Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght));
-                    return Convert.ToInt32(Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght)));
+                    return Convert.ToInt64(Math.Pow(Convert.ToDouble(lft), Convert.ToDouble(rght)));
                 case TokenType.MOD:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) % Convert.ToDouble(rght);
-                    return (int)lft % (int)rght;
+                    return (long)lft % (long)rght;
                 case TokenType.DIV:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) / Convert.ToDouble(rght);
-                    return (int)lft / (int)rght;
+                    return (long)lft / (long)rght;
                 default:
                     throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ: {lft} {operation.Type} {rght} | {left} {operation} {right}");
             }
@@ -283,9 +284,9 @@ namespace PycLan
         public object Evaluated()
         {
             object value = Objects.GetVariable(Name);
-            if (value is int || value is bool)
+            if (value is long || value is bool)
             {
-                int temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt32(value);
+                long temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt64(value);
                 switch (Operation.Type)
                 {
                     case TokenType.PLUSPLUS:
@@ -319,9 +320,9 @@ namespace PycLan
         public void Execute()
         {
             object value = Objects.GetVariable(Name);
-            if (value is int || value is bool)
+            if (value is long || value is bool)
             {
-                int temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt32(value);
+                long temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt64(value);
                 switch (Operation.Type)
                 {
                     case TokenType.PLUSPLUS:
@@ -427,6 +428,21 @@ namespace PycLan
         public override string ToString()
         {
             return base.ToString();
+        }
+    }
+
+    public sealed class NowExpression : IExpression
+    {
+        public double Time;
+        public object Evaluated()
+        {
+            Time = (double)DateTime.Now.Ticks / 10000;
+            return Time;
+        }
+
+        public override string ToString()
+        {
+            return $"СЕЙЧАС<{Time}>";
         }
     }
 }

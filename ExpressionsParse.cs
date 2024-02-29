@@ -10,6 +10,8 @@ namespace PycLan
         private IExpression Primary()
         {
             Token current = Current;
+            if (Match(TokenType.NOW))
+                return new NowExpression();
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || Match(TokenType.FUNCTION))
 
             {

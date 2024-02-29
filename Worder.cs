@@ -157,6 +157,9 @@
                     word.Type = TokenType.PROCEDURE;
                     return word;
 
+                case "сейчас":
+                    word.Type = TokenType.NOW;
+                    return word;
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

@@ -38,7 +38,7 @@ namespace PycLan
 
         [StringValue("ЧИСЛО")]
         NUMBER,
-        [StringValue("ЦЕЛОЕ ЧИСЛО32")]
+        [StringValue("ЦЕЛОЕ ЧИСЛО64")]
         INTEGER,
         [StringValue("НЕ ЦЕЛОЕ ЧИСЛО64")]
         DOUBLE,
@@ -151,7 +151,9 @@ namespace PycLan
         [StringValue("ВЕРНУТЬ")]
         RETURN,
         [StringValue("ВЫПОЛНИТЬ ПРОЦЕДУРУ")]
-        PROCEDURE
+        PROCEDURE,
+        [StringValue("СЕЙЧАС")]
+        NOW
     }
 
     public class Token
