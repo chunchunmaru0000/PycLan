@@ -10,10 +10,7 @@ namespace PycLan
         private IExpression Primary()
         {
             Token current = Current;
-            if (Match(TokenType.NOW))
-                return new NowExpression();
-            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || Match(TokenType.FUNCTION))
-
+            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || current.Type == TokenType.FUNCTION)
             {
                 string name = current.View;
                 Consume(TokenType.FUNCTION, TokenType.VARIABLE);
@@ -26,6 +23,8 @@ namespace PycLan
                 }
                 return function;
             }
+            if (Match(TokenType.NOW))
+                return new NowExpression();
             if (Match(TokenType.INPUT))
             {
                 if (Match(TokenType.LEFTSCOB))
