@@ -1,9 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
 
 namespace PycLan
 {
+    public static class TypePrint
+    {
+        public static string Pyc(object value)
+        {
+            switch (value.GetType().ToString())
+            {
+                case "System.String":
+                    return "СТРОКА";
+                case "System.Int64":
+                    return "ЧИСЛО 64";
+                case "System.Double":
+                    return "ЧИСЛО С ТОЧКОЙ 64";
+                case "System.Boolean":
+                    return "ПРАВДИВОСТЬ";
+                case "PycLan.UserFunction":
+                    return "ПОЛЬЗОВАТЕЛЬСКАЯ ФУНКЦИЯ";
+                case "PycLan.Sinus":
+                    return "ФУНКЦИЯ СИНУС";
+                case "PycLan.Cosinus":
+                    return "ФУНКЦИЯ КОСИНУС";
+                case "PycLan.Ceiling":
+                    return "ФУНКЦИЯ ПОТОЛОК";
+                case "PycLan.Floor":
+                    return "ФУНКЦИЯ ЗАЗЕМЬ";
+                case "PycLan.Tan":
+                    return "ФУНКЦИЯ ТАНГЕНС";
+                case "PycLan.FunctionExpression":
+                    return "ФУНКЦИЯ";
+                default:
+                    return value.GetType().ToString();
+                    //throw new Exception($"НЕ ПОМНЮ ЧТО БЫ ДОБАЛЯЛ ТАКОЙ ТИП: <{value.GetType().Name}> У <{value}>");
+            }
+        }
+    }
     public class StringValueAttribute : Attribute
     {
         public string Value { get; }
@@ -162,7 +197,7 @@ namespace PycLan
         public object Value { get; set; }
         public TokenType Type { get; set; }
 
-        public string toString()
+        public override string ToString()
         {
             return $"<{View}> <{Convert.ToString(Value)}> <{Type.GetStringValue()}>"; 
         }
@@ -234,11 +269,16 @@ namespace PycLan
         public static IFunction DO_NOTHING;
         public static IFunction Sinus = new Sinus();
         public static IFunction Cosinus = new Cosinus();
-
+        public static IFunction Ceiling = new Ceiling();
+        public static IFunction Floor = new Floor();
+        public static IFunction Tan = new Tan();
         public static Dictionary<string, IFunction> Functions = new Dictionary<string, IFunction>()
         {
             { "синус", Sinus },
-            { "косинус", Cosinus }
+            { "косинус", Cosinus },
+            { "потолок", Ceiling },
+            { "заземь", Floor },
+            { "тангенс", Tan },
         };
 
         public static bool ContainsFunction(string key)

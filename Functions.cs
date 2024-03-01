@@ -28,8 +28,6 @@ namespace PycLan
 
         public object Execute(params object[] args)
         {
-        //    for(int i = 0; i < ArgsCount(); i++)
-          //      Objects.AddVariable(GetArgName(i), args[i]);
             try
             {
                 Body.Execute();
@@ -74,6 +72,74 @@ namespace PycLan
         public override string ToString()
         {
             return $"КОСИНУС(<>)";
+        }
+    }
+
+    public sealed class Ceiling : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length == 0)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            return Math.Ceiling(Convert.ToDouble(x[0]));
+        }
+
+        public override string ToString()
+        {
+            return $"ПОТОЛОК(<>)";
+        }
+    }
+
+    public sealed class Floor : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length == 0)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            return Math.Floor(Convert.ToDouble(x[0]));
+        }
+
+        public override string ToString()
+        {
+            return $"ЗАЗЕМЬ(<>)";
+        }
+    }
+
+    public sealed class Tan : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length == 0)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            return Math.Tan(Convert.ToDouble(x[0]));
+        }
+
+        public override string ToString()
+        {
+            return $"ТАНГЕНС(<>)";
+        }
+    }
+
+    public sealed class Max : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length == 0)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            if (x[0] is long && x[1] is long)
+                return Math.Max(Convert.ToInt64(x[0]), Convert.ToInt64(x[1]));
+            if (x[0] is long && x[1] is double)
+                return Math.Max(Convert.ToInt64(x[0]), Convert.ToDouble(x[1]));
+            if (x[0] is double && x[1] is long)
+                return Math.Max(Convert.ToDouble(x[0]), Convert.ToInt64(x[1]));
+            if (x[0] is double && x[1] is double)
+                return Math.Max(Convert.ToDouble(x[0]), Convert.ToDouble(x[1]));
+            throw new Exception($"С ДАННЫМИ ТИПАМИ ПЕРЕМЕННЫХ ДАННАЯ ФЕНКЦИЯ НЕВОЗМОЖНА: <{this}> <>");
+        }
+
+        public override string ToString()
+        {
+            return $"НАИБОЛЬШЕЕ(<>)";
         }
     }
 }

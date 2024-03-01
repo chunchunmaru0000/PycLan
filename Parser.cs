@@ -31,7 +31,7 @@ namespace PycLan
         {
             Token current = Current;
             if (Current.Type != type)
-                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type}\nТЕКУЩИЙ: {Current.Type}\nПОЗИЦИЯ: КОМАНДА<{line}> СЛОВО<{position}>");
+                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: <{type.GetStringValue()}>\nТЕКУЩИЙ: <{Current.Type.GetStringValue()}>\nПОЗИЦИЯ: КОМАНДА<{line}> СЛОВО<{position}>");
             position++;
             return current;
         }
@@ -40,7 +40,7 @@ namespace PycLan
         {
             Token current = Current;
             if (Current.Type != type0 && Current.Type != type1)
-                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: {type0} ИЛИ {type1}\nТЕКУЩИЙ: {Current.Type}\nПОЗИЦИЯ: КОМАНДА<{line}> СЛОВО<{position}>");
+                throw new Exception($"ТОКЕН НЕ СОВПАДАЕТ С ОЖИДАЕМЫМ\nОЖИДАЛСЯ: <{type0.GetStringValue()}> ИЛИ <{type1.GetStringValue()}>\nТЕКУЩИЙ: <{Current.Type.GetStringValue()}>\nПОЗИЦИЯ: КОМАНДА<{line}> СЛОВО<{position}>");
             position++;
             return current;
         }
@@ -123,7 +123,7 @@ namespace PycLan
             if (Printble(current.Type))
                 return Printy();
 
-            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.toString()}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");
+            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.ToString()}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");
         }
 
         private IStatement Block()
@@ -142,14 +142,18 @@ namespace PycLan
             return parsed;
         }
 
-        public void Run()
+        public void Run(bool debug = false, bool printVariables = false, bool printFunctionsInDebug = false)
         {
             while (!Match(TokenType.EOF))
             {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 IStatement statement = Statement();
-                Console.WriteLine(statement.ToString());
-              //  PycLang.PrintVariables();
+                if (debug)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine(statement.ToString());
+                }
+                PycLang.PrintVariables(printVariables, printFunctionsInDebug);
+
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 if (!(statement is BlockStatement))
                     statement.Execute();

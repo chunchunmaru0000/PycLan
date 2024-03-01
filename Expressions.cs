@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.Contracts;
-using System.Xml.Linq;
+using System.Linq;
 
 namespace PycLan
 {
@@ -48,7 +46,7 @@ namespace PycLan
                     return value;
                 case TokenType.MINUS:
                     if (value is long)
-                        return -(long)value;
+                        return -Convert.ToInt64(value);
                     else 
                         return -(double)value;
                 case TokenType.NOT:
@@ -107,21 +105,21 @@ namespace PycLan
                 case TokenType.PLUS:
                     if (lft is double || rght is double) 
                         return Convert.ToDouble(lft) + Convert.ToDouble(rght);
-                    return (long)lft + (long)rght;
+                    return Convert.ToInt64(lft) + Convert.ToInt64(rght);
                 case TokenType.MINUS:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) - Convert.ToDouble(rght);
-                    return (long)lft - (long)rght;
+                    return Convert.ToInt64(lft) - Convert.ToInt64(rght);
                 case TokenType.MULTIPLICATION:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) * Convert.ToDouble(rght);
-                    return (long)lft * (long)rght;
+                    return Convert.ToInt64(lft) * Convert.ToInt64(rght);
                 case TokenType.DIVISION:
                     if (Convert.ToDouble(rght) != 0)
                     {
                         if (lft is double || rght is double)
                             return Convert.ToDouble(lft) / Convert.ToDouble(rght);
-                        return (long)lft / (long)rght;
+                        return Convert.ToInt64(lft) / Convert.ToInt64(rght);
                     }
                     throw new Exception("ЧЕРТИЛА НА 0 ДЕЛИШЬ");
                 case TokenType.POWER:
@@ -134,11 +132,11 @@ namespace PycLan
                 case TokenType.MOD:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) % Convert.ToDouble(rght);
-                    return (long)lft % (long)rght;
+                    return Convert.ToInt64(lft) % Convert.ToInt64(rght);
                 case TokenType.DIV:
                     if (lft is double || rght is double)
                         return Convert.ToDouble(lft) / Convert.ToDouble(rght);
-                    return (long)lft / (long)rght;
+                    return Convert.ToInt64(lft) / Convert.ToInt64(rght);
                 default:
                     throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ: {lft} {operation.Type} {rght} | {left} {operation} {right}");
             }
@@ -192,7 +190,7 @@ namespace PycLan
                     case TokenType.OR:
                         return slftl > 0 || srghtl > 0;
                     default:
-                        throw new Exception($"ТАК НЕЛЬЗЯ СРАВНИВАТЬ СТРОКИ: {left}{comparation.toString()}{right}");
+                        throw new Exception($"ТАК НЕЛЬЗЯ СРАВНИВАТЬ СТРОКИ: {left}{comparation.ToString()}{right}");
                 }
             }
             if (!(olft is bool) && !(orght is bool))
@@ -427,7 +425,7 @@ namespace PycLan
 
         public override string ToString()
         {
-            return base.ToString();
+            return $"ФУНКЦИЯ {Name}({string.Join(", ", Args.Select(a => a.ToString()))})";
         }
     }
 
