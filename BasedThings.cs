@@ -33,6 +33,10 @@ namespace PycLan
                     return "ФУНКЦИЯ ТАНГЕНС";
                 case "PycLan.FunctionExpression":
                     return "ФУНКЦИЯ";
+                case "PycLan.Max":
+                    return "ФУНКЦИЯ НАИБОЛЬШЕЕ";
+                case "PycLan.Min":
+                    return "НАИМЕНЬШЕЕ";
                 default:
                     return value.GetType().ToString();
                     //throw new Exception($"НЕ ПОМНЮ ЧТО БЫ ДОБАЛЯЛ ТАКОЙ ТИП: <{value.GetType().Name}> У <{value}>");
@@ -272,6 +276,9 @@ namespace PycLan
         public static IFunction Ceiling = new Ceiling();
         public static IFunction Floor = new Floor();
         public static IFunction Tan = new Tan();
+        public static IFunction Max = new Max();
+        public static IFunction Min = new Min();
+
         public static Dictionary<string, IFunction> Functions = new Dictionary<string, IFunction>()
         {
             { "синус", Sinus },
@@ -279,6 +286,14 @@ namespace PycLan
             { "потолок", Ceiling },
             { "заземь", Floor },
             { "тангенс", Tan },
+            { "макс",  Max },
+            { "максимум",  Max },
+            { "наибольшее",  Max },
+            { "большее",  Max },
+            { "меньшее",  Min },
+            { "мин",  Min },
+            { "наименьшее",  Min },
+            { "минимум",  Min },
         };
 
         public static bool ContainsFunction(string key)

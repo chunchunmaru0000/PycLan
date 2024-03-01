@@ -420,7 +420,10 @@ namespace PycLan
                 Objects.Pop();
                 return result;
             }
-            return function.Execute(args);
+            if (!(function == null))
+                return function.Execute(args);
+            else
+                throw new Exception($"НЕСУЩЕСТВУЮЩАЯ ФУНКЦИЯ ХОТЯ БЫ СЕЙЧАС: <{Name}>");
         }
 
         public override string ToString()
