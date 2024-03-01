@@ -7,22 +7,25 @@ namespace PycLan
 {
     public partial class Parser
     {
+        private IExpression FuncParsy()
+        {
+            string name = Current.View;
+            Consume(TokenType.FUNCTION, TokenType.VARIABLE);
+            Consume(TokenType.LEFTSCOB);
+            FunctionExpression function = new FunctionExpression(name);
+            while (!Match(TokenType.RIGHTSCOB))
+            {
+                function.AddArg(Expression());
+                Match(TokenType.COMMA, TokenType.SEMICOLON);
+            }
+            return function;
+        }
+
         private IExpression Primary()
         {
             Token current = Current;
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || current.Type == TokenType.FUNCTION)
-            {
-                string name = current.View;
-                Consume(TokenType.FUNCTION, TokenType.VARIABLE);
-                Consume(TokenType.LEFTSCOB);
-                FunctionExpression function = new FunctionExpression(name);
-                while (!Match(TokenType.RIGHTSCOB))
-                {
-                    function.AddArg(Expression());
-                    Match(TokenType.COMMA, TokenType.SEMICOLON);
-                }
-                return function;
-            }
+                return FuncParsy();
             if (Match(TokenType.NOW))
                 return new NowExpression();
             if (Match(TokenType.INPUT))
@@ -129,6 +132,11 @@ namespace PycLan
                     IExpression expression = Expression();
                     Match(TokenType.RIGHTSCOB);
                     result = new BinExpression(result, Mul, expression);
+                    continue;
+                }
+                if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || current.Type == TokenType.FUNCTION)
+                {
+                    result = new BinExpression(result, Mul, FuncParsy());
                     continue;
                 }
                 break;
