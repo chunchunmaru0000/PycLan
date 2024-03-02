@@ -35,6 +35,12 @@ namespace PycLan
                     return "ФУНКЦИЯ НАИБОЛЬШЕЕ";
                 case "PycLan.Min":
                     return "НАИМЕНЬШЕЕ";
+                case "System.Collections.Generic.List`1[System.Object]":
+                    return "СПИСОК";
+                case "[System.Collections.Generic.List`1[PycLan.IExpression]]":
+                    return "СПИСОК";
+                case "System.Object[]":
+                    return "СПИСОК";
                 default:
                     return value.GetType().ToString();
                     //throw new Exception($"НЕ ПОМНЮ ЧТО БЫ ДОБАЛЯЛ ТАКОЙ ТИП: <{value.GetType().Name}> У <{value}>");

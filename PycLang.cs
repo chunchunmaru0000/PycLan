@@ -1,7 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.Diagnostics;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace PycLan
 {
@@ -31,15 +31,16 @@ namespace PycLan
             if (printVariablesInDebug)
                 foreach (var variable in Objects.Variables)
                 {
-                    Console.WriteLine($"{variable.Key} = {variable.Value}; тип <<{TypePrint.Pyc(variable.Value)}>>; ");
+                    if (variable.Value.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
+                        Console.WriteLine($"{variable.Key} = [{string.Join(", ", (List<object>)variable.Value)}]; тип <<{TypePrint.Pyc(variable.Value)}>>; ");
+                    else
+                        Console.WriteLine($"{variable.Key} = {variable.Value}; тип <<{TypePrint.Pyc(variable.Value)}>>; ");
                 }
 
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
             if (printFunctionsInDebug)
                 foreach (var function in Objects.Functions)
-                {
                     Console.WriteLine($"{function.Key} = {function.Value}; тип <<{TypePrint.Pyc(function.Value)}>>; ");
-                }
             Console.ResetColor();
         }
 
@@ -74,7 +75,7 @@ namespace PycLan
                 Console.ResetColor();
                 Console.Write("> ");
                 string code = Console.ReadLine() ?? "";
-                switch (code.TrimEnd())
+                switch (code.Trim())
                 {
                     case "Ё ДЕБАГ Ё":
                         Debug = !Debug;

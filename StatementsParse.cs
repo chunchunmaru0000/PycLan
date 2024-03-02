@@ -20,7 +20,20 @@ namespace PycLan
             Token current = Current;
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
-            IStatement result = new AssignStatement(current.View, Expression());
+            IExpression expression = null;
+            if (Match(TokenType.LCUBSCOB))
+            {
+                List<IExpression> items = new List<IExpression>();
+                while (!Match(TokenType.RCUBSCOB))
+                {
+                    items.Add(Expression());
+                    Match(TokenType.COMMA, TokenType.SEMICOLON);
+                }
+                expression = new ListExpression(items);
+            }
+            else
+                expression = Expression();
+            IStatement result = new AssignStatement(current.View, expression);
             Consume(TokenType.SEMICOLON);
             return result;
         }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
-using System.Text.RegularExpressions;
 
 namespace PycLan
 {
@@ -37,16 +35,61 @@ namespace PycLan
             return new StringSliceExpression(slice, from);
         }
 
+        private IExpression Slicy()
+        {
+            string variable = Current.View;
+            Consume(TokenType.VARIABLE);
+            Consume(TokenType.LCUBSCOB);
+            IExpression from = Expression();
+            if (Match(TokenType.COLON))
+            {
+                IExpression to = Expression();
+                Consume(TokenType.RCUBSCOB);
+                return new ListTakeExpression(variable, from, to);
+            }
+        /*    if (Match(TokenType.COMMA, TokenType.SEMICOLON))
+            {
+                List<IExpression> indexes = new List<IExpression>();
+                Consume(TokenType.COMMA, TokenType.SEMICOLON);
+                while(Current.Type != TokenType.RCUBSCOB)
+                {
+                    indexes.Add(Expression());
+                }
+
+            }*/
+            Consume(TokenType.RCUBSCOB);
+            return new ListTakeExpression(variable, from);
+        }
+
+        private IExpression Listy()
+        {
+            Consume(TokenType.LCUBSCOB);
+            List<IExpression> items = new List<IExpression>();
+            while (!Match(TokenType.RCUBSCOB))
+            {
+                items.Add(Expression());
+                Match(TokenType.COMMA, TokenType.SEMICOLON);
+            }
+            return new ListExpression(items);
+        }
+
         private IExpression Primary()
         {
             Token current = Current;
-           // if (current.Type == TokenType.STRING && Get(1).Type == TokenType.LCUBSCOB)
-             //   return StringSlicy();
-            //if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB)
+            if (current.Type == TokenType.STRING && Get(1).Type == TokenType.LCUBSCOB)
+               return StringSlicy();
+            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB)
+                return Slicy();
+
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || current.Type == TokenType.FUNCTION)
                 return FuncParsy();
+
+            if (current.Type == TokenType.LCUBSCOB)
+                return Listy();
+
             if (Match(TokenType.NOW))
                 return new NowExpression();
+
             if (Match(TokenType.INPUT))
             {
                 if (Match(TokenType.LEFTSCOB))
@@ -57,20 +100,26 @@ namespace PycLan
                 }
                 return new InputExpression();
             }
+
             if (Match(TokenType.STRING))
                 return new NumExpression(current.Value);
+
             if (Match(TokenType.WORD_TRUE, TokenType.WORD_FALSE))
                 return new NumExpression(current.Value);
+
             if (Match(TokenType.INTEGER, TokenType.DOUBLE))
                 return new NumExpression(current.Value);
+
             if (Match(TokenType.LEFTSCOB))
             {
                 IExpression result = Expression();
                 Match(TokenType.RIGHTSCOB);
                 return result;
             }
+
             if (Match(TokenType.VARIABLE))
                 return new VariableExpression(current);
+
             if (Match(TokenType.PLUSPLUS, TokenType.MINUSMINUS))
             {
                 string name = Current.View;
@@ -78,6 +127,7 @@ namespace PycLan
                 Consume(TokenType.VARIABLE);
                 return result;
             }
+
             throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: <{current}>\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
         }
 

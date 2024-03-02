@@ -87,6 +87,7 @@ namespace PycLan
         {
             line++;
             Token current = Current;
+
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DO_EQUAL)
                 return Assigny();
 

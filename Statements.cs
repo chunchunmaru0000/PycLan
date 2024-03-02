@@ -40,7 +40,9 @@ namespace PycLan
         public void Execute()
         {
             object value = Expression.Evaluated();
-            if (value is bool)
+            if (value is List<object>)
+                Console.WriteLine($"[{string.Join(", ", (List<object>)value)}]");
+            else if (value is bool)
                 Console.WriteLine((bool)value ? "Истина" : "Ложь");
             else
                 Console.WriteLine(value);

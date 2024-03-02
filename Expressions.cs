@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace PycLan
@@ -21,6 +22,8 @@ namespace PycLan
 
         public override string ToString()
         {
+            if (Value is List<object>)
+                return $"[{string.Join(", ", Value)}]";
             if (Value is bool)
                 return (bool)Value ? "Истина" : "Ложь";
             return Convert.ToString(Value);
@@ -191,7 +194,7 @@ namespace PycLan
                     case TokenType.OR:
                         return slftl > 0 || srghtl > 0;
                     default:
-                        throw new Exception($"ТАК НЕЛЬЗЯ СРАВНИВАТЬ СТРОКИ: {left}{comparation.ToString()}{right}");
+                        throw new Exception($"ТАК НЕЛЬЗЯ СРАВНИВАТЬ СТРОКИ: <{left}> <{comparation}> <{right}>");
                 }
             }
             if (!(olft is bool) && !(orght is bool))
@@ -217,7 +220,7 @@ namespace PycLan
                     case TokenType.OR:
                         return lft != 0 || rght != 0;
                     default:
-                        throw new Exception($"НЕСРАВНЕННЫЕ ЧИСЛА: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
+                        throw new Exception($"НЕСРАВНЕННЫЕ ЧИСЛА: <{lft}> <{comparation.Type.GetStringValue()}> <{rght}> | <{left}> <{comparation}> <{right}>");
                 }
             }
             else if (olft is bool && orght is bool)
@@ -235,10 +238,10 @@ namespace PycLan
                     case TokenType.OR:
                         return lft || rght;
                     default:
-                        throw new Exception($"НЕСРАВНЕННЫЕ УСЛОВИЯ: {lft} {comparation.Type} {rght} | {left}{comparation}{right}");
+                        throw new Exception("НЕСРАВНЕННЫЕ УСЛОВИЯ: <" + (lft ? "Истина" : "Ложь") + $"> <{comparation.Type.GetStringValue()}> <" + (rght ? "Истина" : "Ложь") + $"> | <{left}> <{comparation}> <{right}>");
                 }
             }
-            throw new Exception($"НЕЛЬЗЯ СРАВНИВАТЬ РАЗНЫЕ ТИПЫ: {olft} {comparation.Type} {orght} | {olft.GetType()}{comparation.View}{orght.GetType()}");
+            throw new Exception($"НЕЛЬЗЯ СРАВНИВАТЬ РАЗНЫЕ ТИПЫ: <{left}> <{comparation}> <{right}>");
         }
 
         public override string ToString()
@@ -265,6 +268,8 @@ namespace PycLan
 
         public override string ToString()
         {
+            if (Value is List<object>)
+                return $"[{string.Join(", ", Value)}]";
             return $"{Name} ИМЕЕТ ЗНАЧЕНИЕ {Value}";
         }
     }
@@ -470,23 +475,92 @@ namespace PycLan
 
         public object Evaluated()
         {
-            int length = Slice.Length;
-            if (From < 0)
-                From = length - From;
-            if (To.HasValue)
+            try
             {
-                if (To < 0)
-                    To = length - To;
-                Console.WriteLine(From);
-                Console.WriteLine(To);
-                return Slice.Substring(From, (int)To - From - 1);
+                int length = Slice.Length;
+                if (From < 0)
+                    From = length + From + 1;
+                if (To.HasValue)
+                {
+                    if (To < 0)
+                        To = length + To + 1;
+                    return Slice.Substring(From, (int)To - From);
+                }
+                return Slice[From];
             }
-            return Slice[From];
+            catch (Exception)
+            {
+                throw new Exception($"НЕКОРРЕКТНЫЕ ИНДЕКСЫ: ОТ <{From}> ДО <{To}> С ДЛИНОЙ <{(int)To - From}>");
+            }
         }
 
         public override string ToString()
         {
             return $"{Slice}[{From}" + (To.HasValue ? ":" + To.ToString() : "") + "]";
+        }
+    }
+
+    public sealed class ListTakeExpression : IExpression
+    {
+        public string Arr;
+        public int From;
+        public int? To = null;
+
+        public ListTakeExpression(string arr, IExpression from)
+        {
+            Arr = arr;
+            From = Convert.ToInt32(from.Evaluated());
+
+        }
+
+        public ListTakeExpression(string arr, IExpression from, IExpression to)
+        {
+            Arr = arr;
+            From = Convert.ToInt32(from.Evaluated());
+            To = Convert.ToInt32(to.Evaluated());
+        }
+
+        public object Evaluated()
+        {
+            List<object> arr = (List<object>)Objects.GetVariable(Arr);
+            int length = arr.Count;
+            if (From < 0)
+                From = length + From + 1;
+            if (To.HasValue)
+            {
+                if (To < 0)
+                    To = length + To + 1;
+                return arr.Skip(From).Take((int)To - From).ToList();
+            }
+            return arr[From];
+        }
+
+        public override string ToString()
+        {
+            return $"{Arr}[{From}" + (To.HasValue ? ":" + To.ToString() : "") + "]";
+        }
+    }
+
+    public sealed class ListExpression : IExpression
+    {
+        public List<IExpression> Items;
+
+        public ListExpression(List<IExpression> items)
+        {
+            Items = items;
+        }
+
+        public object Evaluated()
+        {
+            List<object> items = new List<object>(Items.Count);
+            foreach (IExpression expression in Items)
+                items.Add(expression.Evaluated());
+            return items;
+        }
+
+        public override string ToString()
+        {
+            return "СПИСОК";
         }
     }
 }
