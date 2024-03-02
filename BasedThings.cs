@@ -196,7 +196,11 @@ namespace PycLan
         [StringValue("ВЫПОЛНИТЬ ПРОЦЕДУРУ")]
         PROCEDURE,
         [StringValue("СЕЙЧАС")]
-        NOW
+        NOW,
+        [StringValue("ЧИСТКА")]
+        CLEAR,
+        [StringValue("СОН")]
+        SLEEP
     }
 
     public class Token

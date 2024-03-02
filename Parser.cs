@@ -118,6 +118,12 @@ namespace PycLan
             if (Match(TokenType.WORD_FOR))
                 return Fory();
 
+            if (Match(TokenType.CLEAR))
+                return Cleary();
+
+            if (Match(TokenType.SLEEP))
+                return Sleepy();
+
             if (Match(TokenType.WORD_PRINT))
                 return Printy();
 

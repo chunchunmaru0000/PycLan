@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PycLan
 {
@@ -20,7 +21,7 @@ namespace PycLan
             Token current = Current;
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
-            IExpression expression = null;
+            IExpression expression;
             if (Match(TokenType.LCUBSCOB))
             {
                 List<IExpression> items = new List<IExpression>();
@@ -34,7 +35,7 @@ namespace PycLan
             else
                 expression = Expression();
             IStatement result = new AssignStatement(current.View, expression);
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON);
             return result;
         }
 
@@ -70,13 +71,12 @@ namespace PycLan
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
             IStatement definition = new AssignStatement(current.View, Expression());
-            Consume(TokenType.SEMICOLON, TokenType.COMMA);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
 
             IExpression condition = Expression();
-            Consume(TokenType.SEMICOLON, TokenType.COMMA);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
 
             current = Current;
-
             IStatement alter = null;
             if (Match(TokenType.VARIABLE))
             {
@@ -92,8 +92,8 @@ namespace PycLan
                 alter = new IncDecBefore(operation, name);
             }
 
-            IStatement statement = OneOrBlock();
-            return new ForStatement(definition, condition, alter, statement);
+            IStatement body = OneOrBlock();
+            return new ForStatement(definition, condition, alter, body);
         }
 
         public IStatement BeforeIncDecy()
@@ -149,6 +149,21 @@ namespace PycLan
             IExpression expression = Expression();
             Consume(TokenType.SEMICOLON);
             return new ProcedureStatement(expression);
+        }
+
+        public IStatement Cleary()
+        {
+            Consume(TokenType.SEMICOLON);
+            return new ClearStatement();
+        }
+
+        public IStatement Sleepy()
+        {
+            Consume(TokenType.LEFTSCOB);
+            int ms = Convert.ToInt32(Expression().Evaluated());
+            Consume(TokenType.RIGHTSCOB);
+            Consume(TokenType.SEMICOLON);
+            return new SleepStatement(ms);
         }
     }
 }

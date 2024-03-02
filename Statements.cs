@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using System.Threading;
 
 namespace PycLan
 {
@@ -41,11 +41,29 @@ namespace PycLan
         {
             object value = Expression.Evaluated();
             if (value is List<object>)
-                Console.WriteLine($"[{string.Join(", ", (List<object>)value)}]");
+                Console.WriteLine(ListString((List<object>)value));
             else if (value is bool)
                 Console.WriteLine((bool)value ? "Истина" : "Ложь");
             else
                 Console.WriteLine(value);
+        }
+
+        public static string ListString(List<object> list)
+        {
+            string text = "[";
+            foreach (object item in list)
+            {
+                if (item is List<object>)
+                    text += ListString((List<object>)item);
+                else if (item is bool)
+                    text += (bool)item ? "Истина" : "Ложь";
+                else
+                    text += Convert.ToString(item);
+
+                if (item != list.Last())
+                    text += ", ";
+            }
+            return text + ']';
         }
 
         public override string ToString()
@@ -277,6 +295,39 @@ namespace PycLan
         public override string ToString()
         {
             return $"ВЫПОЛНИТЬ ПРЕЦЕДУРУ {Function}";
+        }
+    }
+
+    public sealed class ClearStatement : IStatement
+    {
+        public void Execute()
+        {
+            Console.Clear();
+        }
+
+        public override string ToString()
+        {
+            return "ЧИСТКА КОНСОЛИ";
+        }
+    }
+
+    public sealed class SleepStatement : IStatement
+    {
+        public int Ms;
+
+        public SleepStatement(int ms)
+        {
+            Ms = ms;
+        }
+
+        public void Execute()
+        {
+            Thread.Sleep(Ms);
+        }
+
+        public override string ToString()
+        {
+            return $"СОН({Ms})";
         }
     }
 }

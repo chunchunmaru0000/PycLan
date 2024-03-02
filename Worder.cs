@@ -160,6 +160,12 @@
                 case "сейчас":
                     word.Type = TokenType.NOW;
                     return word;
+                case "чистка":
+                    word.Type = TokenType.CLEAR;
+                    return word;
+                case "сон":
+                    word.Type = TokenType.SLEEP;
+                    return word;
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

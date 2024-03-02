@@ -10,9 +10,9 @@ namespace PycLan
         public static bool Tokens = false;
         public static bool PrintVariablesInDebug = false;
         public static bool PrintFunctionsInDebug = false;
-        public static bool PrintVariablesAfterDebug = true;
+        public static bool PrintVariablesAfterDebug = false;//
         public static bool PrintFunctionsAfterDebug = false;
-        public static bool Debug = true;
+        public static bool Debug = true;//
         public static bool TimePrint = true;
         public static void LogTokens(ref Token[] tokens)
         {
@@ -32,7 +32,7 @@ namespace PycLan
                 foreach (var variable in Objects.Variables)
                 {
                     if (variable.Value.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
-                        Console.WriteLine($"{variable.Key} = [{string.Join(", ", (List<object>)variable.Value)}]; тип <<{TypePrint.Pyc(variable.Value)}>>; ");
+                        Console.WriteLine($"{variable.Key} = {PrintStatement.ListString((List<object>)variable.Value)}; тип <<{TypePrint.Pyc(variable.Value)}>>; ");
                     else
                         Console.WriteLine($"{variable.Key} = {variable.Value}; тип <<{TypePrint.Pyc(variable.Value)}>>; ");
                 }

@@ -21,8 +21,12 @@ namespace PycLan
 
         private IExpression StringSlicy()
         {
-            string slice = Current.View;
-            Consume(TokenType.STRING);
+            string slice;
+            if (Current.Type == TokenType.STRING)
+                slice = Current.View;
+            else
+                slice = Convert.ToString(Objects.GetVariable(Current.View));
+            Consume(TokenType.STRING, TokenType.VARIABLE);
             Consume(TokenType.LCUBSCOB);
             IExpression from = Expression();
             if (Match(TokenType.COLON))
@@ -78,6 +82,9 @@ namespace PycLan
             Token current = Current;
             if (current.Type == TokenType.STRING && Get(1).Type == TokenType.LCUBSCOB)
                return StringSlicy();
+            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB && Objects.ContainsVariable(current.View) && Objects.GetVariable(current.View) is string)
+                return StringSlicy();
+
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB)
                 return Slicy();
 
