@@ -21,9 +21,28 @@ namespace PycLan
             return function;
         }
 
+        private IExpression StringSlicy()
+        {
+            string slice = Current.View;
+            Consume(TokenType.STRING);
+            Consume(TokenType.LCUBSCOB);
+            IExpression from = Expression();
+            if (Match(TokenType.COLON))
+            {
+                IExpression to = Expression();
+                Consume(TokenType.RCUBSCOB);
+                return new StringSliceExpression(slice, from, to);
+            }
+            Consume(TokenType.RCUBSCOB);
+            return new StringSliceExpression(slice, from);
+        }
+
         private IExpression Primary()
         {
             Token current = Current;
+           // if (current.Type == TokenType.STRING && Get(1).Type == TokenType.LCUBSCOB)
+             //   return StringSlicy();
+            //if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB)
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || current.Type == TokenType.FUNCTION)
                 return FuncParsy();
             if (Match(TokenType.NOW))
@@ -59,17 +78,28 @@ namespace PycLan
                 Consume(TokenType.VARIABLE);
                 return result;
             }
-            throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: <{current.ToString()}>\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
+            throw new Exception($"НЕВОЗМОЖНОЕ МАТЕМАТИЧЕСКОЕ ВЫРАЖЕНИЕ: <{current}>\nПОЗИЦИЯ: ЛИНИЯ<{line}> СИМВОЛ<{position}>");
         }
 
         private IExpression Unary()
         {
             Token current = Current;
+            int sign = -1;
             if (Match(TokenType.NOT))
-                return new UnaryExpression(current, Primary());
-            if (Match(TokenType.PLUS))
-                return new NumExpression(current.Value);
-            if (Match(TokenType.MINUS))
+            {
+                while (true)
+                {
+                    current = Current;
+                    if (Match(TokenType.NOT))
+                    {
+                        sign *= -1;
+                        continue;
+                    }
+                    break;
+                }
+                return sign < 0 ? new UnaryExpression(current, Primary()) : Primary();
+            }
+            if (Match(TokenType.MINUS, TokenType.PLUS))
                 return new UnaryExpression(current, Primary());
             return Primary();
         }
@@ -77,9 +107,9 @@ namespace PycLan
         private IExpression Powy()
         {
             IExpression result = Unary();
-            Token current = Current;
             while (true)
             {
+                Token current = Current;
                 if (Match(TokenType.POWER))
                 {
                     result = new BinExpression(result, current, Unary());
@@ -93,9 +123,9 @@ namespace PycLan
         private IExpression Mody()
         {
             IExpression result = Powy();
-            Token current = Current;
             while (true)
             {
+                Token current = Current;
                 if (Match(TokenType.MOD) || Match(TokenType.DIV))
                 {
                     result = new BinExpression(result, current, Powy());
@@ -147,9 +177,9 @@ namespace PycLan
         private IExpression Addity()
         {
             IExpression result = Muly();
-            Token current = Current;
             while (true)
             {
+                Token current = Current;
                 if (Match(TokenType.PLUS) || Match(TokenType.MINUS))
                 {
                     result = new BinExpression(result, current, Muly());
@@ -163,9 +193,9 @@ namespace PycLan
         private IExpression Booly()
         {
             IExpression result = Addity();
-            Token current = Current;
             while (true)
             {
+                Token current = Current;
                 if (Match(TokenType.EQUALITY, TokenType.NOTEQUALITY))
                 {
                     result = new CmpExpression(result, current, Addity());
@@ -189,9 +219,9 @@ namespace PycLan
         private IExpression Andy()
         {
             IExpression result = Booly();
-            Token current = Current;
             while (true)
             {
+                Token current = Current;
                 if (Match(TokenType.AND))
                 {
                     result = new CmpExpression(result, current, Booly());
@@ -204,9 +234,9 @@ namespace PycLan
         private IExpression Ory()
         {
             IExpression result = Andy();
-            Token current = Current;
             while (true)
             {
+                Token current = Current;
                 if (Match(TokenType.OR))
                 {
                     result = new CmpExpression(result, current, Andy());

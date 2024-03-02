@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -444,6 +445,48 @@ namespace PycLan
         public override string ToString()
         {
             return $"СЕЙЧАС<{Time}>";
+        }
+    }
+
+    public sealed class StringSliceExpression : IExpression
+    {
+        public string Slice;
+        public int From;
+        public int? To = null;
+
+        public StringSliceExpression(string slice, IExpression from)
+        {
+            Slice = slice;
+            From = Convert.ToInt32(from.Evaluated());
+
+        }
+
+        public StringSliceExpression(string slice, IExpression from, IExpression to)
+        {
+            Slice = slice;
+            From = Convert.ToInt32(from.Evaluated());
+            To = Convert.ToInt32(to.Evaluated());
+        }
+
+        public object Evaluated()
+        {
+            int length = Slice.Length;
+            if (From < 0)
+                From = length - From;
+            if (To.HasValue)
+            {
+                if (To < 0)
+                    To = length - To;
+                Console.WriteLine(From);
+                Console.WriteLine(To);
+                return Slice.Substring(From, (int)To - From - 1);
+            }
+            return Slice[From];
+        }
+
+        public override string ToString()
+        {
+            return $"{Slice}[{From}" + (To.HasValue ? ":" + To.ToString() : "") + "]";
         }
     }
 }
