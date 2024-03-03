@@ -21,22 +21,25 @@ namespace PycLan
             Token current = Current;
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
-            IExpression expression;
-            if (Match(TokenType.LCUBSCOB))
-            {
-                List<IExpression> items = new List<IExpression>();
-                while (!Match(TokenType.RCUBSCOB))
-                {
-                    items.Add(Expression());
-                    Match(TokenType.SEMICOLON, TokenType.COMMA);
-                }
-                expression = new ListExpression(items);
-            }
-            else
-                expression = Expression();
+            IExpression expression = Expression();
             IStatement result = new AssignStatement(current, expression);
             Match(TokenType.SEMICOLON, TokenType.COMMA);
             return result;
+        }
+
+        private IStatement ItemAssigny()
+        {
+            Token variable = Current;
+            Consume(TokenType.VARIABLE);
+
+            Consume(TokenType.LCUBSCOB);
+            IExpression index = Expression();
+            Consume(TokenType.RCUBSCOB);
+
+            Consume(TokenType.DO_EQUAL);
+            IExpression value = Expression();
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            return new ItemAssignStatement(variable, index, value);
         }
 
         private IStatement Printy()

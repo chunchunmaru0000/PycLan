@@ -331,4 +331,33 @@ namespace PycLan
             return $"СОН({Ms})";
         }
     }
+
+    public sealed class ItemAssignStatement : IStatement
+    {
+        public Token Variable;
+        public IExpression Index;
+        public IExpression Expression;
+
+        public ItemAssignStatement(Token variable, IExpression index, IExpression expression)
+        {
+            Variable = variable;
+            Index = index;
+            Expression = expression;
+        }
+
+        public void Execute()
+        {
+            string name = Variable.View;
+            int index = Convert.ToInt32(Index.Evaluated());
+            object value = Expression.Evaluated();
+            List<object> list = (List<object>)Objects.GetVariable(name);
+            list[index] = value;
+            Objects.AddVariable(name, list);
+        }
+
+        public override string ToString()
+        {
+            return $"{Variable.View}[{Index.Evaluated()}] = {Expression.Evaluated()};";
+        }
+    }
 }

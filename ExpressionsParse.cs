@@ -42,7 +42,7 @@ namespace PycLan
 
             }*/
             Consume(TokenType.RCUBSCOB);
-            return new ListTakeExpression(sliced, from);
+            return new ListTakeExpression(sliced, from, null);
         }
 
         private IExpression Listy()

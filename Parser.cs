@@ -90,14 +90,16 @@ namespace PycLan
 
             if (current.Type == TokenType.VARIABLE)
             {
-               // if (Get(1).Type == TokenType.LCUBSCOB)
-                 //   return ItemAssigny();
+                Token next = Get(1);
                 
-                if (Get(1).Type == TokenType.DO_EQUAL)
+                if (next.Type == TokenType.DO_EQUAL)
                     return Assigny();
 
-                if (Get(1).Type == TokenType.ARROW)
+                if (next.Type == TokenType.ARROW)
                     return Functiony();
+
+                if (next.Type == TokenType.LCUBSCOB)
+                    return ItemAssigny();
             }
 
             if (current.Type == TokenType.PLUSPLUS || current.Type == TokenType.MINUSMINUS && Get(1).Type == TokenType.VARIABLE)

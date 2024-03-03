@@ -377,7 +377,12 @@ namespace PycLan
 
         public object Evaluated()
         {
-            Console.Write(Message.Evaluated().ToString()??"");
+            string message;
+            if (Message != null)
+                message = Message.Evaluated().ToString();
+            else
+                message = "";
+            Console.Write(message);
             return Console.ReadLine();
         }
 
@@ -458,41 +463,40 @@ namespace PycLan
     public sealed class ListTakeExpression : IExpression
     {
         public Token Arr;
-        public int From;
-        public int? To = null;
-
-        public ListTakeExpression(Token arr, IExpression from)
-        {
-            Arr = arr;
-            From = Convert.ToInt32(from.Evaluated());
-
-        }
+        public IExpression From;
+        public IExpression To = null;
 
         public ListTakeExpression(Token arr, IExpression from, IExpression to)
         {
             Arr = arr;
-            From = Convert.ToInt32(from.Evaluated());
-            To = Convert.ToInt32(to.Evaluated());
+            From = from;
+            To = to;
         }
 
         public string SliceString(string Slice)
         {
             try
             {
+                int from = Convert.ToInt32(From.Evaluated());
+                int to = 0;
+                if (To != null)
+                    to = Convert.ToInt32(To.Evaluated());
                 int length = Slice.Length;
-                if (From < 0)
-                    From = length + From + 1;
-                if (To.HasValue)
+                if (from < 0)
+                    from = length + from + 1;
+                if (To != null)
                 {
-                    if (To < 0)
-                        To = length + To + 1;
-                    return Slice.Substring(From, (int)To - From);
+                    if (to < 0)
+                        to = length + to + 1;
+                    return Slice.Substring(from, to - from);
                 }
-                return Slice[From] + "";
+                return Slice[from] + "";
             }
             catch (Exception)
             {
-                throw new Exception($"НЕКОРРЕКТНЫЕ ИНДЕКСЫ: ОТ <{From}> ДО <{To}> С ДЛИНОЙ <{(int)To - From}>");
+                int from = Convert.ToInt32(From.Evaluated());
+                int to = Convert.ToInt32(To.Evaluated());
+                throw new Exception($"НЕКОРРЕКТНЫЕ ИНДЕКСЫ: ОТ <{from}> ДО <{to}> С ДЛИНОЙ <{to - from}>");
             }
         }
 
@@ -502,26 +506,32 @@ namespace PycLan
                 return SliceString(Arr.View);
 
             object sliced = Objects.GetVariable(Arr.View);
-
             if (sliced is string)
                 return SliceString(Convert.ToString(sliced));
 
+            int from = Convert.ToInt32(From.Evaluated());
+            int to = 0;
+            if (To != null)
+                to = Convert.ToInt32(To.Evaluated());
             List<object> arr = (List<object>)sliced;
+
             int length = arr.Count;
-            if (From < 0)
-                From = length + From + 1;
-            if (To.HasValue)
+            if (from < 0)
+                from = length + from + 1;
+            if (To != null)
             {
-                if (To < 0)
-                    To = length + To + 1;
-                return arr.Skip(From).Take((int)To - From).ToList();
+                if (to < 0)
+                    to = length + to + 1;
+                return arr.Skip(from).Take(to - from).ToList();
             }
-            return arr[From];
+            return arr[from];
         }
 
         public override string ToString()
         {
-            return $"{Arr.View}[{From}" + (To.HasValue ? ":" + To.ToString() : "") + "]";
+            int from = Convert.ToInt32(From.Evaluated());
+            int to = Convert.ToInt32(To.Evaluated());
+            return $"{Arr.View}[{from}" + to??"" + "]";
         }
     }
 
