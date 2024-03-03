@@ -11,6 +11,8 @@ namespace PycLan
             {
                 case "System.String":
                     return "СТРОКА";
+                case "System.Int32":
+                    return "ЧИСЛО 32 ???";
                 case "System.Int64":
                     return "ЧИСЛО 64";
                 case "System.Double":
@@ -105,6 +107,14 @@ namespace PycLan
         MOD,
         [StringValue("СТЕПЕНЬ")]
         POWER,
+        [StringValue("+=")]
+        PLUSEQ,
+        [StringValue("-=")]
+        MINUSEQ,
+        [StringValue("*=")]
+        MULEQ,
+        [StringValue("/=")]
+        DIVEQ,
 
         //cmp
         [StringValue("РАВЕН")]
@@ -167,6 +177,8 @@ namespace PycLan
         QUOTE,
         [StringValue("ТОЧКА")]
         DOT,
+        [StringValue("ЗНАК ВОПРОСА")]
+        QUESTION,
 
         //words types
         [StringValue("ЕСЛИ")]
@@ -238,7 +250,7 @@ namespace PycLan
     {
         /*        VARIABLES          */
 
-        public static object NOTHING = 0; // need improving i believe
+        public static object NOTHING = (long)0; // need improving i believe
         public static Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {

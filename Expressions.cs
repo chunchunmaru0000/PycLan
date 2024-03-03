@@ -109,6 +109,17 @@ namespace PycLan
                 case TokenType.PLUS:
                     if (lft is double || rght is double) 
                         return Convert.ToDouble(lft) + Convert.ToDouble(rght);
+                    if (lft is List<object>)
+                        if (rght is List<object>)
+                        {
+                            ((List<object>)lft).AddRange((List<object>)rght);
+                            return lft;
+                        }
+                        else
+                        {
+                            ((List<object>)lft).Add(rght);
+                            return lft;
+                        }
                     return Convert.ToInt64(lft) + Convert.ToInt64(rght);
                 case TokenType.MINUS:
                     if (lft is double || rght is double)
@@ -142,7 +153,7 @@ namespace PycLan
                         return Convert.ToDouble(lft) / Convert.ToDouble(rght);
                     return Convert.ToInt64(lft) / Convert.ToInt64(rght);
                 default:
-                    throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ: {lft} {operation.Type} {rght} | {left} {operation} {right}");
+                    throw new Exception($"НЕПОДДЕРЖИВАЕМАЯ БИНАРНАЯ ОПЕРАЦИЯ: <{lft}> <{operation.Type.GetStringValue()}> <{rght}> | <{left}> <{operation}> <{right}>");
             }
         }
 
@@ -247,6 +258,34 @@ namespace PycLan
         public override string ToString()
         {
             return $"{left} {comparation.View} {right}";
+        }
+    }
+
+    public sealed class ShortIfExpression : IExpression
+    {
+        IExpression Condition;
+        IExpression Pravda;
+        IExpression Nepravda;
+
+        public ShortIfExpression(IExpression condition, IExpression pravda, IExpression nepravda)
+        {
+            Condition = condition;
+            Pravda = pravda;
+            Nepravda = nepravda;
+        }
+
+        public object Evaluated()
+        {
+            bool condition = Convert.ToBoolean(Condition.Evaluated());
+            if (condition)
+                return Pravda.Evaluated();
+            else
+                return Nepravda.Evaluated();
+        }
+
+        public override string ToString()
+        {
+            return $"({Condition} ? {Pravda} : {Nepravda})";
         }
     }
 

@@ -27,6 +27,17 @@ namespace PycLan
             return result;
         }
 
+        private IStatement OpAssigny()
+        {
+            Token variable = Current;
+            Consume(TokenType.VARIABLE);
+            Token operation = Current;
+            Consume(operation.Type);
+            IExpression expression = Expression();
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            return new OperationAssignStatement(variable, operation, expression);
+        }
+
         private IStatement ItemAssigny()
         {
             Token variable = Current;

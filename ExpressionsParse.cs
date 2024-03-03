@@ -33,11 +33,11 @@ namespace PycLan
             }
         /*    if (Match(TokenType.COMMA, TokenType.SEMICOLON))
             {
-                List<IExpression> indexes = new List<IExpression>();
+                List<IExpression> indices = new List<IExpression>();
                 Consume(TokenType.COMMA, TokenType.SEMICOLON);
                 while(Current.Type != TokenType.RCUBSCOB)
                 {
-                    indexes.Add(Expression());
+                    indices.Add(Expression());
                 }
 
             }*/
@@ -55,6 +55,22 @@ namespace PycLan
                 Match(TokenType.COMMA, TokenType.SEMICOLON);
             }
             return new ListExpression(items);
+        }
+
+        private IExpression Scoby()
+        {
+            IExpression result = Expression();
+            if (Match(TokenType.RIGHTSCOB))
+                return result;
+            if (Match(TokenType.QUESTION))
+            {
+                IExpression pravda = Expression();
+                Consume(TokenType.COLON);
+                IExpression nepravda = Expression();
+                Consume(TokenType.RIGHTSCOB);
+                return new ShortIfExpression(result, pravda, nepravda);
+            }
+            throw new NotImplementedException($"НЕВЕРНЫЙ СИНТАКСИС ГДЕ-ТО РЯДОМ С: {result}");
         }
 
         private IExpression Primary()
@@ -96,11 +112,7 @@ namespace PycLan
                 return new NumExpression(current);
 
             if (Match(TokenType.LEFTSCOB))
-            {
-                IExpression result = Expression();
-                Match(TokenType.RIGHTSCOB);
-                return result;
-            }
+                return Scoby();
 
             if (Match(TokenType.VARIABLE))
                 return new VariableExpression(current);

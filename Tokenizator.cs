@@ -134,6 +134,11 @@ namespace PycLan
                         Next();
                         return new Token() { View = "//", Value = null, Type = TokenType.DIV };
                     }
+                    if (Current == '=')
+                    {
+                        Next();
+                        return new Token() { View = "/=", Value = null, Type = TokenType.DIVEQ };
+                    }
                     return new Token() { View = "/", Value = null, Type = TokenType.DIVISION };
                 case '!':
                     Next();
@@ -150,6 +155,11 @@ namespace PycLan
                         Next();
                         return new Token() { View = "**", Value = null, Type = TokenType.POWER };
                     }
+                    if (Current == '=')
+                    {
+                        Next();
+                        return new Token() { View = "*=", Value = null, Type = TokenType.MULEQ };
+                    }
                     return new Token() { View = "*", Value = null, Type = TokenType.MULTIPLICATION };
                 case '+':
                     Next();
@@ -158,6 +168,11 @@ namespace PycLan
                         Next();
                         return new Token() { View = "++", Value = null, Type = TokenType.PLUSPLUS };
                     }
+                    if (Current == '=')
+                    {
+                        Next();
+                        return new Token() { View = "+=", Value = null, Type = TokenType.PLUSEQ };
+                    }
                     return new Token() { View = "+", Value = null, Type = TokenType.PLUS };
                 case '-':
                     Next();
@@ -165,6 +180,11 @@ namespace PycLan
                     {
                         Next();
                         return new Token() { View = "--", Value = null, Type = TokenType.MINUSMINUS };
+                    }
+                    if (Current == '=')
+                    {
+                        Next();
+                        return new Token() { View = "-=", Value = null, Type = TokenType.MINUSEQ };
                     }
                     return new Token() { View = "-", Value = null, Type = TokenType.MINUS };
                 case '<':
@@ -226,6 +246,9 @@ namespace PycLan
                 case ':':
                     Next();
                     return new Token() { View = ":", Value = null, Type = TokenType.COLON };
+                case '?':
+                    Next();
+                    return new Token() { View = "?", Value = null, Type = TokenType.QUESTION };
                 default:
                     throw new Exception("НЕ СУЩЕСТВУЮЩИЙ СИМВОЛ В ДАННОМ ЯЗЫКЕ");
             }

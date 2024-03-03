@@ -95,6 +95,9 @@ namespace PycLan
                 if (next.Type == TokenType.DO_EQUAL)
                     return Assigny();
 
+                if (next.Type == TokenType.PLUSEQ || next.Type == TokenType.MINUSEQ || next.Type == TokenType.MULEQ || next.Type == TokenType.DIVEQ)
+                    return OpAssigny();
+
                 if (next.Type == TokenType.ARROW)
                     return Functiony();
 

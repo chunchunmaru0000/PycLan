@@ -360,4 +360,84 @@ namespace PycLan
             return $"{Variable.View}[{Index.Evaluated()}] = {Expression.Evaluated()};";
         }
     }
+
+    public sealed class OperationAssignStatement : IStatement
+    {
+        public Token Variable;
+        public Token Operation;
+        public IExpression Expression;
+
+        public OperationAssignStatement(Token variable, Token operation, IExpression expression)
+        {
+            Variable = variable;
+            Operation = operation;
+            Expression = expression;
+        }
+
+        public void Execute()
+        {
+            string name = Variable.View;
+            object value = Expression.Evaluated();
+            object variable = Objects.GetVariable(name);
+            object result = null;
+            switch (Operation.Type)
+            {
+                case TokenType.PLUSEQ:
+                    if (value is bool)
+                    {
+                        if (variable is long)
+                            result = Convert.ToInt64(variable) + ((bool)value ? 1 : 0);
+                        else if (variable is double)
+                            result = Convert.ToDouble(variable) + ((bool)value ? 1 : 0);
+                        else if (variable is string)
+                            result = Convert.ToString(variable) + ((bool)value ? 1 : 0);
+                    }
+                    else if(variable is double || value is double)
+                        result = Convert.ToDouble(variable) + Convert.ToDouble(value);
+                    else if (variable is string || value is string)
+                        result = Convert.ToString(variable) + Convert.ToString(value);
+                    else if (variable is long)
+                        result = Convert.ToInt64(variable) + Convert.ToInt64(value);
+                    else if (variable is List<object>)
+                    {
+                        if (value is List<object>) 
+                            ((List<object>)variable).AddRange((List<object>)value);
+                        else
+                            ((List<object>)variable).Add(value);
+                        result = variable;
+                    }
+                    else throw new Exception($"НЕДОПУСТИМОЕ ДЕЙСТВИЕ МЕЖДУ: <{variable}>({TypePrint.Pyc(variable)}) И <{value}>({TypePrint.Pyc(value)})");
+                    break;
+                case TokenType.MINUSEQ:
+                    if (variable is double || value is double)
+                        result = Convert.ToDouble(variable) - Convert.ToDouble(value);
+                    else if (variable is string || value is string)
+                        result = Convert.ToString(variable).Replace(Convert.ToString(value), "");
+                    else if (variable is long)
+                        result = Convert.ToInt64(variable) - Convert.ToInt64(value);
+                    else throw new Exception($"НЕДОПУСТИМОЕ ДЕЙСТВИЕ МЕЖДУ: <{variable}>({TypePrint.Pyc(variable)}) И <{value}>({TypePrint.Pyc(value)})");
+                    break;
+                case TokenType.MULEQ:
+                    if (variable is double || value is double)
+                        result = Convert.ToDouble(variable) * Convert.ToDouble(value);
+                    else if (variable is long)
+                        result = Convert.ToInt64(variable) * Convert.ToInt64(value);
+                    else throw new Exception($"НЕДОПУСТИМОЕ ДЕЙСТВИЕ МЕЖДУ: <{variable}>({TypePrint.Pyc(variable)}) И <{value}>({TypePrint.Pyc(value)})");
+                    break;
+                case TokenType.DIVEQ:
+                    if (variable is double || value is double || variable is long || value is long)
+                        result = Convert.ToDouble(variable) / Convert.ToDouble(value);
+                    else throw new Exception($"НЕДОПУСТИМОЕ ДЕЙСТВИЕ МЕЖДУ: <{variable}>({TypePrint.Pyc(variable)}) И <{value}>({TypePrint.Pyc(value)})");
+                    break;
+                default:
+                    throw new Exception($"НЕ МОЖЕТ БЫТЬ: <{name}> <{variable}> <{value}> <{Operation.View}>");
+            }
+            Objects.AddVariable(name, result);
+        }
+
+        public override string ToString()
+        {
+            return $"{Variable.View} {Operation.View} {Expression}";
+        }
+    }
 }
