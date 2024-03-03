@@ -61,6 +61,10 @@ namespace PycLan
                                         Next();
                                         buffer += '\t';
                                         break;
+                                    case '\\':
+                                        Next();
+                                        buffer += '\\';
+                                        break;
                                     default:
                                         Next();
                                         break;

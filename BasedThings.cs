@@ -214,7 +214,9 @@ namespace PycLan
         [StringValue("СОН")]
         SLEEP,
         [StringValue("РАЗДЕЛ")]
-        SPLIT
+        SPLIT,
+        [StringValue("ВЫЧИТАТЬ")]
+        READALL
     }
 
     public class Token

@@ -59,7 +59,9 @@ namespace PycLan
                    type == TokenType.LEFTSCOB   ||
                    type == TokenType.INPUT      ||
                    type == TokenType.FUNCTION   ||
-                   type == TokenType.NOW        ;
+                   type == TokenType.NOW        ||
+                   type == TokenType.READALL    ||
+                   type == TokenType.LCUBSCOB   ;
         }
 
         private bool Match(TokenType type)
@@ -141,7 +143,7 @@ namespace PycLan
             if (Printble(current.Type))
                 return Printy();
 
-            try { Console.WriteLine($"{Get(-1)}; {current}; {Get(1)};");} catch (Exception) { }
+            try { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"{Get(-1)}; {current}; {Get(1)};"); Console.ResetColor(); } catch (Exception) { }
             throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");
         }
 

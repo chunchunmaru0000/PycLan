@@ -85,6 +85,15 @@ namespace PycLan
             return new SplitExpression(variable, separator);
         }
 
+        private IExpression Ready() 
+        {
+            Consume(TokenType.READALL);
+            Consume(TokenType.LEFTSCOB);
+            IExpression file = Expression();
+            Consume(TokenType.RIGHTSCOB);
+            return new ReadAllFileExpression(file);
+        }
+
         private IExpression Primary()
         {
             Token current = Current;
@@ -98,7 +107,6 @@ namespace PycLan
                 if (next.Type == TokenType.DOT && Get(2).Type == TokenType.SPLIT)
                     return Splity();
             }
-            
 
             if (current.Type == TokenType.VARIABLE)
             {
@@ -111,6 +119,9 @@ namespace PycLan
                 if (next.Type == TokenType.DOT && Get(2).Type == TokenType.SPLIT)
                     return Splity();
             }
+
+            if (current.Type == TokenType.READALL)
+                return Ready();
 
             if (current.Type == TokenType.FUNCTION)
                 return FuncParsy();

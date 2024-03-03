@@ -58,6 +58,8 @@ namespace PycLan
                     text += ListString((List<object>)item);
                 else if (item is bool)
                     text += (bool)item ? "Истина" : "Ложь";
+                else if (item is string)
+                    text += '"' + (string)item + '"';
                 else
                     text += Convert.ToString(item);
 

@@ -54,9 +54,10 @@ namespace PycLan
                 var tokens = new Tokenizator(code).Tokenize();
                 if (Tokens) LogTokens(ref tokens);
 
-             //   new Parser(tokens).Run(Debug, PrintVariablesInDebug, PrintFunctionsInDebug);
+                //new Parser(tokens).Run(Debug, PrintVariablesInDebug, PrintFunctionsInDebug);
                 IStatement program = new Parser(tokens).Parse();
                 program.Execute();
+                //Console.WriteLine(program);
 
                 stopwatch.Stop();
                 if (TimePrint)
