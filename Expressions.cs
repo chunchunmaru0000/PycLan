@@ -596,4 +596,28 @@ namespace PycLan
             return "СПИСОК";
         }
     }
+
+    public sealed class SplitExpression : IExpression
+    {
+        Token Variable;
+        IExpression Separator;
+
+        public SplitExpression(Token variable, IExpression separator)
+        {
+            Variable = variable;
+            Separator = separator;
+        }
+
+        public object Evaluated()
+        {
+            string stroka = Variable.View;
+            char separator = Convert.ToString(Separator.Evaluated())[0];
+            return stroka.Split(separator).Select(s => (object)s).ToList();
+        }
+
+        public override string ToString()
+        {
+            return $"{Variable.View}.РАЗДЕЛ({Separator})";
+        }
+    }
 }

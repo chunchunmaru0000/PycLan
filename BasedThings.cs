@@ -212,7 +212,9 @@ namespace PycLan
         [StringValue("ЧИСТКА")]
         CLEAR,
         [StringValue("СОН")]
-        SLEEP
+        SLEEP,
+        [StringValue("РАЗДЕЛ")]
+        SPLIT
     }
 
     public class Token

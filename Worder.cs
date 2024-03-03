@@ -166,6 +166,9 @@
                 case "сон":
                     word.Type = TokenType.SLEEP;
                     return word;
+                case "раздел":
+                    word.Type = TokenType.SPLIT;
+                    return word;
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

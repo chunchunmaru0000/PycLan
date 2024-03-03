@@ -73,16 +73,46 @@ namespace PycLan
             throw new NotImplementedException($"НЕВЕРНЫЙ СИНТАКСИС ГДЕ-ТО РЯДОМ С: {result}");
         }
 
+        private IExpression Splity()
+        {
+            Token variable = Current;
+            Consume(TokenType.VARIABLE, TokenType.STRING);
+            Consume(TokenType.DOT);
+            Consume(TokenType.SPLIT);
+            Consume(TokenType.LEFTSCOB);
+            IExpression separator = Expression();
+            Consume(TokenType.RIGHTSCOB);
+            return new SplitExpression(variable, separator);
+        }
+
         private IExpression Primary()
         {
             Token current = Current;
-            if (current.Type == TokenType.STRING && Get(1).Type == TokenType.LCUBSCOB)
-               return Slicy();
+            Token next = Get(1);
 
-            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB)
-                return Slicy();
+            if (current.Type == TokenType.STRING)
+            {
+                if (next.Type == TokenType.LCUBSCOB)
+                   return Slicy();
 
-            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LEFTSCOB || current.Type == TokenType.FUNCTION)
+                if (next.Type == TokenType.DOT && Get(2).Type == TokenType.SPLIT)
+                    return Splity();
+            }
+            
+
+            if (current.Type == TokenType.VARIABLE)
+            {
+                if (next.Type == TokenType.LCUBSCOB)
+                    return Slicy();
+
+                if (next.Type == TokenType.LEFTSCOB )
+                    return FuncParsy();
+
+                if (next.Type == TokenType.DOT && Get(2).Type == TokenType.SPLIT)
+                    return Splity();
+            }
+
+            if (current.Type == TokenType.FUNCTION)
                 return FuncParsy();
 
             if (current.Type == TokenType.LCUBSCOB)
