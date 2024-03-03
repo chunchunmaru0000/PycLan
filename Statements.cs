@@ -7,10 +7,10 @@ namespace PycLan
 {
     public sealed class AssignStatement : IStatement
     {
-        public string Variable;
+        public Token Variable;
         public IExpression Expression;
 
-        public AssignStatement(string variable, IExpression expression) 
+        public AssignStatement(Token variable, IExpression expression) 
         { 
             Variable = variable;
             Expression = expression;
@@ -19,7 +19,8 @@ namespace PycLan
         public void Execute()
         {
             object result = Expression.Evaluated();
-            Objects.AddVariable(Variable, result);
+            string name = Variable.View;
+            Objects.AddVariable(name, result);
         }
 
         public override string ToString()
@@ -256,11 +257,11 @@ namespace PycLan
 
     public sealed class DeclareFunctionStatement : IStatement
     {
-        public string Name;
-        public string[] Args;
+        public Token Name;
+        public Token[] Args;
         public IStatement Body;
 
-        public DeclareFunctionStatement(string name, string[] args, IStatement body)
+        public DeclareFunctionStatement(Token name, Token[] args, IStatement body)
         {
             Name = name;
             Args = args;
@@ -269,12 +270,12 @@ namespace PycLan
 
         public void Execute()
         {
-            Objects.AddFunction(Name, new UserFunction(Args, Body));
+            Objects.AddFunction(Name.View, new UserFunction(Args, Body));
         }
 
         public override string ToString()
         {
-            return $"{Name} => ({string.Join("|", Args)}) {Body};";
+            return $"{Name} => ({string.Join("|", Args.Select(a => a.View))}) {Body};";
         }
     }
 
@@ -313,16 +314,16 @@ namespace PycLan
 
     public sealed class SleepStatement : IStatement
     {
-        public int Ms;
+        public IExpression Ms;
 
-        public SleepStatement(int ms)
+        public SleepStatement(IExpression ms)
         {
             Ms = ms;
         }
 
         public void Execute()
         {
-            Thread.Sleep(Ms);
+            Thread.Sleep(Convert.ToInt32(Ms.Evaluated()));
         }
 
         public override string ToString()

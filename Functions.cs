@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace PycLan
 {
     public sealed class UserFunction : IFunction
     {
-        public string[] Args;
+        public Token[] Args;
         public IStatement Body;
 
-        public UserFunction(string[] args, IStatement body)
+        public UserFunction(Token[] args, IStatement body)
         {
             Args = args;
             Body = body;
@@ -24,7 +25,7 @@ namespace PycLan
         {
             if (i < 0 || i >= ArgsCount())
                 return "";
-            return Args[i];
+            return Args[i].View;
         }
 
         public object Execute(params object[] args)
@@ -42,7 +43,7 @@ namespace PycLan
 
         public override string ToString()
         {
-            return $"({string.Join(", ", Args)}){{{Body}}}";
+            return $"({string.Join(", ", Args.Select(a => a.View))}){{{Body}}}";
         }
     }
 

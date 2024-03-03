@@ -46,24 +46,23 @@ namespace PycLan
 
         public static void PycOnceLoad(string code)
         {
-            try
-            {
+         //   try
+           // {
                 Stopwatch stopwatch = new Stopwatch();
-                var tokens = new Tokenizator(code).Tokenize();
-                if (Tokens)
-                    LogTokens(ref tokens);
-
                 stopwatch.Start();
 
-                new Parser(tokens).Run(Debug, PrintVariablesInDebug, PrintFunctionsInDebug);
-                //IStatement program = new Parser(tokens).Parse();
-                //program.Execute();
+                var tokens = new Tokenizator(code).Tokenize();
+                if (Tokens) LogTokens(ref tokens);
+
+             //   new Parser(tokens).Run(Debug, PrintVariablesInDebug, PrintFunctionsInDebug);
+                IStatement program = new Parser(tokens).Parse();
+                program.Execute();
 
                 stopwatch.Stop();
                 if (TimePrint)
                     Console.WriteLine(stopwatch.Elapsed);
-            }
-            catch (Exception error) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(error.Message); Console.ResetColor(); }
+       //     }
+         //   catch (Exception error) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(error.Message); Console.ResetColor(); }
 
             PrintVariables(PrintVariablesAfterDebug, PrintFunctionsAfterDebug);
         }

@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 namespace PycLan
 {
     public sealed class NumExpression : IExpression
     {
-        public object Value { get; set; }
+        public Token Value { get; set; }
 
-        public NumExpression(object value)
+        public NumExpression(Token value)
         {
             Value = value;
         }
 
         public object Evaluated()
         {
-            return Value;
+            return Value.Value;
         } 
 
         public override string ToString()
         {
-            if (Value is List<object>)
-                return $"[{string.Join(", ", Value)}]";
-            if (Value is bool)
-                return (bool)Value ? "Истина" : "Ложь";
+            object value = Value.Value;
+            if (value is List<object>)
+                return $"[{string.Join(", ", value)}]";
+            if (value is bool)
+                return (bool)value ? "Истина" : "Ложь";
             return Convert.ToString(Value);
         }
     }
@@ -274,12 +274,12 @@ namespace PycLan
         }
     }
 
-    public sealed class IncDecBefore : IExpression, IStatement
+    public sealed class IncDecBeforeExpression : IExpression, IStatement
     {
         public Token Operation;
-        public string Name;
+        public Token Name;
 
-        public IncDecBefore(Token operation, string name)
+        public IncDecBeforeExpression(Token operation, Token name)
         {
             Operation = operation;
             Name = name;
@@ -287,17 +287,18 @@ namespace PycLan
 
         public object Evaluated()
         {
-            object value = Objects.GetVariable(Name);
+            string name = Name.View;
+            object value = Objects.GetVariable(name);
             if (value is long || value is bool)
             {
                 long temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt64(value);
                 switch (Operation.Type)
                 {
                     case TokenType.PLUSPLUS:
-                        Objects.AddVariable(Name, ++temp);
+                        Objects.AddVariable(name, ++temp);
                         return temp;
                     case TokenType.MINUSMINUS:
-                        Objects.AddVariable(Name, --temp);
+                        Objects.AddVariable(name, --temp);
                         return temp;
                     default:
                         throw new Exception("НЕВОЗМОЖНО");
@@ -309,10 +310,10 @@ namespace PycLan
                 switch (Operation.Type)
                 {
                     case TokenType.PLUSPLUS:
-                        Objects.AddVariable(Name, ++temp);
+                        Objects.AddVariable(name, ++temp);
                         return temp;
                     case TokenType.MINUSMINUS:
-                        Objects.AddVariable(Name, --temp);
+                        Objects.AddVariable(name, --temp);
                         return temp;
                     default:
                         throw new Exception("НЕВОЗМОЖНО");
@@ -323,17 +324,18 @@ namespace PycLan
 
         public void Execute()
         {
-            object value = Objects.GetVariable(Name);
+            string name = Name.View;
+            object value = Objects.GetVariable(name);
             if (value is long || value is bool)
             {
                 long temp = value is bool ? Convert.ToBoolean(value) ? 1 : 0 : Convert.ToInt64(value);
                 switch (Operation.Type)
                 {
                     case TokenType.PLUSPLUS:
-                        Objects.AddVariable(Name, ++temp);
+                        Objects.AddVariable(name, ++temp);
                         return;
                     case TokenType.MINUSMINUS:
-                        Objects.AddVariable(Name, --temp);
+                        Objects.AddVariable(name, --temp);
                         return;
                     default:
                         throw new Exception("НЕВОЗМОЖНО");
@@ -345,10 +347,10 @@ namespace PycLan
                 switch (Operation.Type)
                 {
                     case TokenType.PLUSPLUS:
-                        Objects.AddVariable(Name, ++temp);
+                        Objects.AddVariable(name, ++temp);
                         return;
                     case TokenType.MINUSMINUS:
-                        Objects.AddVariable(Name, --temp);
+                        Objects.AddVariable(name, --temp);
                         return;
                     default:
                         throw new Exception("НЕВОЗМОЖНО");
@@ -365,38 +367,38 @@ namespace PycLan
 
     public sealed class InputExpression : IExpression
     {
-        public string Message;
+        public IExpression Message;
         public InputExpression() { }
 
-        public InputExpression(string message)
+        public InputExpression(IExpression message)
         {
             Message = message;
         }
 
         public object Evaluated()
         {
-            Console.Write(Message??"");
+            Console.Write(Message.Evaluated().ToString()??"");
             return Console.ReadLine();
         }
 
         public override string ToString()
         {
-            return $"<{Message??""}>";
+            return $"<{Message.Evaluated().ToString()??""}>";
         }
     }
 
     public sealed class FunctionExpression : IExpression 
     {
-        public string Name;
+        public Token Name;
         public List<IExpression> Args;
 
-        public FunctionExpression(string name)
+        public FunctionExpression(Token name)
         {
             Name = name;
             Args = new List<IExpression>();
         }
 
-        public FunctionExpression(string name, List<IExpression> args) 
+        public FunctionExpression(Token name, List<IExpression> args) 
         {
             Name = name;
             Args = args;
@@ -413,7 +415,7 @@ namespace PycLan
             object[] args = new object[argov];
             for (int i = 0; i < argov; i++)
                 args[i] = Args[i].Evaluated();
-            IFunction function = Objects.GetFunction(Name);
+            IFunction function = Objects.GetFunction(Name.View);
             if (function is UserFunction)
             {
                 UserFunction userFunction = (UserFunction)function;
@@ -429,12 +431,12 @@ namespace PycLan
             if (!(function == null))
                 return function.Execute(args);
             else
-                throw new Exception($"НЕСУЩЕСТВУЮЩАЯ ФУНКЦИЯ ХОТЯ БЫ СЕЙЧАС: <{Name}>");
+                throw new Exception($"НЕСУЩЕСТВУЮЩАЯ ФУНКЦИЯ ХОТЯ БЫ СЕЙЧАС: <{Name.View}>");
         }
 
         public override string ToString()
         {
-            return $"ФУНКЦИЯ {Name}({string.Join(", ", Args.Select(a => a.ToString()))})";
+            return $"ФУНКЦИЯ {Name.View}({string.Join(", ", Args.Select(a => a.ToString()))})";
         }
     }
 
@@ -453,27 +455,27 @@ namespace PycLan
         }
     }
 
-    public sealed class StringSliceExpression : IExpression
+    public sealed class ListTakeExpression : IExpression
     {
-        public string Slice;
+        public Token Arr;
         public int From;
         public int? To = null;
 
-        public StringSliceExpression(string slice, IExpression from)
+        public ListTakeExpression(Token arr, IExpression from)
         {
-            Slice = slice;
+            Arr = arr;
             From = Convert.ToInt32(from.Evaluated());
 
         }
 
-        public StringSliceExpression(string slice, IExpression from, IExpression to)
+        public ListTakeExpression(Token arr, IExpression from, IExpression to)
         {
-            Slice = slice;
+            Arr = arr;
             From = Convert.ToInt32(from.Evaluated());
             To = Convert.ToInt32(to.Evaluated());
         }
 
-        public object Evaluated()
+        public string SliceString(string Slice)
         {
             try
             {
@@ -486,7 +488,7 @@ namespace PycLan
                         To = length + To + 1;
                     return Slice.Substring(From, (int)To - From);
                 }
-                return Slice[From];
+                return Slice[From] + "";
             }
             catch (Exception)
             {
@@ -494,35 +496,17 @@ namespace PycLan
             }
         }
 
-        public override string ToString()
-        {
-            return $"{Slice}[{From}" + (To.HasValue ? ":" + To.ToString() : "") + "]";
-        }
-    }
-
-    public sealed class ListTakeExpression : IExpression
-    {
-        public string Arr;
-        public int From;
-        public int? To = null;
-
-        public ListTakeExpression(string arr, IExpression from)
-        {
-            Arr = arr;
-            From = Convert.ToInt32(from.Evaluated());
-
-        }
-
-        public ListTakeExpression(string arr, IExpression from, IExpression to)
-        {
-            Arr = arr;
-            From = Convert.ToInt32(from.Evaluated());
-            To = Convert.ToInt32(to.Evaluated());
-        }
-
         public object Evaluated()
         {
-            List<object> arr = (List<object>)Objects.GetVariable(Arr);
+            if (Arr.Type == TokenType.STRING)
+                return SliceString(Arr.View);
+
+            object sliced = Objects.GetVariable(Arr.View);
+
+            if (sliced is string)
+                return SliceString(Convert.ToString(sliced));
+
+            List<object> arr = (List<object>)sliced;
             int length = arr.Count;
             if (From < 0)
                 From = length + From + 1;
@@ -537,7 +521,7 @@ namespace PycLan
 
         public override string ToString()
         {
-            return $"{Arr}[{From}" + (To.HasValue ? ":" + To.ToString() : "") + "]";
+            return $"{Arr.View}[{From}" + (To.HasValue ? ":" + To.ToString() : "") + "]";
         }
     }
 

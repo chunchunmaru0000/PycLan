@@ -7,7 +7,7 @@ namespace PycLan
     {
         private IExpression FuncParsy()
         {
-            string name = Current.View;
+            Token name = Current;
             Consume(TokenType.FUNCTION, TokenType.VARIABLE);
             Consume(TokenType.LEFTSCOB);
             FunctionExpression function = new FunctionExpression(name);
@@ -19,29 +19,9 @@ namespace PycLan
             return function;
         }
 
-        private IExpression StringSlicy()
-        {
-            string slice;
-            if (Current.Type == TokenType.STRING)
-                slice = Current.View;
-            else
-                slice = Convert.ToString(Objects.GetVariable(Current.View));
-            Consume(TokenType.STRING, TokenType.VARIABLE);
-            Consume(TokenType.LCUBSCOB);
-            IExpression from = Expression();
-            if (Match(TokenType.COLON))
-            {
-                IExpression to = Expression();
-                Consume(TokenType.RCUBSCOB);
-                return new StringSliceExpression(slice, from, to);
-            }
-            Consume(TokenType.RCUBSCOB);
-            return new StringSliceExpression(slice, from);
-        }
-
         private IExpression Slicy()
         {
-            string variable = Current.View;
+            Token sliced = Current;
             Consume(TokenType.VARIABLE);
             Consume(TokenType.LCUBSCOB);
             IExpression from = Expression();
@@ -49,7 +29,7 @@ namespace PycLan
             {
                 IExpression to = Expression();
                 Consume(TokenType.RCUBSCOB);
-                return new ListTakeExpression(variable, from, to);
+                return new ListTakeExpression(sliced, from, to);
             }
         /*    if (Match(TokenType.COMMA, TokenType.SEMICOLON))
             {
@@ -62,7 +42,7 @@ namespace PycLan
 
             }*/
             Consume(TokenType.RCUBSCOB);
-            return new ListTakeExpression(variable, from);
+            return new ListTakeExpression(sliced, from);
         }
 
         private IExpression Listy()
@@ -81,9 +61,7 @@ namespace PycLan
         {
             Token current = Current;
             if (current.Type == TokenType.STRING && Get(1).Type == TokenType.LCUBSCOB)
-               return StringSlicy();
-            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB && Objects.ContainsVariable(current.View) && Objects.GetVariable(current.View) is string)
-                return StringSlicy();
+               return Slicy();
 
             if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.LCUBSCOB)
                 return Slicy();
@@ -101,7 +79,7 @@ namespace PycLan
             {
                 if (Match(TokenType.LEFTSCOB))
                 {
-                    string message = Expression().Evaluated().ToString();
+                    IExpression message = Expression();
                     Consume(TokenType.RIGHTSCOB);
                     return new InputExpression(message);
                 }
@@ -109,13 +87,13 @@ namespace PycLan
             }
 
             if (Match(TokenType.STRING))
-                return new NumExpression(current.Value);
+                return new NumExpression(current);
 
             if (Match(TokenType.WORD_TRUE, TokenType.WORD_FALSE))
-                return new NumExpression(current.Value);
+                return new NumExpression(current);
 
             if (Match(TokenType.INTEGER, TokenType.DOUBLE))
-                return new NumExpression(current.Value);
+                return new NumExpression(current);
 
             if (Match(TokenType.LEFTSCOB))
             {
@@ -129,8 +107,8 @@ namespace PycLan
 
             if (Match(TokenType.PLUSPLUS, TokenType.MINUSMINUS))
             {
-                string name = Current.View;
-                IExpression result = new IncDecBefore(current, name);
+                Token name = Current;
+                IExpression result = new IncDecBeforeExpression(current, name);
                 Consume(TokenType.VARIABLE);
                 return result;
             }

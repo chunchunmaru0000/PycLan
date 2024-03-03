@@ -11,7 +11,7 @@ namespace PycLan
                 return Block();
             else
             {
-                Consume(TokenType.COLON);
+                Match(TokenType.COLON);
                 return Statement();
             }
         }
@@ -28,21 +28,21 @@ namespace PycLan
                 while (!Match(TokenType.RCUBSCOB))
                 {
                     items.Add(Expression());
-                    Match(TokenType.COMMA, TokenType.SEMICOLON);
+                    Match(TokenType.SEMICOLON, TokenType.COMMA);
                 }
                 expression = new ListExpression(items);
             }
             else
                 expression = Expression();
-            IStatement result = new AssignStatement(current.View, expression);
-            Match(TokenType.SEMICOLON);
+            IStatement result = new AssignStatement(current, expression);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
             return result;
         }
 
         private IStatement Printy()
         {
             IStatement print = new PrintStatement(Expression());
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON);
             return print;
         }
 
@@ -67,29 +67,25 @@ namespace PycLan
 
         private IStatement Fory()
         {
-            Token current = Current;
-            Consume(TokenType.VARIABLE);
-            Consume(TokenType.DO_EQUAL);
-            IStatement definition = new AssignStatement(current.View, Expression());
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            IStatement definition = Assigny();
 
             IExpression condition = Expression();
             Match(TokenType.SEMICOLON, TokenType.COMMA);
 
-            current = Current;
+            Token current = Current;
             IStatement alter = null;
             if (Match(TokenType.VARIABLE))
             {
                 Consume(TokenType.DO_EQUAL);
-                alter = new AssignStatement(current.View, Expression());
+                alter = new AssignStatement(current, Expression());
             }
             else if (Current.Type == TokenType.PLUSPLUS || Current.Type == TokenType.MINUSMINUS)
             {
                 Token operation = Current;
                 Consume(TokenType.PLUSPLUS, TokenType.MINUSMINUS);
-                string name = Current.View;
+                Token name = Current;
                 Consume(TokenType.VARIABLE);
-                alter = new IncDecBefore(operation, name);
+                alter = new IncDecBeforeExpression(operation, name);
             }
 
             IStatement body = OneOrBlock();
@@ -100,44 +96,44 @@ namespace PycLan
         {
             Token current = Current;
             Consume(TokenType.PLUSPLUS, TokenType.MINUSMINUS);
-            string name = Current.View;
+            Token name = Current;
             Consume(TokenType.VARIABLE);
-            IStatement statement = new IncDecBefore(current, name);
-            Consume(TokenType.SEMICOLON);
+            IStatement statement = new IncDecBeforeExpression(current, name);
+            Match(TokenType.SEMICOLON);
             return statement;
         }
 
         public IStatement Breaky()
         {
             IStatement statement = new BreakStatement();
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON);
             return statement;
         }
 
         public IStatement Continuy()
         {
             IStatement statement = new ContinueStatement();
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
             return statement;
         }
 
         public IStatement Returny() 
         {
             IExpression expression = Expression();
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
             return new ReturnStatement(expression);
         }
 
         public IStatement Functiony()
         {
-            string name = Current.View;
+            Token name = Current;
             Consume(TokenType.VARIABLE);
-            List<string> args = new List<string>();
+            List<Token> args = new List<Token>();
             Consume(TokenType.ARROW);
             Consume(TokenType.LEFTSCOB);
             while (!Match(TokenType.RIGHTSCOB))
             {
-                args.Add(Consume(TokenType.VARIABLE).View);
+                args.Add(Consume(TokenType.VARIABLE));
                 Match(TokenType.COMMA, TokenType.SEMICOLON);
             }
             IStatement body = OneOrBlock();
@@ -147,22 +143,22 @@ namespace PycLan
         public IStatement Procedury()
         {
             IExpression expression = Expression();
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
             return new ProcedureStatement(expression);
         }
 
         public IStatement Cleary()
         {
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
             return new ClearStatement();
         }
 
         public IStatement Sleepy()
         {
             Consume(TokenType.LEFTSCOB);
-            int ms = Convert.ToInt32(Expression().Evaluated());
+            IExpression ms = Expression();
             Consume(TokenType.RIGHTSCOB);
-            Consume(TokenType.SEMICOLON);
+            Match(TokenType.SEMICOLON, TokenType.COMMA);
             return new SleepStatement(ms);
         }
     }

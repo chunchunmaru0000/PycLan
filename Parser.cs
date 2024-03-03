@@ -88,11 +88,17 @@ namespace PycLan
             line++;
             Token current = Current;
 
-            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.DO_EQUAL)
-                return Assigny();
+            if (current.Type == TokenType.VARIABLE)
+            {
+               // if (Get(1).Type == TokenType.LCUBSCOB)
+                 //   return ItemAssigny();
+                
+                if (Get(1).Type == TokenType.DO_EQUAL)
+                    return Assigny();
 
-            if (current.Type == TokenType.VARIABLE && Get(1).Type == TokenType.ARROW)
-                return Functiony();
+                if (Get(1).Type == TokenType.ARROW)
+                    return Functiony();
+            }
 
             if (current.Type == TokenType.PLUSPLUS || current.Type == TokenType.MINUSMINUS && Get(1).Type == TokenType.VARIABLE)
                 return BeforeIncDecy();
@@ -130,7 +136,8 @@ namespace PycLan
             if (Printble(current.Type))
                 return Printy();
 
-            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current.ToString()}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");
+            try { Console.WriteLine($"{Get(-1)}; {current}; {Get(1)};");} catch (Exception) { }
+            throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");
         }
 
         private IStatement Block()
