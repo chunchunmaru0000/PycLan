@@ -60,6 +60,8 @@ namespace PycLan
                     text += (bool)item ? "Истина" : "Ложь";
                 else if (item is string)
                     text += '"' + (string)item + '"';
+                else if (item is char)
+                    text += '"' + Convert.ToString(item) + '"';
                 else
                     text += Convert.ToString(item);
 

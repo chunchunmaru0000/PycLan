@@ -60,7 +60,6 @@ namespace PycLan
                    type == TokenType.INPUT      ||
                    type == TokenType.FUNCTION   ||
                    type == TokenType.NOW        ||
-                   type == TokenType.READALL    ||
                    type == TokenType.LCUBSCOB   ;
         }
 

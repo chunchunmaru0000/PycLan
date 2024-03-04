@@ -182,8 +182,9 @@ namespace PycLan
             object orght = right.Evaluated();
             if (olft is string || orght is string) 
             {
-                string slft = left.ToString();
-                string srght = right.ToString();
+                string slft = Convert.ToString(left);
+                string srght = Convert.ToString(right);
+                Console.WriteLine(slft + srght);
                 int slftl = slft.Length;
                 int srghtl = srght.Length;
                 switch (comparation.Type)
@@ -404,6 +405,14 @@ namespace PycLan
         }
     }
 
+    public sealed class Inp : IExpression
+    {
+        public object Evaluated()
+        {
+            return Console.ReadLine();
+        }
+    }
+
     public sealed class InputExpression : IExpression
     {
         public IExpression Message;
@@ -416,13 +425,10 @@ namespace PycLan
 
         public object Evaluated()
         {
-            string message;
             if (Message != null)
-                message = Message.Evaluated().ToString();
-            else
-                message = "";
-            Console.Write(message);
-            return Console.ReadLine();
+                Console.Write(Message.Evaluated());
+          //  string text = Console.ReadLine();
+            return Convert.ToString(new Inp().Evaluated());
         }
 
         public override string ToString()
@@ -594,63 +600,6 @@ namespace PycLan
         public override string ToString()
         {
             return "СПИСОК";
-        }
-    }
-
-    public sealed class SplitExpression : IExpression
-    {
-        Token Variable;
-        IExpression Separator;
-
-        public SplitExpression(Token variable, IExpression separator)
-        {
-            Variable = variable;
-            Separator = separator;
-        }
-
-        public object Evaluated()
-        {
-            string stroka;
-            if (Variable.Type == TokenType.STRING)
-                stroka = Variable.View;
-            else
-                stroka = Convert.ToString(Objects.GetVariable(Variable.View));
-            string sep = Convert.ToString(Separator.Evaluated());
-            char separator = sep[0]; //(sep == "\\n") ? '\n' : (sep == "\\t") ? '\t' : sep[0];
-            return stroka.Split(separator).Select(s => (object)s).ToList();
-        }
-
-        public override string ToString()
-        {
-            return $"{Variable.View}.РАЗДЕЛ({Separator})";
-        }
-    }
-
-    public sealed class ReadAllFileExpression : IExpression
-    {
-        public IExpression File;
-
-        public ReadAllFileExpression(IExpression file)
-        {
-            File = file;
-        }
-
-        public object Evaluated()
-        {
-            string file = Convert.ToString(File.Evaluated());
-            try
-            {
-                return System.IO.File.ReadAllText(file, System.Text.Encoding.UTF8);
-            }
-            catch (IOException)
-            {
-                throw new Exception("НЕ ПОЛУЧИЛОСЬ ПРОЧИТАТЬ ФАЙЛ В: " + file);
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"ВЫЧИТАТЬ({File})";
         }
     }
 }

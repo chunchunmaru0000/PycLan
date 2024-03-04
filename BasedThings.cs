@@ -212,11 +212,7 @@ namespace PycLan
         [StringValue("ЧИСТКА")]
         CLEAR,
         [StringValue("СОН")]
-        SLEEP,
-        [StringValue("РАЗДЕЛ")]
-        SPLIT,
-        [StringValue("ВЫЧИТАТЬ")]
-        READALL
+        SLEEP
     }
 
     public class Token
@@ -302,6 +298,8 @@ namespace PycLan
         public static IFunction Tan = new Tan();
         public static IFunction Max = new Max();
         public static IFunction Min = new Min();
+        public static IFunction ReadAll = new ReadAllFileFunction();
+        public static IFunction Split = new SplitFunction();
 
         public static Dictionary<string, IFunction> Functions = new Dictionary<string, IFunction>()
         {
@@ -318,6 +316,8 @@ namespace PycLan
             { "мин",  Min },
             { "наименьшее",  Min },
             { "минимум",  Min },
+            { "вычитать",  ReadAll },
+            { "раздел",  Split },
         };
 
         public static bool ContainsFunction(string key)

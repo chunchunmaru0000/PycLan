@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 
 namespace PycLan
@@ -209,6 +210,69 @@ namespace PycLan
         public override string ToString()
         {
             return $"НАИМЕНЬШЕЕ(<>)";
+        }
+    }
+
+    public sealed class ReadAllFileFunction : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length == 0)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            string file = Convert.ToString(x[0]);
+
+            if (x.Length >= 2 && Convert.ToString(x[1]) == "линии")
+            {
+                try
+                {
+                    return File.ReadAllLines(file, System.Text.Encoding.UTF8).Select(s => (object)s).ToList();
+                }
+                catch (IOException)
+                {
+                    throw new Exception("НЕ ПОЛУЧИЛОСЬ ПРОЧИТАТЬ ФАЙЛ В: " + file);
+
+                }
+            }
+            else
+            {
+                try
+                {
+                    return File.ReadAllText(file, System.Text.Encoding.UTF8);
+                }
+                catch (IOException)
+                {
+                    throw new Exception("НЕ ПОЛУЧИЛОСЬ ПРОЧИТАТЬ ФАЙЛ В: " + file);
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"ВЫЧИТАТЬ(<>)";
+        }
+    }
+
+    public sealed class SplitFunction : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length == 0)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            string stroka = Convert.ToString(x[0]);
+
+            if (x.Length == 1) 
+                return stroka.Split('\n').Select(s => (object)s).ToList();
+            else
+            {
+                string sep = Convert.ToString(x[1]);
+                char separator = sep[0]; //(sep == "\\n") ? '\n' : (sep == "\\t") ? '\t' : sep[0];
+                return stroka.Split(separator).Select(s => (object)s).ToList();
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"РАЗДЕЛ(<>)";
         }
     }
 }
