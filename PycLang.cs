@@ -8,7 +8,7 @@ namespace PycLan
     public static class PycLang
     {
         public static bool Tokens = false;
-        public static bool PrintVariablesInDebug = false;
+        public static bool PrintVariablesInDebug = true;
         public static bool PrintFunctionsInDebug = false;
         public static bool PrintVariablesAfterDebug = false;//
         public static bool PrintFunctionsAfterDebug = false;

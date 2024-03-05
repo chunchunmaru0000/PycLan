@@ -275,4 +275,64 @@ namespace PycLan
             return $"РАЗДЕЛ(<>)";
         }
     }
+
+    public sealed class InputFunction : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length > 0)
+            {
+                string message = Convert.ToString(x[0]);
+                Console.Write(message);
+            }
+            return Console.ReadLine();
+        }
+
+        public override string ToString()
+        {
+            return $"ВВОД(<>)";
+        }
+    }
+
+    public sealed class StringingFunction : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            switch (x.Length)
+            {
+                case 0:
+                    return "";
+                case 1:
+                    return x[0] is bool ? (bool)x[0] ? "Истина" : "Ложь" : Convert.ToString(x[0]);
+                default:
+                    return x.Select(s => s is bool ? (bool)s ? (object)"Истина" : (object)"Ложь" : (object)Convert.ToString(s)).ToList();
+            }
+        }
+
+        public override string ToString()
+        {
+            return "СТРОЧИТЬ(<>)";
+        }
+    }
+
+    public sealed class IntingFunction : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            switch (x.Length)
+            {
+                case 0:
+                    return 0;
+                case 1:
+                    return Convert.ToInt64(x[0]);
+                default:
+                    return x.Select(s => (object)Convert.ToInt64(s)).ToList();
+            }
+        }
+
+        public override string ToString()
+        {
+            return "ЧИСЛИТЬ(<>)";
+        }
+    }
 }

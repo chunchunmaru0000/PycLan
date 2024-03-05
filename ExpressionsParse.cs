@@ -102,17 +102,6 @@ namespace PycLan
             if (Match(TokenType.NOW))
                 return new NowExpression();
 
-            if (Match(TokenType.INPUT))
-            {
-                if (Match(TokenType.LEFTSCOB))
-                {
-                    IExpression message = Expression();
-                    Consume(TokenType.RIGHTSCOB);
-                    return new InputExpression(message);
-                }
-                return new InputExpression();
-            }
-
             if (Match(TokenType.STRING))
                 return new NumExpression(current);
 

@@ -115,19 +115,6 @@
                     word.Type = TokenType.BREAK;
                     return word;
 
-                case "харатья":
-                    word.Type = TokenType.INPUT;
-                    return word;
-                case "хартия":
-                    word.Type = TokenType.INPUT;
-                    return word;
-                case "ввод":
-                    word.Type = TokenType.INPUT;
-                    return word;
-                case "ввести":
-                    word.Type = TokenType.INPUT;
-                    return word;
-
                 case "вернуть":
                     word.Type = TokenType.RETURN;
                     return word;

@@ -57,7 +57,6 @@ namespace PycLan
                    type == TokenType.NOT        ||
                    type == TokenType.STRING     ||
                    type == TokenType.LEFTSCOB   ||
-                   type == TokenType.INPUT      ||
                    type == TokenType.FUNCTION   ||
                    type == TokenType.NOW        ||
                    type == TokenType.LCUBSCOB   ;

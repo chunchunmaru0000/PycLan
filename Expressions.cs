@@ -86,8 +86,8 @@ namespace PycLan
             object rght = right.Evaluated();
             if (lft is string || rght is string)
             {
-                string slft = lft.ToString();
-                string srght = rght.ToString();
+                string slft = lft is bool ? (bool)lft ? "Истина" : "Ложь" : Convert.ToString(lft);
+                string srght = rght is bool ? (bool)rght ? "Истина" : "Ложь" : Convert.ToString(rght);
                 switch (operation.Type)
                 {
                     case TokenType.PLUS:
@@ -182,9 +182,8 @@ namespace PycLan
             object orght = right.Evaluated();
             if (olft is string || orght is string) 
             {
-                string slft = Convert.ToString(left);
-                string srght = Convert.ToString(right);
-                Console.WriteLine(slft + srght);
+                string slft = Convert.ToString(olft);
+                string srght = Convert.ToString(orght);
                 int slftl = slft.Length;
                 int srghtl = srght.Length;
                 switch (comparation.Type)
@@ -402,38 +401,6 @@ namespace PycLan
         public override string ToString()
         {
             return '<' + Operation.ToString() + Name + '>';
-        }
-    }
-
-    public sealed class Inp : IExpression
-    {
-        public object Evaluated()
-        {
-            return Console.ReadLine();
-        }
-    }
-
-    public sealed class InputExpression : IExpression
-    {
-        public IExpression Message;
-        public InputExpression() { }
-
-        public InputExpression(IExpression message)
-        {
-            Message = message;
-        }
-
-        public object Evaluated()
-        {
-            if (Message != null)
-                Console.Write(Message.Evaluated());
-          //  string text = Console.ReadLine();
-            return Convert.ToString(new Inp().Evaluated());
-        }
-
-        public override string ToString()
-        {
-            return $"<{Message.Evaluated().ToString()??""}>";
         }
     }
 

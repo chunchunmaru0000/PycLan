@@ -201,8 +201,6 @@ namespace PycLan
         CONTINUE,
         [StringValue("ВЫЙТИ")]
         BREAK,
-        [StringValue("НАПИСТЬ")]
-        INPUT,
         [StringValue("ВЕРНУТЬ")]
         RETURN,
         [StringValue("ВЫПОЛНИТЬ ПРОЦЕДУРУ")]
@@ -300,6 +298,9 @@ namespace PycLan
         public static IFunction Min = new Min();
         public static IFunction ReadAll = new ReadAllFileFunction();
         public static IFunction Split = new SplitFunction();
+        public static IFunction Input = new InputFunction();
+        public static IFunction Stringing = new StringingFunction();
+        public static IFunction Inting = new IntingFunction();
 
         public static Dictionary<string, IFunction> Functions = new Dictionary<string, IFunction>()
         {
@@ -318,6 +319,12 @@ namespace PycLan
             { "минимум",  Min },
             { "вычитать",  ReadAll },
             { "раздел",  Split },
+            { "хартия",  Input },
+            { "ввод",  Input },
+            { "харатья",  Input },
+            { "ввести",  Input },
+            { "строчить",  Stringing },
+            { "числить",  Inting },
         };
 
         public static bool ContainsFunction(string key)
