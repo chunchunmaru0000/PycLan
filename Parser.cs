@@ -78,6 +78,8 @@ namespace PycLan
             return true;
         }
 
+        private bool Sep () => Match(TokenType.SEMICOLON, TokenType.COMMA);
+
         private IExpression Expression()
         {
             return Ory();
@@ -87,11 +89,16 @@ namespace PycLan
         {
             line++;
             Token current = Current;
+            Token next = Get(1);
+
+            if (current.Type == TokenType.CREATE)
+            {
+                if (next.Type == TokenType.DATABASE)
+                    return SQLCreateDatabasy();
+            }
 
             if (current.Type == TokenType.VARIABLE)
             {
-                Token next = Get(1);
-                
                 if (next.Type == TokenType.DO_EQUAL)
                     return Assigny();
 

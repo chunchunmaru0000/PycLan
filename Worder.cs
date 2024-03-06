@@ -153,6 +153,15 @@
                 case "сон":
                     word.Type = TokenType.SLEEP;
                     return word;
+
+                /*           SQL           */
+
+                case "создать":
+                    word.Type = TokenType.CREATE;
+                    return word;
+                case "бд":
+                    word.Type = TokenType.DATABASE;
+                    return word;
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

@@ -23,7 +23,7 @@ namespace PycLan
             Consume(TokenType.DO_EQUAL);
             IExpression expression = Expression();
             IStatement result = new AssignStatement(current, expression);
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return result;
         }
 
@@ -34,7 +34,7 @@ namespace PycLan
             Token operation = Current;
             Consume(operation.Type);
             IExpression expression = Expression();
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return new OperationAssignStatement(variable, operation, expression);
         }
 
@@ -49,7 +49,7 @@ namespace PycLan
 
             Consume(TokenType.DO_EQUAL);
             IExpression value = Expression();
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return new ItemAssignStatement(variable, index, value);
         }
 
@@ -84,7 +84,7 @@ namespace PycLan
             IStatement definition = Assigny();
 
             IExpression condition = Expression();
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
 
             Token current = Current;
             IStatement alter = null;
@@ -127,14 +127,14 @@ namespace PycLan
         public IStatement Continuy()
         {
             IStatement statement = new ContinueStatement();
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return statement;
         }
 
         public IStatement Returny() 
         {
             IExpression expression = Expression();
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return new ReturnStatement(expression);
         }
 
@@ -157,13 +157,13 @@ namespace PycLan
         public IStatement Procedury()
         {
             IExpression expression = Expression();
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return new ProcedureStatement(expression);
         }
 
         public IStatement Cleary()
         {
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return new ClearStatement();
         }
 
@@ -172,8 +172,17 @@ namespace PycLan
             Consume(TokenType.LEFTSCOB);
             IExpression ms = Expression();
             Consume(TokenType.RIGHTSCOB);
-            Match(TokenType.SEMICOLON, TokenType.COMMA);
+            Sep();
             return new SleepStatement(ms);
+        }
+
+        public IStatement SQLCreateDatabasy()
+        {
+            Consume(TokenType.CREATE);
+            Consume(TokenType.DATABASE);
+            IExpression expression = Expression();
+            Sep();
+            return new SQLCreateDatabase(expression);
         }
     }
 }

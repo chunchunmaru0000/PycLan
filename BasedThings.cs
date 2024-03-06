@@ -210,7 +210,13 @@ namespace PycLan
         [StringValue("ЧИСТКА")]
         CLEAR,
         [StringValue("СОН")]
-        SLEEP
+        SLEEP,
+
+        //SQL
+        [StringValue("СОЗДАТЬ")]
+        CREATE,
+        [StringValue("БД")]
+        DATABASE
     }
 
     public class Token
