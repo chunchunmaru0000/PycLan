@@ -301,6 +301,8 @@ namespace PycLan
         public static IFunction Input = new InputFunction();
         public static IFunction Stringing = new StringingFunction();
         public static IFunction Inting = new IntingFunction();
+        public static IFunction Doubling = new DoublingFunction();
+        public static IFunction Writing = new WritingFileFunction();
 
         public static Dictionary<string, IFunction> Functions = new Dictionary<string, IFunction>()
         {
@@ -325,6 +327,9 @@ namespace PycLan
             { "ввести",  Input },
             { "строчить",  Stringing },
             { "числить",  Inting },
+            { "точить",  Doubling },
+            { "писать",  Writing },
+            { "летописить",  Writing },
         };
 
         public static bool ContainsFunction(string key)

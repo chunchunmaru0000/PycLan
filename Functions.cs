@@ -319,20 +319,92 @@ namespace PycLan
     {
         public object Execute(object[] x)
         {
-            switch (x.Length)
+            try
             {
-                case 0:
-                    return 0;
-                case 1:
-                    return Convert.ToInt64(x[0]);
-                default:
-                    return x.Select(s => (object)Convert.ToInt64(s)).ToList();
+                switch (x.Length)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return Convert.ToInt64(x[0]);
+                    default:
+                        return x.Select(s => (object)Convert.ToInt64(s)).ToList();
+                }
             }
+            catch (Exception) { throw new Exception("КОНВЕРТАЦИЯ НЕ УДАЛАСЬ"); }
         }
 
         public override string ToString()
         {
             return "ЧИСЛИТЬ(<>)";
+        }
+    }
+
+    public sealed class DoublingFunction : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            try
+            {
+                switch (x.Length)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return Convert.ToDouble(x[0]);
+                    default:
+                        return x.Select(s => (object)Convert.ToDouble(s)).ToList();
+                }
+            }
+            catch (Exception) { throw new Exception("КОНВЕРТАЦИЯ НЕ УДАЛАСЬ"); }
+        }
+
+        public override string ToString()
+        {
+            return "ТОЧИТЬ(<>)";
+        }
+    }
+
+    public sealed class WritingFileFunction : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length < 3)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            string file = Convert.ToString(x[0]);
+            string mode = Convert.ToString(x[1]);
+            string data = Convert.ToString(x[2]);
+
+            try
+            {
+                if (mode.ToLower() == "пере")
+                    using (StreamWriter writer = new StreamWriter(file, false, System.Text.Encoding.UTF8))
+                        writer.WriteLine(data); 
+                else
+                    using (StreamWriter writer = new StreamWriter(file, true, System.Text.Encoding.UTF8))
+                        switch (mode.ToLower())
+                        {
+                            case "до":
+                                writer.Write(data);
+                                break;
+                            case "линию":
+                                writer.WriteLine(data);
+                                break;
+                            default:
+                                throw new Exception("НЕСУЩЕСТВУЮЩИЙ РЕЖИМ ЗАПИСИ: " + file);
+                        }
+            }
+            catch (IOException)
+            {
+                throw new Exception("НЕ ПОЛУЧИЛОСЬ ЗАПИСАТЬ В ФАЙЛ: " + file);
+            }
+
+            return x;
+        }
+
+        public override string ToString()
+        {
+            return "ЛЕТОПИСИТЬ(<>)";
         }
     }
 }
