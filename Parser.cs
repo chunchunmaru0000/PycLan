@@ -95,6 +95,9 @@ namespace PycLan
             {
                 if (next.Type == TokenType.DATABASE)
                     return SQLCreateDatabasy();
+
+                if (next.Type == TokenType.TABLE)
+                    return SQLCreateTably();
             }
 
             if (current.Type == TokenType.VARIABLE)

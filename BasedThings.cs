@@ -216,7 +216,9 @@ namespace PycLan
         [StringValue("СОЗДАТЬ")]
         CREATE,
         [StringValue("БД")]
-        DATABASE
+        DATABASE,
+        [StringValue("ТАБЛИЦА")]
+        TABLE,
     }
 
     public class Token
@@ -259,7 +261,8 @@ namespace PycLan
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {
             { "ПИ", Math.PI },
-            { "Е", Math.E }
+            { "Е", Math.E },
+            { "ИСПБД", "негр" }
         };
 
         public static bool ContainsVariable(string key)

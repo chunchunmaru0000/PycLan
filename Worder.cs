@@ -162,6 +162,17 @@
                 case "бд":
                     word.Type = TokenType.DATABASE;
                     return word;
+
+                case "таблица":
+                    word.Type = TokenType.TABLE;
+                    return word;
+                case "таблицу":
+                    word.Type = TokenType.TABLE;
+                    return word;
+                case "тб":
+                    word.Type = TokenType.TABLE;
+                    return word;
+
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

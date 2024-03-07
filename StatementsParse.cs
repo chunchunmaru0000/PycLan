@@ -184,5 +184,14 @@ namespace PycLan
             Sep();
             return new SQLCreateDatabase(expression);
         }
+
+        public IStatement SQLCreateTably()
+        {
+            Consume(TokenType.CREATE);
+            Consume(TokenType.TABLE);
+            IExpression expression = Expression();
+            Sep();
+            return new SQLCreateTable(expression);
+        }
     }
 }
