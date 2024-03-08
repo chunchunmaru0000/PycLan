@@ -83,6 +83,9 @@ namespace PycLan
 
         [StringValue("ЧИСЛО")]
         NUMBER,
+        [StringValue("СТРОЧКА")]
+        STROKE,
+
         [StringValue("ЦЕЛОЕ ЧИСЛО64")]
         INTEGER,
         [StringValue("НЕ ЦЕЛОЕ ЧИСЛО64")]

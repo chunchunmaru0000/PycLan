@@ -56,8 +56,8 @@ namespace PycLan
 
                 //new Parser(tokens).Run(Debug, PrintVariablesInDebug, PrintFunctionsInDebug);
                 IStatement program = new Parser(tokens).Parse();
+                Console.WriteLine(program);
                 program.Execute();
-                //Console.WriteLine(program);
 
                 stopwatch.Stop();
                 if (TimePrint)

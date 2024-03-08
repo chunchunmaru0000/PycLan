@@ -189,9 +189,28 @@ namespace PycLan
         {
             Consume(TokenType.CREATE);
             Consume(TokenType.TABLE);
-            IExpression expression = Expression();
-            Sep();
-            return new SQLCreateTable(expression);
+            IExpression tableName = Expression();
+
+            Match(TokenType.LTRISCOB);
+            List<Token> types = new List<Token>();
+            List<Token> names = new List<Token>();
+            while (!Match(TokenType.RTRISCOB))
+            {
+                Token current = Current;
+                if (Match(TokenType.COMMA))
+                    continue;
+                if (Match(TokenType.STROKE, TokenType.NUMBER))
+                {
+                    types.Add(current);
+                    continue;
+                }
+                if (Match(TokenType.VARIABLE, TokenType.STRING))
+                {
+                    names.Add(current);
+                    continue;
+                }
+            }
+            return new SQLCreateTable(tableName, types.ToArray(), names.ToArray());
         }
     }
 }

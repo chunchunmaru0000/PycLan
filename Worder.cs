@@ -173,6 +173,13 @@
                     word.Type = TokenType.TABLE;
                     return word;
 
+                case "строчка":
+                    word.Type = TokenType.STROKE;
+                    return word;
+                case "число":
+                    word.Type = TokenType.NUMBER;
+                    return word;
+
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;
