@@ -222,6 +222,14 @@ namespace PycLan
         DATABASE,
         [StringValue("ТАБЛИЦА")]
         TABLE,
+        [StringValue("ДОБАВИТЬ")]
+        INSERT,
+        [StringValue("В")]
+        IN,
+        [StringValue("ЗНАЧЕНИЯ")]
+        VALUES,
+        [StringValue("КОЛОНКИ")]
+        COLONS,
     }
 
     public class Token

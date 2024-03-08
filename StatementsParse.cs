@@ -180,16 +180,18 @@ namespace PycLan
         {
             Consume(TokenType.CREATE);
             Consume(TokenType.DATABASE);
-            IExpression expression = Expression();
+            Token database = Current;
+            Named();
             Sep();
-            return new SQLCreateDatabase(expression);
+            return new SQLCreateDatabase(database);
         }
 
         public IStatement SQLCreateTably()
         {
             Consume(TokenType.CREATE);
             Consume(TokenType.TABLE);
-            IExpression tableName = Expression();
+            Token tableName = Current;
+            Named();
 
             Match(TokenType.LTRISCOB);
             List<Token> types = new List<Token>();
@@ -211,6 +213,50 @@ namespace PycLan
                 }
             }
             return new SQLCreateTable(tableName, types.ToArray(), names.ToArray());
+        }
+
+        public IStatement SQLInserty()
+        {
+            Consume(TokenType.IN);
+            Token table = Current;
+            Named();
+
+            List<Token> colons = new List<Token>();
+            if (Match(TokenType.COLONS))
+            {
+                Consume(TokenType.LEFTSCOB);
+                while (!Match(TokenType.RIGHTSCOB, TokenType.EOF))
+                {
+                    Token current = Current;
+                    if (Match(TokenType.COMMA))
+                        continue;
+                    if (Match(TokenType.STROKE, TokenType.NUMBER))
+                    {
+                        colons.Add(current);
+                        continue;
+                    }
+                }
+            }
+
+            List<Token> values = new List<Token>();
+            if (Match(TokenType.VALUES))
+            {
+                Consume(TokenType.LEFTSCOB);
+                while (!Match(TokenType.RIGHTSCOB, TokenType.EOF))
+                {
+                    Token current = Current;
+                    if (Match(TokenType.COMMA))
+                        continue;
+                    if (Match(TokenType.STROKE, TokenType.NUMBER))
+                    {
+                        values.Add(current);
+                        continue;
+                    }
+                }
+            }
+
+            Sep();
+            return new SQLInsert(table, colons.ToArray(), values.ToArray());
         }
     }
 }

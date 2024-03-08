@@ -80,6 +80,8 @@ namespace PycLan
 
         private bool Sep () => Match(TokenType.SEMICOLON, TokenType.COMMA);
 
+        private bool Named() => Match(TokenType.VARIABLE, TokenType.STRING);
+
         private IExpression Expression()
         {
             return Ory();
@@ -99,6 +101,9 @@ namespace PycLan
                 if (next.Type == TokenType.TABLE)
                     return SQLCreateTably();
             }
+
+            if (Match(TokenType.INSERT))
+                return SQLInserty();
 
             if (current.Type == TokenType.VARIABLE)
             {

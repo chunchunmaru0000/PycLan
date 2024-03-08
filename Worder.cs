@@ -180,6 +180,19 @@
                     word.Type = TokenType.NUMBER;
                     return word;
 
+                case "добавить":
+                    word.Type = TokenType.INSERT;
+                    return word;
+                case "в":
+                    word.Type = TokenType.IN;
+                    return word;
+                case "значения":
+                    word.Type = TokenType.VALUES;
+                    return word;
+                case "колонки":
+                    word.Type = TokenType.COLONS;
+                    return word;
+
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;
