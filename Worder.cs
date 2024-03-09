@@ -153,6 +153,9 @@
                 case "сон":
                     word.Type = TokenType.SLEEP;
                     return word;
+                case "русить":
+                    word.Type = TokenType.VOVASCRIPT;
+                    return word;
 
                 /*           SQL           */
 

@@ -444,4 +444,25 @@ namespace PycLan
             return $"{Variable.View} {Operation.View} {Expression}";
         }
     }
+
+    public sealed class ProgramStatement : IStatement
+    {
+        IExpression Program;
+
+        public ProgramStatement(IExpression program)
+        {
+            Program = program;
+        }
+
+        public void Execute()
+        {
+            string code = Convert.ToString(Program.Evaluated());
+            PycLang.PycOnceLoad(code);
+        }
+
+        public override string ToString()
+        {
+            return "РУСИТЬ " + Program.ToString();
+        }
+    }
 }

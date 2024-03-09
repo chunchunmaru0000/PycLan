@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -74,7 +75,7 @@ namespace PycLan
                 for (int i = 0; i < types.Length; i++)
                     colonsJobj.Add(names[i], types[i]);
 
-                tableJobj.Add("значения", new JObject());
+                tableJobj.Add("значения", new JArray());
 
                 File.WriteAllText(database, JsonConvert.SerializeObject(jObj));
             } catch (ArgumentException) { throw new Exception($"ТАБЛИЦА С ИМЕНЕНМ <{tableName}> УЖЕ СУЩЕСТВУЕТ"); }
@@ -88,11 +89,11 @@ namespace PycLan
 
     public sealed class SQLInsert : IStatement
     {
-        public Token TableName;
-        public Token[] Colons;
-        public Token[] Values;
+        public IExpression TableName;
+        public IExpression[] Colons;
+        public IExpression[] Values;
 
-        public SQLInsert(Token tableName, Token[] colons, Token[] values)
+        public SQLInsert(IExpression tableName, IExpression[] colons, IExpression[] values)
         {
             TableName = tableName;
             Colons = colons;
@@ -105,40 +106,47 @@ namespace PycLan
             string data = File.ReadAllText(database);
             dynamic jsonData = JsonConvert.DeserializeObject(data);
 
-            string tableName;
-            if (Objects.ContainsVariable(TableName.View))
-                tableName = Convert.ToString(Objects.GetVariable(TableName.View));
-            else
-                tableName = TableName.View;
+            string tableName = Convert.ToString(TableName.Evaluated());
 
-     //       try
-       //     {
+            try
+            {
                 JObject jObj = jsonData as JObject;
                 JObject tableJobj = jObj[tableName] as JObject;
-                JObject valuesJobj = tableJobj["значения"] as JObject;
                 JObject colonsJobj = tableJobj["колонки"] as JObject;
+                JArray valuesJobj = tableJobj["значения"] as JArray;
 
                 string[] colonsNames = colonsJobj.Properties().Select(n => n.Name).ToArray();
                 string[] colonsTypes = colonsJobj.Properties().Select(n => n.Value.ToString()).ToArray();
 
-                string[] colonsReaded = Colons.Select(c => Objects.ContainsVariable(c.View) ? Convert.ToString(Objects.GetVariable(c.View)) : c.View).ToArray();
-                string[] valuesReaded = Values.Select(v => Objects.ContainsVariable(v.View) ? Convert.ToString(Objects.GetVariable(v.View)) : v.View).ToArray();
+                string[] colonsReaded = Colons.Select(c => Convert.ToString(c.Evaluated())).ToArray();
+                object[] valuesReaded = Values.Select(v => v.Evaluated()).ToArray();
 
                 int value = 0;
-                Dictionary<string, string> columnsToSave = new Dictionary<string, string>();
-                
+                //Dictionary<string, string> columnsToSave = new Dictionary<string, string>();
                 if (colonsReaded.Length > 0)
                     for (int i = 0; i < colonsNames.Length; i++)
-                        columnsToSave.Add(colonsNames[i], colonsReaded.Contains(colonsNames[i]) ? valuesReaded[value++] : "НИЧЕГО");
+                    {
+                        JObject temp = new JObject();
+                        temp.Add("колонка", colonsNames[i]);
+                        temp.Add("значение", JToken.FromObject(colonsReaded.Contains(colonsNames[i]) ? valuesReaded[value++] : "НИЧЕГО"));
+                        valuesJobj.Add(temp);
+                    }
                 else
                     for (int i = 0; i < colonsNames.Length; i++)
-                        columnsToSave.Add(colonsNames[i], valuesReaded[value++]);
+                    {
+                    //    Console.WriteLine(i);
+                    //    Console.WriteLine(value);
+                    //    Console.WriteLine(colonsNames[i]);
+                    //    Console.WriteLine(valuesReaded[value]);
 
-                foreach (var column in columnsToSave)
-                    valuesJobj.Add(column.Value, column.Key);
+                        JObject temp = new JObject();
+                        temp.Add("колонка", colonsNames[i]);
+                        temp.Add("значение", JToken.FromObject(valuesReaded[value++]));
+                        valuesJobj.Add(temp);
+                    }
 
                 File.WriteAllText(database, JsonConvert.SerializeObject(jObj));
-         //   } catch (Exception)  {  throw; }
+            } catch (Exception e)  { Console.WriteLine(e); }
         }
 
         public override string ToString()

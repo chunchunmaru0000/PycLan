@@ -176,6 +176,13 @@ namespace PycLan
             return new SleepStatement(ms);
         }
 
+        public IStatement Pycy()
+        {
+            IExpression program = Expression();
+            Sep();
+            return new ProgramStatement(program);
+        }
+
         public IStatement SQLCreateDatabasy()
         {
             Consume(TokenType.CREATE);
@@ -218,40 +225,27 @@ namespace PycLan
         public IStatement SQLInserty()
         {
             Consume(TokenType.IN);
-            Token table = Current;
-            Named();
+            IExpression table = Expression();
 
-            List<Token> colons = new List<Token>();
+            List<IExpression> colons = new List<IExpression>();
             if (Match(TokenType.COLONS))
             {
                 Consume(TokenType.LEFTSCOB);
                 while (!Match(TokenType.RIGHTSCOB, TokenType.EOF))
                 {
-                    Token current = Current;
-                    if (Match(TokenType.COMMA))
-                        continue;
-                    if (Match(TokenType.STROKE, TokenType.NUMBER))
-                    {
-                        colons.Add(current);
-                        continue;
-                    }
+                    colons.Add(Expression());
+                    Sep();
                 }
             }
 
-            List<Token> values = new List<Token>();
+            List<IExpression> values = new List<IExpression>();
             if (Match(TokenType.VALUES))
             {
                 Consume(TokenType.LEFTSCOB);
                 while (!Match(TokenType.RIGHTSCOB, TokenType.EOF))
                 {
-                    Token current = Current;
-                    if (Match(TokenType.COMMA))
-                        continue;
-                    if (Match(TokenType.STROKE, TokenType.NUMBER))
-                    {
-                        values.Add(current);
-                        continue;
-                    }
+                    values.Add(Expression());
+                    Sep();
                 }
             }
 

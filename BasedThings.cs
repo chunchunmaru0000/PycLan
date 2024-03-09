@@ -214,6 +214,8 @@ namespace PycLan
         CLEAR,
         [StringValue("СОН")]
         SLEEP,
+        [StringValue("РУСИТЬ")]
+        VOVASCRIPT,
 
         //SQL
         [StringValue("СОЗДАТЬ")]
