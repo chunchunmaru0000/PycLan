@@ -122,36 +122,32 @@ namespace PycLan
                 object[] valuesReaded = Values.Select(v => v.Evaluated()).ToArray();
 
                 int value = 0;
-                //Dictionary<string, string> columnsToSave = new Dictionary<string, string>();
+                JArray toBeAdded = new JArray();
                 if (colonsReaded.Length > 0)
                     for (int i = 0; i < colonsNames.Length; i++)
                     {
                         JObject temp = new JObject();
                         temp.Add("колонка", colonsNames[i]);
                         temp.Add("значение", JToken.FromObject(colonsReaded.Contains(colonsNames[i]) ? valuesReaded[value++] : "НИЧЕГО"));
-                        valuesJobj.Add(temp);
+                        toBeAdded.Add(temp);
                     }
                 else
                     for (int i = 0; i < colonsNames.Length; i++)
                     {
-                    //    Console.WriteLine(i);
-                    //    Console.WriteLine(value);
-                    //    Console.WriteLine(colonsNames[i]);
-                    //    Console.WriteLine(valuesReaded[value]);
-
                         JObject temp = new JObject();
                         temp.Add("колонка", colonsNames[i]);
                         temp.Add("значение", JToken.FromObject(valuesReaded[value++]));
-                        valuesJobj.Add(temp);
+                        toBeAdded.Add(temp);
                     }
 
+                valuesJobj.Add(toBeAdded);
                 File.WriteAllText(database, JsonConvert.SerializeObject(jObj));
             } catch (Exception e)  { Console.WriteLine(e); }
         }
 
         public override string ToString()
         {
-            return $"ДОБАВИТЬ В {TableName} КОЛОНКИ ({string.Join(", ", Colons.Select(c => c.ToString()))})\nЗНАЧАНИЯ({string.Join(", ", Values.Select(v => v.ToString()))})";
+            return $"ДОБАВИТЬ В {TableName} КОЛОНКИ ({string.Join(", ", Colons.Select(c => c.ToString()))})\nЗНАЧЕНИЯ({string.Join(", ", Values.Select(v => v.ToString()))})";
         }
     }
 }

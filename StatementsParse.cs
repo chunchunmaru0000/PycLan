@@ -208,8 +208,9 @@ namespace PycLan
                 Token current = Current;
                 if (Match(TokenType.COMMA))
                     continue;
-                if (Match(TokenType.STROKE, TokenType.NUMBER))
+                if (current.Type == TokenType.STROKE || current.Type == TokenType.NUMBER || current.Type == TokenType.FNUMBER || current.Type == TokenType.BUL)
                 {
+                    Match(current.Type);
                     types.Add(current);
                     continue;
                 }

@@ -182,6 +182,12 @@
                 case "число":
                     word.Type = TokenType.NUMBER;
                     return word;
+                case "точка":
+                    word.Type = TokenType.FNUMBER;
+                    return word;
+                case "обманчивость":
+                    word.Type = TokenType.BUL;
+                    return word;
 
                 case "добавить":
                     word.Type = TokenType.INSERT;

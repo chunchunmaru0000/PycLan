@@ -78,14 +78,8 @@ namespace PycLan
         WORD,
         [StringValue("СТРОКА")]
         STRING,
-        [StringValue("БУЛ")]
+        [StringValue("ИСТИННОСТЬ")]
         BOOLEAN,
-
-        [StringValue("ЧИСЛО")]
-        NUMBER,
-        [StringValue("СТРОЧКА")]
-        STROKE,
-
         [StringValue("ЦЕЛОЕ ЧИСЛО64")]
         INTEGER,
         [StringValue("НЕ ЦЕЛОЕ ЧИСЛО64")]
@@ -232,6 +226,15 @@ namespace PycLan
         VALUES,
         [StringValue("КОЛОНКИ")]
         COLONS,
+
+        [StringValue("ЧИСЛО")]
+        NUMBER,
+        [StringValue("ЧИСЛО С ТОЧКОЙ")]
+        FNUMBER,
+        [StringValue("СТРОЧКА")]
+        STROKE,
+        [StringValue("ПРАВДИВОСТЬ")]
+        BUL,
     }
 
     public class Token
