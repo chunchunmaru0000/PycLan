@@ -56,7 +56,7 @@ namespace PycLan
         private IStatement Printy()
         {
             IStatement print = new PrintStatement(Expression());
-            Match(TokenType.SEMICOLON);
+            Sep();
             return print;
         }
 
@@ -113,14 +113,14 @@ namespace PycLan
             Token name = Current;
             Consume(TokenType.VARIABLE);
             IStatement statement = new IncDecBeforeExpression(current, name);
-            Match(TokenType.SEMICOLON);
+            Sep();
             return statement;
         }
 
         public IStatement Breaky()
         {
             IStatement statement = new BreakStatement();
-            Match(TokenType.SEMICOLON);
+            Sep();
             return statement;
         }
 
@@ -148,7 +148,7 @@ namespace PycLan
             while (!Match(TokenType.RIGHTSCOB))
             {
                 args.Add(Consume(TokenType.VARIABLE));
-                Match(TokenType.COMMA, TokenType.SEMICOLON);
+                Sep();
             }
             IStatement body = OneOrBlock();
             return new DeclareFunctionStatement(name, args.ToArray(), body);

@@ -466,6 +466,5 @@ namespace PycLan
         }
     }
 
-    public sealed class NothingStatement : IStatement { public void Execute() { } public override string ToString() => "НИЧЕГО";
-    }
+    public sealed class NothingStatement : IStatement { public void Execute() { } public override string ToString() => "НИЧЕГО"; }
 }

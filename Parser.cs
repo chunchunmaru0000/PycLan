@@ -10,6 +10,8 @@ namespace PycLan
         public int position;
         public int line = 0;
         public static Token Mul = new Token() { View = "*", Value = null, Type = TokenType.MULTIPLICATION };
+        public static Token AllToken = new Token () { View = "всё", Value = "всё", Type = TokenType.ALL };
+        public static NumExpression All = new NumExpression(AllToken);
         public static IStatement Nothing = new NothingStatement();
 
         public Parser(Token[] tokens) 
@@ -60,7 +62,8 @@ namespace PycLan
                    type == TokenType.LEFTSCOB   ||
                    type == TokenType.FUNCTION   ||
                    type == TokenType.NOW        ||
-                   type == TokenType.LCUBSCOB   ;
+                   type == TokenType.LCUBSCOB   ||
+                   type == TokenType.SELECT     ;
         }
 
         private bool Match(TokenType type)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -127,21 +128,29 @@ namespace PycLan
                     {
                         JObject temp = new JObject();
                         temp.Add("колонка", colonsNames[i]);
-                        temp.Add("значение", JToken.FromObject(colonsReaded.Contains(colonsNames[i]) ? valuesReaded[value++] : "НИЧЕГО"));
+                        temp.Add("значение", JToken.FromObject(colonsReaded.Contains(colonsNames[i]) ? valuesReaded[value++] is bool ? (bool)valuesReaded[value - 1] ? "Истина" : "Ложь" : valuesReaded[value - 1] : "НИЧЕГО"));
                         toBeAdded.Add(temp);
                     }
                 else
                     for (int i = 0; i < colonsNames.Length; i++)
                     {
+                     /*
+                        Console.WriteLine(PrintStatement.ListString(colonsNames.Select(c => (object)c).ToList()));
+                        Console.WriteLine(PrintStatement.ListString(valuesReaded.Select(c => c).ToList()));
+                        Console.WriteLine(i);
+                        Console.WriteLine(value);
+                        Console.WriteLine(colonsNames[i]);
+                        Console.WriteLine(valuesReaded[value]);
+                    */
                         JObject temp = new JObject();
                         temp.Add("колонка", colonsNames[i]);
-                        temp.Add("значение", JToken.FromObject(valuesReaded[value++]));
+                        temp.Add("значение", JToken.FromObject(valuesReaded[value++] is bool ? (bool)valuesReaded[value-1] ? "Истина" : "Ложь" : valuesReaded[value-1]));
                         toBeAdded.Add(temp);
                     }
 
                 valuesJobj.Add(toBeAdded);
                 File.WriteAllText(database, JsonConvert.SerializeObject(jObj));
-            } catch (Exception e)  { Console.WriteLine(e); }
+            } catch (Exception e)  { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(e); Console.ResetColor(); }
         }
 
         public override string ToString()
@@ -171,18 +180,46 @@ namespace PycLan
             string database = Convert.ToString(Objects.GetVariable("ИСПБД")) + ".pycdb";
             string data = File.ReadAllText(database);
             dynamic jsonData = JsonConvert.DeserializeObject(data);
+            JObject jObj = jsonData as JObject;
 
-            if (Condition != null)
+            List<object> selected = new List<object>();
+
+            if (Condition == null)
             {
+                if (froms.Length == 1)
+                {
+                    JObject tableJobj = jObj[froms[0]] as JObject;
+                    JArray values = tableJobj["значения"] as JArray;
 
+                    Console.WriteLine(PrintStatement.ListString(selections.Select(s => (object)s).ToList()));
+
+                    foreach (string selection in selections)
+                    {
+                        // object[] toBeAdded = values.Select(v => v["значение"]).ToArray();
+                       // Console.WriteLine("СЕЛЕКТИОН " + selection);
+                        if (selection == "всё")
+                        {
+                      //      var a = values.Select(v => v.ToArray().Select(t => (object)t["значение"]).ToList()).ToList();
+                      //      Console.WriteLine(a[0][0]);
+                      //      Console.WriteLine(a[0][1]);
+                      //      Console.WriteLine(a[0][2]);
+                      //      Console.WriteLine(a[0][3]);
+                            selected.Add(values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList());
+                        }
+                        else
+                            Console.WriteLine("ЭЭЭЭЭ");
+                       // selected.Add(values.Where(v => (string)v["колонка"] == selection).Select(v => v["значение"]).ToArray());
+                    }
+                }
+                else
+                    throw new NotImplementedException("ДАУН3");
             }
             else
             {
-
+                throw new NotImplementedException("ДАУН2");
             }
 
-            throw new NotImplementedException("ФЫВФЫВАФВЫАФВАПФВАПФВАППФВАФ");
-            return null;
+            return selected;
         }
     }
 }

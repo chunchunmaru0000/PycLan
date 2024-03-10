@@ -76,7 +76,6 @@ namespace PycLan
 
         private IExpression SQLy()
         {
-            Consume(TokenType.SELECT);
             List<IExpression> selections = new List<IExpression>();
             while (!Match(TokenType.FROM)) 
             { 
@@ -118,8 +117,11 @@ namespace PycLan
                     return FuncParsy();
             }
 
-            if (current.Type == TokenType.SELECT)
+            if (Match(TokenType.SELECT))
                 return SQLy();
+
+            if (Match(TokenType.ALL))
+                return All;
 
             if (current.Type == TokenType.FUNCTION)
                 return FuncParsy();
