@@ -182,7 +182,7 @@ namespace PycLan
             dynamic jsonData = JsonConvert.DeserializeObject(data);
             JObject jObj = jsonData as JObject;
 
-            List<object> selected = new List<object>();
+            object[] selected = new object[selections.Length];
 
             if (Condition == null)
             {
@@ -191,25 +191,22 @@ namespace PycLan
                     JObject tableJobj = jObj[froms[0]] as JObject;
                     JArray values = tableJobj["значения"] as JArray;
 
-                    Console.WriteLine(PrintStatement.ListString(selections.Select(s => (object)s).ToList()));
-
-                    foreach (string selection in selections)
-                    {
-                        // object[] toBeAdded = values.Select(v => v["значение"]).ToArray();
-                       // Console.WriteLine("СЕЛЕКТИОН " + selection);
-                        if (selection == "всё")
-                        {
-                      //      var a = values.Select(v => v.ToArray().Select(t => (object)t["значение"]).ToList()).ToList();
-                      //      Console.WriteLine(a[0][0]);
-                      //      Console.WriteLine(a[0][1]);
-                      //      Console.WriteLine(a[0][2]);
-                      //      Console.WriteLine(a[0][3]);
-                            selected.Add(values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList());
-                        }
+                    for (int i = 0; i < selections.Length; i++)
+                        if (selections[i] == "всё")
+                            selected[i] = values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
                         else
-                            Console.WriteLine("ЭЭЭЭЭ");
-                       // selected.Add(values.Where(v => (string)v["колонка"] == selection).Select(v => v["значение"]).ToArray());
-                    }
+                        {
+                            JToken[][] valuesArray = values.Select(v => v.ToArray()).ToArray();
+                            List<object> toBeAdded = new List<object>();
+                            foreach (JToken[] value in valuesArray)
+                            {
+                                foreach (JToken token in value)
+                                    if ((string)token["колонка"] == selections[i])
+                                        toBeAdded.Add(token["значение"]);
+                                selected[i] = toBeAdded;
+                            }
+                            
+                        }
                 }
                 else
                     throw new NotImplementedException("ДАУН3");
@@ -219,7 +216,12 @@ namespace PycLan
                 throw new NotImplementedException("ДАУН2");
             }
 
-            return selected;
+            return selected.ToList();
+        }
+
+        public override string ToString()
+        {
+            return $"ВЫБРАТЬ {string.Join(", ", Selections)} ИЗ {string.Join(", ", Froms)}" + (Condition != null ? "ГДЕ {Condition}" : "");
         }
     }
 }

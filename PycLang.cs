@@ -8,11 +8,12 @@ namespace PycLan
     public static class PycLang
     {
         public static bool Tokens = false;
-        public static bool PrintVariablesInDebug = true;
+        public static bool PrintVariablesInDebug = false;//
         public static bool PrintFunctionsInDebug = false;
         public static bool PrintVariablesAfterDebug = false;//
         public static bool PrintFunctionsAfterDebug = false;
-        public static bool Debug = true;//
+        public static bool PrintProgram = false;//
+        public static bool Debug = false;//
         public static bool TimePrint = true;
         public static void LogTokens(ref Token[] tokens)
         {
@@ -56,7 +57,8 @@ namespace PycLan
 
                 //new Parser(tokens).Run(Debug, PrintVariablesInDebug, PrintFunctionsInDebug);
                 IStatement program = new Parser(tokens).Parse();
-                Console.WriteLine(program);
+                if (PrintProgram)
+                    Console.WriteLine(program);
                 program.Execute();
 
                 stopwatch.Stop();

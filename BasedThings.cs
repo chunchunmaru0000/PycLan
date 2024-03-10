@@ -43,6 +43,8 @@ namespace PycLan
                     return "СПИСОК";
                 case "System.Object[]":
                     return "СПИСОК";
+                case "PycLan.SQLSelectExpression":
+                    return "ВЫБОР ИЗ ТАБЛИЦЫ";
                 default:
                     return value.GetType().ToString();
                     //throw new Exception($"НЕ ПОМНЮ ЧТО БЫ ДОБАЛЯЛ ТАКОЙ ТИП: <{value.GetType().Name}> У <{value}>");
