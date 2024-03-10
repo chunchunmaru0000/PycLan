@@ -465,4 +465,7 @@ namespace PycLan
             return "РУСИТЬ " + Program.ToString();
         }
     }
+
+    public sealed class NothingStatement : IStatement { public void Execute() { } public override string ToString() => "НИЧЕГО";
+    }
 }

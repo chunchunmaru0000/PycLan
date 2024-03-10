@@ -190,7 +190,7 @@ namespace PycLan
             Token database = Current;
             Named();
             Sep();
-            return new SQLCreateDatabase(database);
+            return new SQLCreateDatabaseStatement(database);
         }
 
         public IStatement SQLCreateTably()
@@ -220,7 +220,7 @@ namespace PycLan
                     continue;
                 }
             }
-            return new SQLCreateTable(tableName, types.ToArray(), names.ToArray());
+            return new SQLCreateTableStatement(tableName, types.ToArray(), names.ToArray());
         }
 
         public IStatement SQLInserty()
@@ -251,7 +251,7 @@ namespace PycLan
             }
 
             Sep();
-            return new SQLInsert(table, colons.ToArray(), values.ToArray());
+            return new SQLInsertStatement(table, colons.ToArray(), values.ToArray());
         }
     }
 }

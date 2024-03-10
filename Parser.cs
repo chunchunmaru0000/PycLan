@@ -10,6 +10,7 @@ namespace PycLan
         public int position;
         public int line = 0;
         public static Token Mul = new Token() { View = "*", Value = null, Type = TokenType.MULTIPLICATION };
+        public static IStatement Nothing = new NothingStatement();
 
         public Parser(Token[] tokens) 
         {
@@ -158,6 +159,9 @@ namespace PycLan
 
             if (Printble(current.Type))
                 return Printy();
+
+            if (Sep())
+                return Nothing;
 
             try { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"{Get(-1)}; {current}; {Get(1)};"); Console.ResetColor(); } catch (Exception) { }
             throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");

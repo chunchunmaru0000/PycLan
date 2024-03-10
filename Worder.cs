@@ -1,4 +1,6 @@
-﻿namespace PycLan
+﻿using System.Net;
+
+namespace PycLan
 {
     static class Worder
     {
@@ -188,6 +190,12 @@
                 case "обманчивость":
                     word.Type = TokenType.BUL;
                     return word;
+                case "все":
+                    word.Type = TokenType.ALL;
+                    return word;
+                case "всё":
+                    word.Type = TokenType.ALL;
+                    return word;
 
                 case "добавить":
                     word.Type = TokenType.INSERT;
@@ -201,7 +209,15 @@
                 case "колонки":
                     word.Type = TokenType.COLONS;
                     return word;
-
+                case "выбрать":
+                    word.Type = TokenType.SELECT;
+                    return word;
+                case "из":
+                    word.Type = TokenType.FROM;
+                    return word;
+                case "где":
+                    word.Type = TokenType.WHERE;
+                    return word;
                 default:
                     word.Type = TokenType.VARIABLE;
                     return word;

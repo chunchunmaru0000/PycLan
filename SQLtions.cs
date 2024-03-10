@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace PycLan
 {
-    public sealed class SQLCreateDatabase : IStatement
+    public sealed class SQLCreateDatabaseStatement : IStatement
     {
         public Token Database;
 
-        public SQLCreateDatabase(Token database)
+        public SQLCreateDatabaseStatement(Token database)
         {
             Database = database;
         }
@@ -35,13 +34,13 @@ namespace PycLan
         }
     }
 
-    public sealed class SQLCreateTable: IStatement
+    public sealed class SQLCreateTableStatement : IStatement
     {
         public Token TableName;
         public Token[] Types;
         public Token[] Names;
 
-        public SQLCreateTable(Token tableName, Token[] types, Token[] names)
+        public SQLCreateTableStatement(Token tableName, Token[] types, Token[] names)
         {
             TableName = tableName;
             Types = types;
@@ -87,13 +86,13 @@ namespace PycLan
         }
     }
 
-    public sealed class SQLInsert : IStatement
+    public sealed class SQLInsertStatement : IStatement
     {
         public IExpression TableName;
         public IExpression[] Colons;
         public IExpression[] Values;
 
-        public SQLInsert(IExpression tableName, IExpression[] colons, IExpression[] values)
+        public SQLInsertStatement(IExpression tableName, IExpression[] colons, IExpression[] values)
         {
             TableName = tableName;
             Colons = colons;
@@ -148,6 +147,42 @@ namespace PycLan
         public override string ToString()
         {
             return $"ДОБАВИТЬ В {TableName} КОЛОНКИ ({string.Join(", ", Colons.Select(c => c.ToString()))})\nЗНАЧЕНИЯ({string.Join(", ", Values.Select(v => v.ToString()))})";
+        }
+    }
+
+    public sealed class SQLSelectExpression : IExpression
+    {
+        List<IExpression> Selections;
+        List<IExpression> Froms;
+        IExpression Condition;
+
+        public SQLSelectExpression(List<IExpression> selections, List<IExpression> froms, IExpression condition)
+        {
+            Selections = selections;
+            Froms = froms;
+            Condition = condition;
+        }
+
+        public object Evaluated()
+        {
+            string[] selections = Selections.Select(s => Convert.ToString(s.Evaluated())).ToArray();
+            string[] froms = Froms.Select(f => Convert.ToString(f.Evaluated())).ToArray();
+
+            string database = Convert.ToString(Objects.GetVariable("ИСПБД")) + ".pycdb";
+            string data = File.ReadAllText(database);
+            dynamic jsonData = JsonConvert.DeserializeObject(data);
+
+            if (Condition != null)
+            {
+
+            }
+            else
+            {
+
+            }
+
+            throw new NotImplementedException("ФЫВФЫВАФВЫАФВАПФВАПФВАППФВАФ");
+            return null;
         }
     }
 }

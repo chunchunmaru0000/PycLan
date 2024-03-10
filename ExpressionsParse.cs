@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace PycLan
 {
@@ -73,6 +74,30 @@ namespace PycLan
             throw new NotImplementedException($"НЕВЕРНЫЙ СИНТАКСИС ГДЕ-ТО РЯДОМ С: {result}");
         }
 
+        private IExpression SQLy()
+        {
+            Consume(TokenType.SELECT);
+            List<IExpression> selections = new List<IExpression>();
+            while (!Match(TokenType.FROM)) 
+            { 
+                selections.Add(Expression());
+                Sep();
+            }
+
+            List<IExpression> froms = new List<IExpression>();
+            while (!Match(TokenType.SEMICOLON, TokenType.WHERE))
+            {
+                froms.Add(Expression());
+                Match(TokenType.COMMA);
+            }
+
+            IExpression condition = null;
+            if (Get(-1).Type == TokenType.WHERE)
+                condition = Expression();
+
+            return new SQLSelectExpression(selections, froms, condition);
+        }
+
         private IExpression Primary()
         {
             Token current = Current;
@@ -92,6 +117,9 @@ namespace PycLan
                 if (next.Type == TokenType.LEFTSCOB )
                     return FuncParsy();
             }
+
+            if (current.Type == TokenType.SELECT)
+                return SQLy();
 
             if (current.Type == TokenType.FUNCTION)
                 return FuncParsy();

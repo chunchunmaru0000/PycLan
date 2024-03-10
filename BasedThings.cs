@@ -226,6 +226,12 @@ namespace PycLan
         VALUES,
         [StringValue("КОЛОНКИ")]
         COLONS,
+        [StringValue("ГДЕ")]
+        WHERE,
+        [StringValue("ВЫБРАТЬ")]
+        SELECT,
+        [StringValue("ИЗ")]
+        FROM,
 
         [StringValue("ЧИСЛО")]
         NUMBER,
@@ -235,6 +241,9 @@ namespace PycLan
         STROKE,
         [StringValue("ПРАВДИВОСТЬ")]
         BUL,
+
+        [StringValue("ВСЁ")]
+        ALL,
     }
 
     public class Token
