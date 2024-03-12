@@ -13,6 +13,7 @@ namespace PycLan
         public static Token AllToken = new Token () { View = "всё", Value = "всё", Type = TokenType.ALL };
         public static NumExpression All = new NumExpression(AllToken);
         public static IStatement Nothing = new NothingStatement();
+        public static IExpression Nothingness = new NothingExpression();
 
         public Parser(Token[] tokens) 
         {
@@ -77,6 +78,14 @@ namespace PycLan
         private bool Match(TokenType type0, TokenType type1)
         {
             if (Current.Type != type0 && Current.Type != type1)
+                return false;
+            position++;
+            return true;
+        }
+
+        private bool Match(TokenType type0, TokenType type1, TokenType type2)
+        {
+            if (Current.Type != type0 && Current.Type != type1 && Current.Type != type2)
                 return false;
             position++;
             return true;

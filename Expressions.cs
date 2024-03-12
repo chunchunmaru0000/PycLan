@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace PycLan
@@ -526,4 +527,6 @@ namespace PycLan
 
         public override string ToString() => $"СПИСОК[{PrintStatement.ListString(Items.Select(i => (object)i).ToList())}]";
     }
+
+    public sealed class NothingExpression : IExpression { public object Evaluated() => (long)0; public override string ToString() => "НИЧЕГО"; }
 }

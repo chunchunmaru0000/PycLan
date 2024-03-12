@@ -234,6 +234,10 @@ namespace PycLan
         SELECT,
         [StringValue("ИЗ")]
         FROM,
+        [StringValue("ОТ")]
+        AT,
+        [StringValue("КАК")]
+        AS,
 
         [StringValue("ЧИСЛО")]
         NUMBER,

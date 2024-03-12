@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -26,7 +25,7 @@ namespace PycLan
                 name = Database.View;
             var database = new { бд = name };
             string json = JsonConvert.SerializeObject(database);
-            File.WriteAllText($"{name}.pycdb", json);
+            File.WriteAllText($"{name}.pycdb", json, System.Text.Encoding.UTF8);
         }
 
         public override string ToString() => $"СОЗДАТЬ БАЗУ ДАННЫХ <{Database}>";
@@ -48,7 +47,7 @@ namespace PycLan
         public void Execute()
         {
             string database = Convert.ToString(Objects.GetVariable("ИСПБД")) + ".pycdb";
-            string data = File.ReadAllText(database);
+            string data = File.ReadAllText(database, System.Text.Encoding.UTF8);
             dynamic jsonData = JsonConvert.DeserializeObject(data);
 
             string tableName;
@@ -74,8 +73,13 @@ namespace PycLan
 
                 tableJobj.Add("значения", new JArray());
 
-                File.WriteAllText(database, JsonConvert.SerializeObject(jObj));
-            } catch (ArgumentException) { throw new Exception($"ТАБЛИЦА С ИМЕНЕНМ <{tableName}> УЖЕ СУЩЕСТВУЕТ"); }
+                File.WriteAllText(database, JsonConvert.SerializeObject(jObj), System.Text.Encoding.UTF8);
+            } catch (ArgumentException) {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"ТАБЛИЦА С ИМЕНЕНМ <{tableName}> УЖЕ СУЩЕСТВУЕТ");
+                Console.ResetColor();
+              //  throw new Exception($"ТАБЛИЦА С ИМЕНЕНМ <{tableName}> УЖЕ СУЩЕСТВУЕТ"); 
+            }
         }
 
         public override string ToString() => $" СОЗДАТЬ ТАБЛИЦУ {TableName} {{ТИПЫ: {string.Join(", ", Types.Select(t => t.ToString()))};\n НАЗВАНИЯ: {string.Join(", ", Names.Select(n => n.ToString()))};}}";
@@ -97,7 +101,7 @@ namespace PycLan
         public void Execute()
         {
             string database = Convert.ToString(Objects.GetVariable("ИСПБД")) + ".pycdb";
-            string data = File.ReadAllText(database);
+            string data = File.ReadAllText(database, System.Text.Encoding.UTF8);
             dynamic jsonData = JsonConvert.DeserializeObject(data);
 
             string tableName = Convert.ToString(TableName.Evaluated());
@@ -136,7 +140,7 @@ namespace PycLan
                     }
 
                 valuesJobj.Add(toBeAdded);
-                File.WriteAllText(database, JsonConvert.SerializeObject(jObj));
+                File.WriteAllText(database, JsonConvert.SerializeObject(jObj), System.Text.Encoding.UTF8);
             } catch (Exception e)  { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(e); Console.ResetColor(); }
         }
 
@@ -146,36 +150,49 @@ namespace PycLan
     public sealed class SQLSelectExpression : IExpression
     {
         List<IExpression> Selections;
+        List<IExpression> Ats;
+        List<IExpression> Aliases;
         List<IExpression> Froms;
         IExpression Condition;
 
-        public SQLSelectExpression(List<IExpression> selections, List<IExpression> froms, IExpression condition)
+        public SQLSelectExpression(List<IExpression> selections, List<IExpression> ats, List<IExpression> aliases, List<IExpression> froms, IExpression condition)
         {
             Selections = selections;
+            Ats = ats;
+            Aliases = aliases;
             Froms = froms;
             Condition = condition;
         }
 
         public object Evaluated()
         {
-            List<string> selections = Selections.Select(s => Convert.ToString(s.Evaluated())).ToList();
+            string[] selections = Selections.Select(s => Convert.ToString(s.Evaluated())).ToArray();
+            // ats
+            string[] ats = new string[selections.Length];
+            for (int i = 0; i < selections.Length; i++)
+                ats[i] = Convert.ToString(Ats[i].Evaluated());
+            // aliases
+            string[] aliases = new string[selections.Length];
+            for (int i = 0; i < selections.Length; i++)
+                aliases[i] = Aliases[i] == Parser.Nothingness ? selections[i] : Convert.ToString(Aliases[i].Evaluated());
+            //froms
             string[] froms = Froms.Select(f => Convert.ToString(f.Evaluated())).ToArray();
-
+            // begin setup vars
             string database = Convert.ToString(Objects.GetVariable("ИСПБД")) + ".pycdb";
-            string data = File.ReadAllText(database);
+            string data = File.ReadAllText(database, System.Text.Encoding.UTF8);
             dynamic jsonData = JsonConvert.DeserializeObject(data);
             JObject jObj = jsonData as JObject;
-
-            object[] selected = selections.Select(s => new object[] { s, null }).ToArray();
-
+            // selected dicts
+            object[] selected = aliases.Select(a => new List<object> { a, null }).ToArray();
+            // single from
             if (froms.Length == 1)
             {
                 JObject tableJobj = jObj[froms[0]] as JObject;
                 JArray values = tableJobj["значения"] as JArray;
 
-                for (int i = 0; i < selections.Count; i++)
-                    if (selections[i] == "всё")
-                        selected[i] = values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
+                for (int i = 0; i < selections.Length; i++)
+                    if (selections[i] == "всё") // to be fixed
+                        ((List<object>)selected[i])[1] = values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
                     else
                     {
                         JToken[][] valuesArray = values.Select(v => v.ToArray()).ToArray();
@@ -185,17 +202,38 @@ namespace PycLan
                             foreach (JToken token in value)
                                 if ((string)token["колонка"] == selections[i])
                                     toBeAdded.Add(token["значение"]);
-                            selected[i] = toBeAdded;
+                            ((List<object>)selected[i])[1] = toBeAdded;
                         }
-
                     }
             }
-            else
+            else // multiple from
             {
-                throw new NotImplementedException("ДАУН3");
+                try
+                {
+                    JObject[] tableJobj = froms.Select(f => jObj[f] as JObject).ToArray();
+                    JArray[] values = tableJobj.Select(t => t["значения"] as JArray).ToArray();
+                    Dictionary<string, JArray> fromToValues = new Dictionary<string, JArray>();
+                    for (int i = 0; i < froms.Length; i++)
+                        fromToValues.Add(froms[i], values[i]);
+
+                    for (int i = 0; i < selections.Length; i++)
+                        if (selections[i] == "всё") // to be fixed
+                            ((List<object>)selected[i])[1] = fromToValues[ats[i]].Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
+                        else
+                        {
+                            JToken[][] valuesArray = fromToValues[ats[i]].Select(v => v.ToArray()).ToArray();
+                            List<object> toBeAdded = new List<object>();
+                            foreach (JToken[] value in valuesArray)
+                            {
+                                foreach (JToken token in value)
+                                    if ((string)token["колонка"] == selections[i])
+                                        toBeAdded.Add(token["значение"]);
+                                ((List<object>)selected[i])[1] = toBeAdded;
+                            }
+                        }
+                }
+                catch (KeyNotFoundException) { throw new Exception($"НЕ СУЩЕСТВУЕТ СТОЛБЦА С НЕКОТОРЫМ НАЗВАНИЕМ\nЭТО МОЖЕТ БЫТЬ ПО ПРИЧИНЕ НЕ УКАЗАНИЯ ИСТОЧНИКА ПРИ ВЫБОРЕ ИЗ НЕСКОЛЬКИХ ТАБЛИЦ"); }
             }
-
-
 
             if (Condition == null)
                 return selected.ToList();

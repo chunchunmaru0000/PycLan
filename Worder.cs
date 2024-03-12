@@ -215,6 +215,12 @@ namespace PycLan
                 case "из":
                     word.Type = TokenType.FROM;
                     return word;
+                case "от":
+                    word.Type = TokenType.AT;
+                    return word;
+                case "как":
+                    word.Type = TokenType.AS;
+                    return word;
                 case "где":
                     word.Type = TokenType.WHERE;
                     return word;

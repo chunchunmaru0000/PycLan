@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace PycLan
 {
@@ -77,24 +76,34 @@ namespace PycLan
         private IExpression SQLy()
         {
             List<IExpression> selections = new List<IExpression>();
+            List<IExpression> ats = new List<IExpression>();
+            List<IExpression> aliases = new List<IExpression>();
             while (!Match(TokenType.FROM)) 
             { 
                 selections.Add(Expression());
-                Sep();
+                if (Match(TokenType.AT))
+                    ats.Add(Expression());
+                else
+                    ats.Add(Nothingness);
+                if (Match(TokenType.AS))
+                    aliases.Add(Addity());
+                else
+                    aliases.Add(Nothingness);
+                Match(TokenType.COMMA, TokenType.AND);
             }
 
             List<IExpression> froms = new List<IExpression>();
-            while (!Match(TokenType.SEMICOLON, TokenType.WHERE))
+            while (!Match(TokenType.SEMICOLON, TokenType.WHERE, TokenType.EOF))
             {
                 froms.Add(Expression());
-                Match(TokenType.COMMA);
+                Match(TokenType.COMMA, TokenType.AND);
             }
 
             IExpression condition = null;
             if (Get(-1).Type == TokenType.WHERE)
                 condition = Expression();
 
-            return new SQLSelectExpression(selections, froms, condition);
+            return new SQLSelectExpression(selections, ats, aliases, froms, condition);
         }
 
         private IExpression Primary()
