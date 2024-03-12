@@ -8,21 +8,15 @@ namespace PycLan
     {
         public Token Value { get; set; }
 
-        public NumExpression(Token value)
-        {
-            Value = value;
-        }
+        public NumExpression(Token value) => Value = value;
 
-        public object Evaluated()
-        {
-            return Value.Value;
-        } 
+        public object Evaluated() => Value.Value;
 
         public override string ToString()
         {
             object value = Value.Value;
             if (value is List<object>)
-                return $"[{string.Join(", ", value)}]";
+                return PrintStatement.ListString((List<object>)value);
             if (value is bool)
                 return (bool)value ? "Истина" : "Ложь";
             return Convert.ToString(Value);
@@ -60,10 +54,7 @@ namespace PycLan
             }
         }
 
-        public override string ToString()
-        {
-            return Operation.View + ' ' + Value.ToString();
-        }
+        public override string ToString() => Operation.View + ' ' + Value.ToString();
     }
 
     public sealed class BinExpression : IExpression 
@@ -156,10 +147,7 @@ namespace PycLan
             }
         }
 
-        public override string ToString()
-        {
-            return $"{left} {operation.View} {right};";
-        }
+        public override string ToString() => $"{left} {operation.View} {right};";
     }
 
     public sealed class CmpExpression : IExpression
@@ -254,10 +242,7 @@ namespace PycLan
             throw new Exception($"НЕЛЬЗЯ СРАВНИВАТЬ РАЗНЫЕ ТИПЫ: <{left}> <{comparation}> <{right}>");
         }
 
-        public override string ToString()
-        {
-            return $"{left} {comparation.View} {right}";
-        }
+        public override string ToString() => $"{left} {comparation.View} {right}";
     }
 
     public sealed class ShortIfExpression : IExpression
@@ -282,10 +267,7 @@ namespace PycLan
                 return Nepravda.Evaluated();
         }
 
-        public override string ToString()
-        {
-            return $"({Condition} ? {Pravda} : {Nepravda})";
-        }
+        public override string ToString() => $"({Condition} ? {Pravda} : {Nepravda})";
     }
 
     public sealed class VariableExpression : IExpression
@@ -299,15 +281,12 @@ namespace PycLan
             Value = Objects.GetVariable(Name);
         }
 
-        public object Evaluated() 
-        { 
-            return Objects.GetVariable(Name); 
-        }
+        public object Evaluated() => Objects.GetVariable(Name); 
 
         public override string ToString()
         {
             if (Value is List<object>)
-                return $"[{string.Join(", ", Value)}]";
+                return PrintStatement.ListString((List<object>)Value);
             return $"{Name} ИМЕЕТ ЗНАЧЕНИЕ {Value}";
         }
     }
@@ -397,10 +376,7 @@ namespace PycLan
             throw new Exception($"С ДАННЫМ ЗНАЧЕНИЕМ {value} ДАННОЕ ДЕЙСТВИЕ ({Operation.View}) НЕВОЗМОЖНО");
         }
 
-        public override string ToString()
-        {
-            return '<' + Operation.ToString() + Name + '>';
-        }
+        public override string ToString() => '<' + Operation.ToString() + Name + '>';
     }
 
     public sealed class FunctionExpression : IExpression 
@@ -420,10 +396,7 @@ namespace PycLan
             Args = args;
         }
 
-        public void AddArg(IExpression arg)
-        {
-            Args.Add(arg);
-        }
+        public void AddArg(IExpression arg) => Args.Add(arg);
 
         public object Evaluated()
         {
@@ -450,25 +423,16 @@ namespace PycLan
                 throw new Exception($"НЕСУЩЕСТВУЮЩАЯ ФУНКЦИЯ ХОТЯ БЫ СЕЙЧАС: <{Name.View}>");
         }
 
-        public override string ToString()
-        {
-            return $"ФУНКЦИЯ {Name.View}({string.Join(", ", Args.Select(a => a.ToString()))})";
-        }
+        public override string ToString() => $"ФУНКЦИЯ {Name.View}({string.Join(", ", Args.Select(a => a.ToString()))})";
     }
 
     public sealed class NowExpression : IExpression
     {
         public double Time;
-        public object Evaluated()
-        {
-            Time = (double)DateTime.Now.Ticks / 10000;
-            return Time;
-        }
 
-        public override string ToString()
-        {
-            return $"СЕЙЧАС<{Time}>";
-        }
+        public object Evaluated() => (double)DateTime.Now.Ticks / 10000;
+
+        public override string ToString() => $"СЕЙЧАС<{Time}>";
     }
 
     public sealed class ListTakeExpression : IExpression
@@ -550,10 +514,7 @@ namespace PycLan
     {
         public List<IExpression> Items;
 
-        public ListExpression(List<IExpression> items)
-        {
-            Items = items;
-        }
+        public ListExpression(List<IExpression> items) => Items = items;
 
         public object Evaluated()
         {
@@ -563,9 +524,6 @@ namespace PycLan
             return items;
         }
 
-        public override string ToString()
-        {
-            return "СПИСОК";
-        }
+        public override string ToString() => $"СПИСОК[{PrintStatement.ListString(Items.Select(i => (object)i).ToList())}]";
     }
 }

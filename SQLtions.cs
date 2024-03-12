@@ -29,10 +29,7 @@ namespace PycLan
             File.WriteAllText($"{name}.pycdb", json);
         }
 
-        public override string ToString()
-        {
-            return $"СОЗДАТЬ БАЗУ ДАННЫХ <{Database}>";
-        }
+        public override string ToString() => $"СОЗДАТЬ БАЗУ ДАННЫХ <{Database}>";
     }
 
     public sealed class SQLCreateTableStatement : IStatement
@@ -81,10 +78,7 @@ namespace PycLan
             } catch (ArgumentException) { throw new Exception($"ТАБЛИЦА С ИМЕНЕНМ <{tableName}> УЖЕ СУЩЕСТВУЕТ"); }
         }
 
-        public override string ToString()
-        {
-            return $" СОЗДАТЬ ТАБЛИЦУ {TableName} {{ТИПЫ: {string.Join(", ", Types.Select(t => t.ToString()))};\n НАЗВАНИЯ: {string.Join(", ", Names.Select(n => n.ToString()))};}}";
-        }
+        public override string ToString() => $" СОЗДАТЬ ТАБЛИЦУ {TableName} {{ТИПЫ: {string.Join(", ", Types.Select(t => t.ToString()))};\n НАЗВАНИЯ: {string.Join(", ", Names.Select(n => n.ToString()))};}}";
     }
 
     public sealed class SQLInsertStatement : IStatement
@@ -134,14 +128,7 @@ namespace PycLan
                 else
                     for (int i = 0; i < colonsNames.Length; i++)
                     {
-                     /*
-                        Console.WriteLine(PrintStatement.ListString(colonsNames.Select(c => (object)c).ToList()));
-                        Console.WriteLine(PrintStatement.ListString(valuesReaded.Select(c => c).ToList()));
-                        Console.WriteLine(i);
-                        Console.WriteLine(value);
-                        Console.WriteLine(colonsNames[i]);
-                        Console.WriteLine(valuesReaded[value]);
-                    */
+                        // Console.WriteLine(PrintStatement.ListString(colonsNames.Select(c => (object)c).ToList())); Console.WriteLine(PrintStatement.ListString(valuesReaded.Select(c => c).ToList())); Console.WriteLine(i); Console.WriteLine(value); Console.WriteLine(colonsNames[i]); Console.WriteLine(valuesReaded[value]);
                         JObject temp = new JObject();
                         temp.Add("колонка", colonsNames[i]);
                         temp.Add("значение", JToken.FromObject(valuesReaded[value++] is bool ? (bool)valuesReaded[value-1] ? "Истина" : "Ложь" : valuesReaded[value-1]));
@@ -153,10 +140,7 @@ namespace PycLan
             } catch (Exception e)  { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine(e); Console.ResetColor(); }
         }
 
-        public override string ToString()
-        {
-            return $"ДОБАВИТЬ В {TableName} КОЛОНКИ ({string.Join(", ", Colons.Select(c => c.ToString()))})\nЗНАЧЕНИЯ({string.Join(", ", Values.Select(v => v.ToString()))})";
-        }
+        public override string ToString() => $"ДОБАВИТЬ В {TableName} КОЛОНКИ ({string.Join(", ", Colons.Select(c => c.ToString()))})\nЗНАЧЕНИЯ({string.Join(", ", Values.Select(v => v.ToString()))})";
     }
 
     public sealed class SQLSelectExpression : IExpression
@@ -174,7 +158,7 @@ namespace PycLan
 
         public object Evaluated()
         {
-            string[] selections = Selections.Select(s => Convert.ToString(s.Evaluated())).ToArray();
+            List<string> selections = Selections.Select(s => Convert.ToString(s.Evaluated())).ToList();
             string[] froms = Froms.Select(f => Convert.ToString(f.Evaluated())).ToArray();
 
             string database = Convert.ToString(Objects.GetVariable("ИСПБД")) + ".pycdb";
@@ -182,46 +166,45 @@ namespace PycLan
             dynamic jsonData = JsonConvert.DeserializeObject(data);
             JObject jObj = jsonData as JObject;
 
-            object[] selected = new object[selections.Length];
+            object[] selected = selections.Select(s => new object[] { s, null }).ToArray();
 
-            if (Condition == null)
+            if (froms.Length == 1)
             {
-                if (froms.Length == 1)
-                {
-                    JObject tableJobj = jObj[froms[0]] as JObject;
-                    JArray values = tableJobj["значения"] as JArray;
+                JObject tableJobj = jObj[froms[0]] as JObject;
+                JArray values = tableJobj["значения"] as JArray;
 
-                    for (int i = 0; i < selections.Length; i++)
-                        if (selections[i] == "всё")
-                            selected[i] = values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
-                        else
+                for (int i = 0; i < selections.Count; i++)
+                    if (selections[i] == "всё")
+                        selected[i] = values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
+                    else
+                    {
+                        JToken[][] valuesArray = values.Select(v => v.ToArray()).ToArray();
+                        List<object> toBeAdded = new List<object>();
+                        foreach (JToken[] value in valuesArray)
                         {
-                            JToken[][] valuesArray = values.Select(v => v.ToArray()).ToArray();
-                            List<object> toBeAdded = new List<object>();
-                            foreach (JToken[] value in valuesArray)
-                            {
-                                foreach (JToken token in value)
-                                    if ((string)token["колонка"] == selections[i])
-                                        toBeAdded.Add(token["значение"]);
-                                selected[i] = toBeAdded;
-                            }
-                            
+                            foreach (JToken token in value)
+                                if ((string)token["колонка"] == selections[i])
+                                    toBeAdded.Add(token["значение"]);
+                            selected[i] = toBeAdded;
                         }
-                }
-                else
-                    throw new NotImplementedException("ДАУН3");
+
+                    }
             }
             else
             {
-                throw new NotImplementedException("ДАУН2");
+                throw new NotImplementedException("ДАУН3");
             }
 
-            return selected.ToList();
+
+
+            if (Condition == null)
+                return selected.ToList();
+            else
+            {
+                throw new NotImplementedException("ДАУН4");
+            }
         }
 
-        public override string ToString()
-        {
-            return $"ВЫБРАТЬ {string.Join(", ", Selections)} ИЗ {string.Join(", ", Froms)}" + (Condition != null ? "ГДЕ {Condition}" : "");
-        }
+        public override string ToString() => $"ВЫБРАТЬ {string.Join(", ", Selections)} ИЗ {string.Join(", ", Froms)}" + (Condition != null ? "ГДЕ {Condition}" : "");
     }
 }

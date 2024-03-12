@@ -23,10 +23,7 @@ namespace PycLan
             Objects.AddVariable(name, result);
         }
 
-        public override string ToString()
-        {
-            return $"{Variable} = {Expression};";
-        }
+        public override string ToString() => $"{Variable} = {Expression};";
     }
 
     public sealed class PrintStatement : IStatement
@@ -62,6 +59,8 @@ namespace PycLan
                     text += '"' + (string)item + '"';
                 else if (item is char)
                     text += '"' + Convert.ToString(item) + '"';
+                else if (item is IExpression)
+                    text += ((IExpression)item).ToString();
                 else
                     text += Convert.ToString(item);
 
@@ -71,10 +70,7 @@ namespace PycLan
             return text + ']';
         }
 
-        public override string ToString()
-        {
-            return $"НАЧЕРТАТЬ {Expression};";
-        }
+        public override string ToString() => $"НАЧЕРТАТЬ {Expression};";
     }
 
     public sealed class IfStatement : IStatement
@@ -98,10 +94,7 @@ namespace PycLan
                 ElsePart.Execute();
         }
 
-        public override string ToString()
-        {
-            return $"ЕСЛИ {Expression} ТОГДА {{{IfPart}}} ИНАЧЕ {{{ElsePart}}}";
-        }
+        public override string ToString() => $"ЕСЛИ {Expression} ТОГДА {{{IfPart}}} ИНАЧЕ {{{ElsePart}}}";
     }
 
     public sealed class BlockStatement : IStatement
@@ -124,10 +117,7 @@ namespace PycLan
             Statements.Add(statement);
         }
 
-        public override string ToString()
-        {
-            return string.Join("|", Statements.Select(s =>'<' + s.ToString() + '>').ToArray());
-        }
+        public override string ToString() => string.Join("|", Statements.Select(s =>'<' + s.ToString() + '>').ToArray());
     }
 
     public sealed class WhileStatement : IStatement
@@ -160,10 +150,7 @@ namespace PycLan
             }
         }
 
-        public override string ToString()
-        {
-            return $"{Expression}: {{{Statement}}}";
-        }
+        public override string ToString() => $"{Expression}: {{{Statement}}}";
     }
 
     public sealed class ForStatement : IStatement
@@ -195,41 +182,26 @@ namespace PycLan
                 }
                 catch (ContinueStatement)
                 {
-                    // contonue by itself
+                    // continue by itself
                 }
             }
         }
 
-        public override string ToString()
-        {
-            return $"ДЛЯ {Definition} {Condition} {Alter}: {Statement}";
-        }
+        public override string ToString() => $"ДЛЯ {Definition} {Condition} {Alter}: {Statement}";
     }
 
     public sealed class BreakStatement : Exception, IStatement
     {
-        public void Execute()
-        {
-            throw this;
-        }
+        public void Execute() => throw this;
 
-        public override string ToString()
-        {
-            return "ВЫЙТИ;";
-        }
+        public override string ToString() => "ВЫЙТИ;";
     }
 
     public sealed class ContinueStatement : Exception, IStatement
     {
-        public void Execute()
-        {
-            throw this;
-        }
+        public void Execute() => throw this;
 
-        public override string ToString()
-        {
-            return "ПРОДОЛЖИТЬ;";
-        }
+        public override string ToString() => "ПРОДОЛЖИТЬ;";
     }
 
     public sealed class ReturnStatement : Exception, IStatement
@@ -237,10 +209,7 @@ namespace PycLan
         public IExpression Expression;
         public object Value;
 
-        public ReturnStatement(IExpression expression)
-        {
-            Expression = expression;
-        }
+        public ReturnStatement(IExpression expression) => Expression = expression;
 
         public void Execute()
         {
@@ -248,15 +217,9 @@ namespace PycLan
             throw this;
         }
 
-        public object GetResult()
-        {
-            return Value;
-        }
+        public object GetResult() => Value;
 
-        public override string ToString()
-        {
-            return $"ВЕРНУТЬ {Value};";
-        }
+        public override string ToString() => $"ВЕРНУТЬ {Value};";
     }
 
     public sealed class DeclareFunctionStatement : IStatement
@@ -272,68 +235,38 @@ namespace PycLan
             Body = body;
         }
 
-        public void Execute()
-        {
-            Objects.AddFunction(Name.View, new UserFunction(Args, Body));
-        }
+        public void Execute() => Objects.AddFunction(Name.View, new UserFunction(Args, Body));
 
-        public override string ToString()
-        {
-            return $"{Name} => ({string.Join("|", Args.Select(a => a.View))}) {Body};";
-        }
+        public override string ToString() => $"{Name} => ({string.Join("|", Args.Select(a => a.View))}) {Body};";
     }
 
     public sealed class ProcedureStatement : IStatement
     {
         public IExpression Function;
 
-        public ProcedureStatement(IExpression function)
-        {
-            Function = function;
-        }
+        public ProcedureStatement(IExpression function) => Function = function;
 
-        public void Execute()
-        {
-            Function.Evaluated();
-        }
+        public void Execute() => Function.Evaluated();
 
-        public override string ToString()
-        {
-            return $"ВЫПОЛНИТЬ ПРЕЦЕДУРУ {Function}";
-        }
+        public override string ToString() => $"ВЫПОЛНИТЬ ПРЕЦЕДУРУ {Function}";
     }
 
     public sealed class ClearStatement : IStatement
     {
-        public void Execute()
-        {
-            Console.Clear();
-        }
+        public void Execute() => Console.Clear();
 
-        public override string ToString()
-        {
-            return "ЧИСТКА КОНСОЛИ";
-        }
+        public override string ToString() => "ЧИСТКА КОНСОЛИ";
     }
 
     public sealed class SleepStatement : IStatement
     {
         public IExpression Ms;
 
-        public SleepStatement(IExpression ms)
-        {
-            Ms = ms;
-        }
+        public SleepStatement(IExpression ms) => Ms = ms;
 
-        public void Execute()
-        {
-            Thread.Sleep(Convert.ToInt32(Ms.Evaluated()));
-        }
+        public void Execute() => Thread.Sleep(Convert.ToInt32(Ms.Evaluated()));
 
-        public override string ToString()
-        {
-            return $"СОН({Ms})";
-        }
+        public override string ToString() => $"СОН({Ms})";
     }
 
     public sealed class ItemAssignStatement : IStatement
@@ -359,10 +292,7 @@ namespace PycLan
             Objects.AddVariable(name, list);
         }
 
-        public override string ToString()
-        {
-            return $"{Variable.View}[{Index.Evaluated()}] = {Expression.Evaluated()};";
-        }
+        public override string ToString() => $"{Variable.View}[{Index.Evaluated()}] = {Expression.Evaluated()};";
     }
 
     public sealed class OperationAssignStatement : IStatement
@@ -439,20 +369,14 @@ namespace PycLan
             Objects.AddVariable(name, result);
         }
 
-        public override string ToString()
-        {
-            return $"{Variable.View} {Operation.View} {Expression}";
-        }
+        public override string ToString() => $"{Variable.View} {Operation.View} {Expression}";
     }
 
     public sealed class ProgramStatement : IStatement
     {
         IExpression Program;
 
-        public ProgramStatement(IExpression program)
-        {
-            Program = program;
-        }
+        public ProgramStatement(IExpression program) => Program = program;
 
         public void Execute()
         {
@@ -460,10 +384,7 @@ namespace PycLan
             PycLang.PycOnceLoad(code);
         }
 
-        public override string ToString()
-        {
-            return "РУСИТЬ " + Program.ToString();
-        }
+        public override string ToString() => "РУСИТЬ " + Program.ToString();
     }
 
     public sealed class NothingStatement : IStatement { public void Execute() { } public override string ToString() => "НИЧЕГО"; }
