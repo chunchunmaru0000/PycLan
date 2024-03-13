@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -66,10 +67,15 @@ namespace PycLan
                 string[] names = Names.Select(n => n.View).ToArray();
 
                 tableJobj.Add("колонки", new JObject());
-                JObject colonsJobj = tableJobj["колонки"] as JObject;
+                JObject colonJobj = tableJobj["колонки"] as JObject;
+                tableJobj.Add("колонок", new JArray());
+                JArray colonsJobj = (JArray)tableJobj["колонок"];
 
                 for (int i = 0; i < types.Length; i++)
-                    colonsJobj.Add(names[i], types[i]);
+                    colonJobj.Add(names[i], types[i]);
+
+                for (int i = 0; i < types.Length; i++)
+                    colonsJobj.Add(names[i]);
 
                 tableJobj.Add("значения", new JArray());
 
@@ -147,6 +153,15 @@ namespace PycLan
         public override string ToString() => $"ДОБАВИТЬ В {TableName} КОЛОНКИ ({string.Join(", ", Colons.Select(c => c.ToString()))})\nЗНАЧЕНИЯ({string.Join(", ", Values.Select(v => v.ToString()))})";
     }
 
+    //public sealed class SQLConditionExpression : IExpression { }
+
+    public struct SelectedColumn
+    {
+        public string Selection { get; set; }
+        public string Alias { get; set; }
+        public string From { get; set; }
+    }
+
     public sealed class SQLSelectExpression : IExpression
     {
         List<IExpression> Selections;
@@ -166,75 +181,65 @@ namespace PycLan
 
         public object Evaluated()
         {
-            string[] selections = Selections.Select(s => Convert.ToString(s.Evaluated())).ToArray();
-            // ats
-            string[] ats = new string[selections.Length];
-            for (int i = 0; i < selections.Length; i++)
-                ats[i] = Convert.ToString(Ats[i].Evaluated());
-            // aliases
-            string[] aliases = new string[selections.Length];
-            for (int i = 0; i < selections.Length; i++)
-                aliases[i] = Aliases[i] == Parser.Nothingness ? selections[i] : Convert.ToString(Aliases[i].Evaluated());
-            //froms
-            string[] froms = Froms.Select(f => Convert.ToString(f.Evaluated())).ToArray();
             // begin setup vars
             string database = Convert.ToString(Objects.GetVariable("ИСПБД")) + ".pycdb";
             string data = File.ReadAllText(database, System.Text.Encoding.UTF8);
             dynamic jsonData = JsonConvert.DeserializeObject(data);
             JObject jObj = jsonData as JObject;
-            // selected dicts
-            object[] selected = aliases.Select(a => new List<object> { a, null }).ToArray();
-            // single from
-            if (froms.Length == 1)
+            //seslections
+            string[] selections = Selections.Select(s => Convert.ToString(s.Evaluated())).ToArray();
+            // ats
+            string[] ats = new string[selections.Length];
+            // aliases
+            string[] aliases = new string[selections.Length];
+            for (int i = 0; i < selections.Length; i++)
             {
-                JObject tableJobj = jObj[froms[0]] as JObject;
-                JArray values = tableJobj["значения"] as JArray;
-
-                for (int i = 0; i < selections.Length; i++)
-                    if (selections[i] == "всё") // to be fixed
-                        ((List<object>)selected[i])[1] = values.Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
-                    else
-                    {
-                        JToken[][] valuesArray = values.Select(v => v.ToArray()).ToArray();
-                        List<object> toBeAdded = new List<object>();
-                        foreach (JToken[] value in valuesArray)
-                        {
-                            foreach (JToken token in value)
-                                if ((string)token["колонка"] == selections[i])
-                                    toBeAdded.Add(token["значение"]);
-                            ((List<object>)selected[i])[1] = toBeAdded;
-                        }
-                    }
+                ats[i] = Convert.ToString(Ats[i].Evaluated());
+                aliases[i] = Aliases[i] == Parser.Nothingness ? selections[i] : Convert.ToString(Aliases[i].Evaluated());
             }
-            else // multiple from
-            {
-                try
+            // froms
+            string[] froms = Froms.Select(f => Convert.ToString(f.Evaluated())).ToArray();
+            // others
+            JObject[] tableJobj = froms.Select(f => jObj[f] as JObject).ToArray();
+            JArray[] values = tableJobj.Select(t => t["значения"] as JArray).ToArray();
+            Dictionary<string, JArray> fromToValues = new Dictionary<string, JArray>();
+            for (int i = 0; i < froms.Length; i++)
+                fromToValues.Add(froms[i], values[i]);
+            // selected columns finally
+            List<SelectedColumn> columns = new List<SelectedColumn>();
+            for (int select = 0, column = 0; select < selections.Length; select++, column++)
+                if (selections[select] == "всё")
                 {
-                    JObject[] tableJobj = froms.Select(f => jObj[f] as JObject).ToArray();
-                    JArray[] values = tableJobj.Select(t => t["значения"] as JArray).ToArray();
-                    Dictionary<string, JArray> fromToValues = new Dictionary<string, JArray>();
-                    for (int i = 0; i < froms.Length; i++)
-                        fromToValues.Add(froms[i], values[i]);
-
-                    for (int i = 0; i < selections.Length; i++)
-                        if (selections[i] == "всё") // to be fixed
-                            ((List<object>)selected[i])[1] = fromToValues[ats[i]].Select(v => (object)v.ToList().Select(t => (object)t["значение"]).ToList()).ToList();
-                        else
-                        {
-                            JToken[][] valuesArray = fromToValues[ats[i]].Select(v => v.ToArray()).ToArray();
-                            List<object> toBeAdded = new List<object>();
-                            foreach (JToken[] value in valuesArray)
-                            {
-                                foreach (JToken token in value)
-                                    if ((string)token["колонка"] == selections[i])
-                                        toBeAdded.Add(token["значение"]);
-                                ((List<object>)selected[i])[1] = toBeAdded;
-                            }
-                        }
+                    JObject table = jObj[Ats[select] == Parser.Nothingness ? froms[0] : ats[select]] as JObject;
+                    string[] columnsNames = table["колонок"].ToObject<string[]>();
+                    foreach(string name in columnsNames)
+                    {
+                        string from = Ats[select] == Parser.Nothingness ? froms[0] : ats[select];
+                        columns.Add(new SelectedColumn() { Selection = name, Alias = name + " от " + from, From = from });
+                    }
                 }
-                catch (KeyNotFoundException) { throw new Exception($"НЕ СУЩЕСТВУЕТ СТОЛБЦА С НЕКОТОРЫМ НАЗВАНИЕМ\nЭТО МОЖЕТ БЫТЬ ПО ПРИЧИНЕ НЕ УКАЗАНИЯ ИСТОЧНИКА ПРИ ВЫБОРЕ ИЗ НЕСКОЛЬКИХ ТАБЛИЦ"); }
+                else
+                    columns.Add (new SelectedColumn() { Selection = selections[select], Alias = aliases[select], From = Ats[select] == Parser.Nothingness ? froms[0] : ats[select] });
+            // selected dicts
+            object[] selected = columns.Select(a => new List<object> { a.Alias, null }).ToArray();
+            // select of all
+            try
+            {
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    JToken[][] valuesArray = fromToValues[columns[i].From].Select(v => v.ToArray()).ToArray();
+                    List<object> toBeAdded = new List<object>();
+                    foreach (JToken[] value in valuesArray)
+                    {
+                        foreach (JToken token in value)
+                            if ((string)token["колонка"] == columns[i].Selection)
+                                toBeAdded.Add(token["значение"]);
+                        ((List<object>)selected[i])[1] = toBeAdded;
+                    }
+                }
             }
-
+            catch (KeyNotFoundException) { throw new Exception($"НЕ СУЩЕСТВУЕТ СТОЛБЦА С НЕКОТОРЫМ НАЗВАНИЕМ\nЭТО МОЖЕТ БЫТЬ ПО ПРИЧИНЕ НЕ УКАЗАНИЯ ИСТОЧНИКА ПРИ ВЫБОРЕ ИЗ НЕСКОЛЬКИХ ТАБЛИЦ"); }
+            // selection of what is need based on condition
             if (Condition == null)
                 return selected.ToList();
             else
