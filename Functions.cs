@@ -63,10 +63,10 @@ namespace PycLan
 
         public object Evaluated()
         {
-            IClass classObject = Objects.ClassObjects[ObjectName.View];
+            IClass classObject = Objects.GetClassObject(ObjectName.View);
             UserFunction method = classObject.GetMethod(MethodName.View);
             object[] args = Borrow.Args.Select(a => a.Evaluated()).ToArray();
-            if (args.Length != method.ArgsCount())
+            if (args.Length < method.ArgsCount())
                 throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{args.Length}> ОЖИДАЛОСЬ<{method.ArgsCount()}>");
             classObject.Push();
             for (int i = 0; i < method.ArgsCount(); i++)

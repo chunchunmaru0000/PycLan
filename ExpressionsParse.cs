@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Xml.Linq;
 
 namespace PycLan
 {
@@ -25,7 +24,7 @@ namespace PycLan
         {
             Token objectName = Consume(TokenType.VARIABLE);
             Consume(TokenType.DOT);
-            Token methodName = Consume(TokenType.VARIABLE);
+            Token methodName = Current;
             FunctionExpression borrow = new FunctionExpression(methodName);
             return new MethodExpression(objectName, methodName, borrow);
         }

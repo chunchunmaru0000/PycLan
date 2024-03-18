@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace PycLan
 {
@@ -23,6 +24,24 @@ namespace PycLan
             Token current = Current;
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
+            if (Match(TokenType.NEW))
+            {
+                if (Objects.ContainsClass(Current.View))
+                {
+                    Token className = Current;
+                    Consume(TokenType.VARIABLE);
+                    Consume(TokenType.LEFTSCOB);
+                    List<IStatement> assignments = new List<IStatement>();
+                    while (!Match(TokenType.RIGHTSCOB))
+                    {
+                        assignments.Add(Statement());
+                        Sep();
+                    }
+                    Sep();
+                    return new CreateObjectStatement(current, className, assignments.ToArray());
+                }
+                throw new Exception($"КЛАССА С ТАКИМ НАЗВАНИЕМ НЕ СУЩЕСТВУЕТ: <{Current.View}>");
+            }
             IExpression expression = Expression();
             IStatement result = new AssignStatement(current, expression);
             Sep();

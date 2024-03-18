@@ -417,11 +417,60 @@ namespace PycLan
                     newClass.AddAttribute(attribute.Variable.View, attribute.Expression.Evaluated());
                     continue;
                 }
+                if (statement is CreateObjectStatement)
+                {
+                    CreateObjectStatement obj = statement as CreateObjectStatement;
+                    throw new Exception("НА ДАННЫЙ МОМЕНТ НЕЛЬЗЯ ЕЩЕ ОБЬЯВЛЯТЬ ОБЬЕКТЫ ВНУТРИ ОБЬЕКТОВ");
+                    continue;
+                }
                 throw new Exception($"НЕДОПУСТИМОЕ ВЫРАЖЕНИЕ ДЛЯ ОБЬЯВЛЕНИЯ В КЛАССЕ: <{TypePrint.Pyc(statement)}> С ТЕЛОМ {statement}");
             }
-            throw new NotImplementedException("БОМЖ");
+            Objects.AddClass(ClassName.View, newClass);
         }
 
         public override string ToString() => $"КЛАСС {ClassName.View}{{{Body}}}";
+    }
+
+    public sealed class CreateObjectStatement : IStatement
+    {
+        public Token ObjectName;
+        public Token ClassName;
+        public IStatement[] Assignments;
+
+        public CreateObjectStatement(Token objectName, Token className, IStatement[] assignments)
+        {
+            ObjectName = objectName;
+            ClassName = className;
+            Assignments = assignments;
+        }
+
+        public void Execute()
+        {
+            IClass classObject = Objects.GetClass(ClassName.View);
+            foreach (IStatement assignment in Assignments)
+            { 
+                if (assignment is AssignStatement)
+                {
+                    AssignStatement assign = assignment as AssignStatement;
+                    classObject.AddAttribute(assign.Variable.View, assign.Expression.Evaluated());
+                    continue;
+                }
+                if (assignment is DeclareFunctionStatement)
+                {
+                    DeclareFunctionStatement method = assignment as DeclareFunctionStatement;
+                    classObject.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
+                    continue;
+                }
+                if (assignment is CreateObjectStatement)
+                {
+                    CreateObjectStatement obj = assignment as CreateObjectStatement;
+                    throw new Exception("НА ДАННЫЙ МОМЕНТ НЕЛЬЗЯ ЕЩЕ ОБЬЯВЛЯТЬ ОБЬЕКТЫ ВНУТРИ ОБЬЕКТОВ");
+                    continue;
+                }
+            }
+            throw new NotImplementedException("ЭЭЭЭЭЭ СОЗДАТЬ ОБЖ");
+        }
+
+        public override string ToString() => $"{ObjectName} = {ClassName}({string.Join(", ", Assignments.Select(a => Convert.ToString(a)))})";
     }
 }

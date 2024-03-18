@@ -300,6 +300,8 @@ namespace PycLan
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
         public Dictionary<string, UserFunction> Methods = new Dictionary<string, UserFunction>();
         public Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
+        public Stack<Dictionary<string, UserFunction>> RegistersF = new Stack<Dictionary<string, UserFunction>>();
+        public Stack<Dictionary<string, IClass>> RegistersO = new Stack<Dictionary<string, IClass>>();
 
         public IClass(string name, Dictionary<string, object> attributes, Dictionary<string, UserFunction> methods)
         {
@@ -323,16 +325,20 @@ namespace PycLan
         public void Push()
         {
             Registers.Push(new Dictionary<string, object>(Attributes));
+            RegistersF.Push(new Dictionary<string, UserFunction>(Methods));
+            RegistersO.Push(new Dictionary<string, IClass>(ClassObjects));
         }
 
         public void Pop()
         {
             Attributes = Registers.Pop();
+            Methods = RegistersF.Pop();
+            ClassObjects = RegistersO.Pop();
         }
-
+        //metods
         public bool ContainsMethod(string key) => Methods.ContainsKey(key);
 
-        public UserFunction GetMethod(string key) => ContainsMethod(key) ? Methods[key] : throw new Exception("ДА НЕ МОЖЕТ БЫТЬ ОБЬЯВЛЕННАЯ В КЛАССЕ ЙУНКЦИЯ БЫТЬ НЕ ПОЛЬЗОВАТЕЛЬСКОЙ");
+        public UserFunction GetMethod(string key) => ContainsMethod(key) ? Methods[key] : throw new Exception($"НЕТУ ТАКОГО МЕТОДА В КЛАССЕ ДАННОГО ОБЬЕКТА: <{Name}>");
 
         public void AddMethod(string key, UserFunction value)
         {
@@ -341,14 +347,30 @@ namespace PycLan
             else
                 Methods.Add(key, value);
         }
+        //objs
+        public Dictionary<string, IClass> ClassObjects = new Dictionary<string, IClass>();
+        
+        public bool ContainsClassObject(string key) => ClassObjects.ContainsKey(key);
+
+        public IClass GetClassObject(string key) => ContainsClassObject(key) ? ClassObjects[key] : ClassObjects["ФЕДКИН"];
+
+        public void AddClassObject(string key, IClass value)
+        {
+            if (ClassObjects.ContainsKey(key))
+                ClassObjects[key] = value;
+            else
+                ClassObjects.Add(key, value);
+        }
     }
 
-    public class Objects
+    public static class Objects
     {
         /*        VARIABLES          */
 
         public static object NOTHING = (long)0; // need improving i believe
-        public static Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
+        public static Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>(); 
+        public static Stack<Dictionary<string, IFunction>> RegistersF = new Stack<Dictionary<string, IFunction>>();
+        public static Stack<Dictionary<string, IClass>> RegistersO = new Stack<Dictionary<string, IClass>>();
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
         {
             { "ПИ", Math.PI },
@@ -371,11 +393,15 @@ namespace PycLan
         public static void Push()
         {
             Registers.Push(new Dictionary<string, object>(Variables));
+            RegistersF.Push(new Dictionary<string, IFunction>(Functions));
+            RegistersO.Push(new Dictionary<string, IClass>(ClassObjects));
         }
 
         public static void Pop()
         {
             Variables = Registers.Pop();
+            Functions = RegistersF.Pop();
+            ClassObjects = RegistersO.Pop();
         }
 
         /*        FUNCTIONS          */
@@ -436,21 +462,39 @@ namespace PycLan
                 Functions.Add(key, value);
         }
 
-        /*        CLASSES          */
+        /*           CLASSES         */
 
         public static IClass Fedkin = new IClass("Федкин", new Dictionary<string, object>(), new Dictionary<string, UserFunction>());
 
+        public static Dictionary<string, IClass> Classes = new Dictionary<string, IClass>()
+        {
+            { "Федкин", Fedkin }
+        };
 
-        public static Dictionary<string, IClass> ClassObjects = new Dictionary<string, IClass>()
+        public static bool ContainsClass(string key) => Classes.ContainsKey(key);
+
+        public static IClass GetClass(string key) => ContainsClass(key) ? Classes[key] : Classes["ФЕДКИН"];
+
+        public static void AddClass(string key, IClass value)
+        {
+            if (Classes.ContainsKey(key))
+                Classes[key] = value;
+            else
+                Classes.Add(key, value);
+        }
+
+        /*        CLASS OBJECTS      */
+
+        public static Dictionary<string, IClass> ClassObjects = new Dictionary<string, IClass>() 
         {
             { "ФЕДКИН", Fedkin }
         };
 
-        public static bool ContainsClass(string key) => ClassObjects.ContainsKey(key);
+        public static bool ContainsClassObject(string key) => ClassObjects.ContainsKey(key);
 
-        public static IClass GetClass(string key) => ContainsClass(key) ? ClassObjects[key] : ClassObjects["ФЕДКИН"];
+        public static IClass GetClassObject(string key) => ContainsClassObject(key) ? ClassObjects[key] : ClassObjects["ФЕДКИН"];
 
-        public static void AddClass(string key, IClass value)
+        public static void AddClassObject(string key, IClass value)
         {
             if (ClassObjects.ContainsKey(key))
                 ClassObjects[key] = value;
