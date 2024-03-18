@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PycLan
 {
@@ -18,6 +19,7 @@ namespace PycLan
 
         private IStatement Assigny()
         {
+            Match(TokenType.THIS);
             Token current = Current;
             Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
@@ -183,12 +185,18 @@ namespace PycLan
             return new ProgramStatement(program);
         }
 
+        public IStatement Classy()
+        {
+            Token className = Consume(TokenType.VARIABLE);
+            BlockStatement body = (BlockStatement)OneOrBlock();
+            return new DeclareClassStatement(className, body);
+        }
+
         public IStatement SQLCreateDatabasy()
         {
             Consume(TokenType.CREATE);
             Consume(TokenType.DATABASE);
-            Token database = Current;
-            Named();
+            IExpression database = Expression();
             Sep();
             return new SQLCreateDatabaseStatement(database);
         }
@@ -197,8 +205,7 @@ namespace PycLan
         {
             Consume(TokenType.CREATE);
             Consume(TokenType.TABLE);
-            Token tableName = Current;
-            Named();
+            IExpression tableName = Expression();
 
             Match(TokenType.LTRISCOB);
             List<Token> types = new List<Token>();

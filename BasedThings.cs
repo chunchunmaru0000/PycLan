@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 
 namespace PycLan
@@ -45,6 +46,10 @@ namespace PycLan
                     return "СПИСОК";
                 case "PycLan.SQLSelectExpression":
                     return "ВЫБОР ИЗ ТАБЛИЦЫ";
+                case "PycLan.DeclareFunctionStatement":
+                    return "НАЗНАЧИТЬ ФУНКЦИЮ";
+                case "PycLan.AssignStatement":
+                    return "НАЗНАЧИТЬ ПЕРЕМЕННУЮ";
                 default:
                     return value.GetType().ToString();
                     //throw new Exception($"НЕ ПОМНЮ ЧТО БЫ ДОБАЛЯЛ ТАКОЙ ТИП: <{value.GetType().Name}> У <{value}>");
@@ -86,6 +91,10 @@ namespace PycLan
         INTEGER,
         [StringValue("НЕ ЦЕЛОЕ ЧИСЛО64")]
         DOUBLE,
+        [StringValue("КЛАСС")]
+        CLASS,
+        [StringValue("ЭТОТ")]
+        THIS,
 
         //operators
         [StringValue("ПЛЮС")]
@@ -114,6 +123,8 @@ namespace PycLan
         MULEQ,
         [StringValue("/=")]
         DIVEQ,
+        [StringValue("НОВЫЙ")]
+        NEW,
 
         //cmp
         [StringValue("РАВЕН")]
@@ -260,7 +271,7 @@ namespace PycLan
 
         public override string ToString()
         {
-            return $"<{View}> <{Convert.ToString(Value)}> <{Type.GetStringValue()}>"; 
+            return $"<{View}> <{Convert.ToString(Value)}> <{Type.GetStringValue()}>";
         }
     }
 
@@ -283,6 +294,55 @@ namespace PycLan
         object Execute(params object[] obj);
     }
 
+    public sealed class IClass
+    {
+        public string Name;
+        public Dictionary<string, object> Attributes = new Dictionary<string, object>();
+        public Dictionary<string, UserFunction> Methods = new Dictionary<string, UserFunction>();
+        public Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
+
+        public IClass(string name, Dictionary<string, object> attributes, Dictionary<string, UserFunction> methods)
+        {
+            Name = name;
+            Attributes = attributes;
+            Methods = methods;
+        }
+
+        public bool ContainsAttribute(string key) => Attributes.ContainsKey(key);
+
+        public object GetAttribute(string key) => ContainsAttribute(key) ? Attributes[key] : Objects.NOTHING;
+
+        public void AddAttribute(string key, object value)
+        {
+            if (Attributes.ContainsKey(key))
+                Attributes[key] = value;
+            else
+                Attributes.Add(key, value);
+        }
+
+        public void Push()
+        {
+            Registers.Push(new Dictionary<string, object>(Attributes));
+        }
+
+        public void Pop()
+        {
+            Attributes = Registers.Pop();
+        }
+
+        public bool ContainsMethod(string key) => Methods.ContainsKey(key);
+
+        public UserFunction GetMethod(string key) => ContainsMethod(key) ? Methods[key] : throw new Exception("ДА НЕ МОЖЕТ БЫТЬ ОБЬЯВЛЕННАЯ В КЛАССЕ ЙУНКЦИЯ БЫТЬ НЕ ПОЛЬЗОВАТЕЛЬСКОЙ");
+
+        public void AddMethod(string key, UserFunction value)
+        {
+            if (Methods.ContainsKey(key))
+                Methods[key] = value;
+            else
+                Methods.Add(key, value);
+        }
+    }
+
     public class Objects
     {
         /*        VARIABLES          */
@@ -296,17 +356,9 @@ namespace PycLan
             { "ИСПБД", "негр" }
         };
 
-        public static bool ContainsVariable(string key)
-        {
-            return Variables.ContainsKey(key);
-        }
+        public static bool ContainsVariable(string key) => Variables.ContainsKey(key);
 
-        public static object GetVariable(string key)
-        {
-            if (ContainsVariable(key))
-                return Variables[key];
-            return NOTHING;
-        }
+        public static object GetVariable(string key) => ContainsVariable(key) ? Variables[key] : NOTHING;
 
         public static void AddVariable(string key, object value)
         {
@@ -372,17 +424,9 @@ namespace PycLan
             { "летописить",  Writing },
         };
 
-        public static bool ContainsFunction(string key)
-        {
-            return Functions.ContainsKey(key);
-        }
+        public static bool ContainsFunction(string key) => Functions.ContainsKey(key);
 
-        public static IFunction GetFunction(string key)
-        {
-            if (ContainsFunction(key))
-                return Functions[key];
-            return DO_NOTHING;
-        }
+        public static IFunction GetFunction(string key) => ContainsFunction(key) ? Functions[key] : DO_NOTHING;
 
         public static void AddFunction(string key, IFunction value)
         {
@@ -390,6 +434,28 @@ namespace PycLan
                 Functions[key] = value;
             else
                 Functions.Add(key, value);
+        }
+
+        /*        CLASSES          */
+
+        public static IClass Fedkin = new IClass("Федкин", new Dictionary<string, object>(), new Dictionary<string, UserFunction>());
+
+
+        public static Dictionary<string, IClass> ClassObjects = new Dictionary<string, IClass>()
+        {
+            { "ФЕДКИН", Fedkin }
+        };
+
+        public static bool ContainsClass(string key) => ClassObjects.ContainsKey(key);
+
+        public static IClass GetClass(string key) => ContainsClass(key) ? ClassObjects[key] : ClassObjects["ФЕДКИН"];
+
+        public static void AddClass(string key, IClass value)
+        {
+            if (ClassObjects.ContainsKey(key))
+                ClassObjects[key] = value;
+            else
+                ClassObjects.Add(key, value);
         }
     }
 }

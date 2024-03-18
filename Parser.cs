@@ -93,8 +93,6 @@ namespace PycLan
 
         private bool Sep () => Match(TokenType.SEMICOLON, TokenType.COMMA);
 
-        private bool Named() => Match(TokenType.VARIABLE, TokenType.STRING);
-
         private IExpression Expression()
         {
             return Ory();
@@ -118,6 +116,9 @@ namespace PycLan
             if (Match(TokenType.INSERT))
                 return SQLInserty();
 
+            if (Match(TokenType.THIS))
+                return Assigny();
+
             if (current.Type == TokenType.VARIABLE)
             {
                 if (next.Type == TokenType.DO_EQUAL)
@@ -138,6 +139,9 @@ namespace PycLan
 
             if (Match(TokenType.VOVASCRIPT))
                 return Pycy();
+
+            if (Match(TokenType.CLASS))
+                return Classy();
 
             if (Match(TokenType.PROCEDURE))
                 return Procedury();

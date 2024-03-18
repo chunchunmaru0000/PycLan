@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Xml.Linq;
 
 namespace PycLan
 {
@@ -14,9 +16,18 @@ namespace PycLan
             while (!Match(TokenType.RIGHTSCOB))
             {
                 function.AddArg(Expression());
-                Match(TokenType.COMMA, TokenType.SEMICOLON);
+                Sep();
             }
             return function;
+        }
+
+        private IExpression Methody()
+        {
+            Token objectName = Consume(TokenType.VARIABLE);
+            Consume(TokenType.DOT);
+            Token methodName = Consume(TokenType.VARIABLE);
+            FunctionExpression borrow = new FunctionExpression(methodName);
+            return new MethodExpression(objectName, methodName, borrow);
         }
 
         private IExpression Slicy()
@@ -99,11 +110,15 @@ namespace PycLan
                 Match(TokenType.COMMA, TokenType.AND);
             }
 
-            IExpression condition = null;
+            List<Token> condition = null;
             if (Get(-1).Type == TokenType.WHERE)
-                condition = Expression();
+            {
+                condition = new List<Token>();
+                while (!Match(TokenType.SEMICOLON, TokenType.WHERE, TokenType.EOF))
+                    condition.Add(Consume(Current.Type));
+            }
 
-            return new SQLSelectExpression(selections, ats, aliases, froms, condition);
+            return new SQLSelectExpression(selections, ats, aliases, froms, condition.ToArray());
         }
 
         private IExpression Primary()
@@ -124,6 +139,9 @@ namespace PycLan
 
                 if (next.Type == TokenType.LEFTSCOB )
                     return FuncParsy();
+
+                if (next.Type == TokenType.DOT)
+                    return Methody();
             }
 
             if (Match(TokenType.SELECT))

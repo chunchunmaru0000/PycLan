@@ -388,4 +388,40 @@ namespace PycLan
     }
 
     public sealed class NothingStatement : IStatement { public void Execute() { } public override string ToString() => "НИЧЕГО"; }
+
+    public sealed class DeclareClassStatement : IStatement
+    {
+        public Token ClassName;
+        public BlockStatement Body;
+
+        public DeclareClassStatement(Token className, BlockStatement body)
+        {
+            ClassName = className;
+            Body = body;
+        }
+
+        public void Execute()
+        {
+            IClass newClass = new IClass(ClassName.View, new Dictionary<string, object>(), new Dictionary<string, UserFunction>());
+            foreach (IStatement statement in Body.Statements)
+            {
+                if (statement is DeclareFunctionStatement)
+                {
+                    DeclareFunctionStatement method = statement as DeclareFunctionStatement;
+                    newClass.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
+                    continue;
+                }
+                if (statement is AssignStatement)
+                {
+                    AssignStatement attribute = statement as AssignStatement;
+                    newClass.AddAttribute(attribute.Variable.View, attribute.Expression.Evaluated());
+                    continue;
+                }
+                throw new Exception($"НЕДОПУСТИМОЕ ВЫРАЖЕНИЕ ДЛЯ ОБЬЯВЛЕНИЯ В КЛАССЕ: <{TypePrint.Pyc(statement)}> С ТЕЛОМ {statement}");
+            }
+            throw new NotImplementedException("БОМЖ");
+        }
+
+        public override string ToString() => $"КЛАСС {ClassName.View}{{{Body}}}";
+    }
 }

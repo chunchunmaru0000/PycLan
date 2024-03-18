@@ -408,15 +408,22 @@ namespace PycLan
             IFunction function = Objects.GetFunction(Name.View);
             if (function is UserFunction)
             {
-                UserFunction userFunction = (UserFunction)function;
-                if (argov != userFunction.ArgsCount())
-                    throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{argov}> ОЖИДАЛОСЬ<{userFunction.ArgsCount()}>");
-                Objects.Push();
-                for (int i = 0; i < argov; i++)
-                    Objects.AddVariable(userFunction.GetArgName(i), args[i]);
-                object result = userFunction.Execute();
-                Objects.Pop();
-                return result;
+                if (Objects.ContainsFunction(Name.View))
+                {
+                    UserFunction userFunction = (UserFunction)function;
+                    if (argov != userFunction.ArgsCount())
+                        throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{argov}> ОЖИДАЛОСЬ<{userFunction.ArgsCount()}>");
+                    Objects.Push();
+                    for (int i = 0; i < argov; i++)
+                        Objects.AddVariable(userFunction.GetArgName(i), args[i]);
+                    object result = userFunction.Execute();
+                    Objects.Pop();
+                    return result;
+                }
+                else
+                {
+                    throw new NotImplementedException("СДЕЛАЙ МЕТОД а вообще это не реально");
+                }
             }
             if (!(function == null))
                 return function.Execute(args);

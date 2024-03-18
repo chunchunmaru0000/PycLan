@@ -39,6 +39,25 @@ namespace PycLan
                     word.Type = TokenType.NOT;
                     return word;
 
+                case "класс":
+                    word.Type = TokenType.CLASS;
+                    return word;
+                case "новый":
+                    word.Type = TokenType.NEW;
+                    return word;
+                case "здесь":
+                    word.Type = TokenType.THIS;
+                    return word;
+                case "этот":
+                    word.Type = TokenType.THIS;
+                    return word;
+                case "овый":
+                    word.Type = TokenType.THIS;
+                    return word;
+                case "свой":
+                    word.Type = TokenType.THIS;
+                    return word;
+
                 case "пока":
                     word.Type = TokenType.WORD_WHILE;
                     return word;

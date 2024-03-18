@@ -10,20 +10,16 @@ namespace PycLan
 {
     public sealed class SQLCreateDatabaseStatement : IStatement
     {
-        public Token Database;
+        public IExpression Database;
 
-        public SQLCreateDatabaseStatement(Token database)
+        public SQLCreateDatabaseStatement(IExpression database)
         {
             Database = database;
         }
 
         public void Execute() 
         {
-            string name;
-            if (Objects.ContainsVariable(Database.View))
-                name = Convert.ToString(Objects.GetVariable(Database.View));
-            else
-                name = Database.View;
+            string name = Convert.ToString(Database.Evaluated());
             var database = new { бд = name };
             string json = JsonConvert.SerializeObject(database);
             File.WriteAllText($"{name}.pycdb", json, System.Text.Encoding.UTF8);
@@ -34,11 +30,11 @@ namespace PycLan
 
     public sealed class SQLCreateTableStatement : IStatement
     {
-        public Token TableName;
+        public IExpression TableName;
         public Token[] Types;
         public Token[] Names;
 
-        public SQLCreateTableStatement(Token tableName, Token[] types, Token[] names)
+        public SQLCreateTableStatement(IExpression tableName, Token[] types, Token[] names)
         {
             TableName = tableName;
             Types = types;
@@ -51,12 +47,7 @@ namespace PycLan
             string data = File.ReadAllText(database, System.Text.Encoding.UTF8);
             dynamic jsonData = JsonConvert.DeserializeObject(data);
 
-            string tableName;
-            if (Objects.ContainsVariable(TableName.View))
-                tableName = Convert.ToString(Objects.GetVariable(TableName.View));
-            else
-                tableName = TableName.View;
-
+            string tableName = Convert.ToString(TableName.Evaluated());
             try
             {
                 JObject jObj = jsonData as JObject;
@@ -153,7 +144,22 @@ namespace PycLan
         public override string ToString() => $"ДОБАВИТЬ В {TableName} КОЛОНКИ ({string.Join(", ", Colons.Select(c => c.ToString()))})\nЗНАЧЕНИЯ({string.Join(", ", Values.Select(v => v.ToString()))})";
     }
 
-    //public sealed class SQLConditionExpression : IExpression { }
+    public sealed class SQLConditionExpression : IExpression 
+    {
+        Token[] Condition;
+        List<object> Data;
+        int position;
+
+
+        public SQLConditionExpression(Token[] condition, List<object> data)
+        {
+            Condition = condition;
+            Data = data;
+            position = 0;
+        }
+
+        public object Evaluated() => throw new Exception("ЧЕЛ");
+    }
 
     public struct SelectedColumn
     {
@@ -168,9 +174,9 @@ namespace PycLan
         List<IExpression> Ats;
         List<IExpression> Aliases;
         List<IExpression> Froms;
-        IExpression Condition;
+        Token[] Condition;
 
-        public SQLSelectExpression(List<IExpression> selections, List<IExpression> ats, List<IExpression> aliases, List<IExpression> froms, IExpression condition)
+        public SQLSelectExpression(List<IExpression> selections, List<IExpression> ats, List<IExpression> aliases, List<IExpression> froms, Token[] condition)
         {
             Selections = selections;
             Ats = ats;
@@ -220,7 +226,7 @@ namespace PycLan
                 }
                 else
                     columns.Add (new SelectedColumn() { Selection = selections[select], Alias = aliases[select], From = Ats[select] == Parser.Nothingness ? froms[0] : ats[select] });
-            // selected dicts
+            // selected "dicts"
             object[] selected = columns.Select(a => new List<object> { a.Alias, null }).ToArray();
             // select of all
             try
@@ -244,6 +250,7 @@ namespace PycLan
                 return selected.ToList();
             else
             {
+
                 throw new NotImplementedException("ДАУН4");
             }
         }
