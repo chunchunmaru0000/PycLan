@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PycLan
 {
@@ -50,6 +51,8 @@ namespace PycLan
                     return "НАЗНАЧИТЬ ФУНКЦИЮ";
                 case "PycLan.AssignStatement":
                     return "НАЗНАЧИТЬ ПЕРЕМЕННУЮ";
+                case "PycLan.MethodExpression":
+                    return "МЕТОД";
                 default:
                     return value.GetType().ToString();
                     //throw new Exception($"НЕ ПОМНЮ ЧТО БЫ ДОБАЛЯЛ ТАКОЙ ТИП: <{value.GetType().Name}> У <{value}>");
@@ -310,6 +313,8 @@ namespace PycLan
             Methods = methods;
         }
 
+        public IClass Clone() => new IClass(Name, new Dictionary<string, object>(Attributes), new Dictionary<string, UserFunction>(Methods));
+
         public bool ContainsAttribute(string key) => Attributes.ContainsKey(key);
 
         public object GetAttribute(string key) => ContainsAttribute(key) ? Attributes[key] : Objects.NOTHING;
@@ -349,7 +354,7 @@ namespace PycLan
         }
         //objs
         public Dictionary<string, IClass> ClassObjects = new Dictionary<string, IClass>();
-        
+
         public bool ContainsClassObject(string key) => ClassObjects.ContainsKey(key);
 
         public IClass GetClassObject(string key) => ContainsClassObject(key) ? ClassObjects[key] : ClassObjects["ФЕДКИН"];
@@ -361,6 +366,8 @@ namespace PycLan
             else
                 ClassObjects.Add(key, value);
         }
+
+        public override string ToString() => $"{Name}";
     }
 
     public static class Objects

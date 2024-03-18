@@ -18,8 +18,8 @@ namespace PycLan
 
         public void Execute()
         {
-            object result = Expression.Evaluated();
             string name = Variable.View;
+            object result = Expression.Evaluated();
             Objects.AddVariable(name, result);
         }
 
@@ -392,9 +392,9 @@ namespace PycLan
     public sealed class DeclareClassStatement : IStatement
     {
         public Token ClassName;
-        public BlockStatement Body;
+        public IStatement Body;
 
-        public DeclareClassStatement(Token className, BlockStatement body)
+        public DeclareClassStatement(Token className, IStatement body)
         {
             ClassName = className;
             Body = body;
@@ -403,10 +403,12 @@ namespace PycLan
         public void Execute()
         {
             IClass newClass = new IClass(ClassName.View, new Dictionary<string, object>(), new Dictionary<string, UserFunction>());
-            foreach (IStatement statement in Body.Statements)
+            BlockStatement body = Body as BlockStatement;
+            foreach (IStatement statement in body.Statements)
             {
                 if (statement is DeclareFunctionStatement)
                 {
+                    Console.WriteLine("ЭТО В СОЗДАНИИ КАЛАССА ГДЕ ПРОВЕРКА НА СОЗДАНИЕ ФУНКЦИИ");
                     DeclareFunctionStatement method = statement as DeclareFunctionStatement;
                     newClass.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
                     continue;
@@ -421,11 +423,12 @@ namespace PycLan
                 {
                     CreateObjectStatement obj = statement as CreateObjectStatement;
                     throw new Exception("НА ДАННЫЙ МОМЕНТ НЕЛЬЗЯ ЕЩЕ ОБЬЯВЛЯТЬ ОБЬЕКТЫ ВНУТРИ ОБЬЕКТОВ");
-                    continue;
+                   // continue;
                 }
                 throw new Exception($"НЕДОПУСТИМОЕ ВЫРАЖЕНИЕ ДЛЯ ОБЬЯВЛЕНИЯ В КЛАССЕ: <{TypePrint.Pyc(statement)}> С ТЕЛОМ {statement}");
             }
-            Objects.AddClass(ClassName.View, newClass);
+            Objects.AddClass(newClass.Name, newClass);
+            Console.WriteLine(Objects.GetClass(newClass.Name));
         }
 
         public override string ToString() => $"КЛАСС {ClassName.View}{{{Body}}}";
@@ -446,7 +449,7 @@ namespace PycLan
 
         public void Execute()
         {
-            IClass classObject = Objects.GetClass(ClassName.View);
+            IClass classObject = Objects.GetClass(ClassName.View).Clone();
             foreach (IStatement assignment in Assignments)
             { 
                 if (assignment is AssignStatement)
@@ -465,10 +468,10 @@ namespace PycLan
                 {
                     CreateObjectStatement obj = assignment as CreateObjectStatement;
                     throw new Exception("НА ДАННЫЙ МОМЕНТ НЕЛЬЗЯ ЕЩЕ ОБЬЯВЛЯТЬ ОБЬЕКТЫ ВНУТРИ ОБЬЕКТОВ");
-                    continue;
+                 //   continue;
                 }
             }
-            throw new NotImplementedException("ЭЭЭЭЭЭ СОЗДАТЬ ОБЖ");
+            Objects.AddClassObject(ObjectName.View, classObject);
         }
 
         public override string ToString() => $"{ObjectName} = {ClassName}({string.Join(", ", Assignments.Select(a => Convert.ToString(a)))})";

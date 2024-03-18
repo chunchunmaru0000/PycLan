@@ -25,8 +25,16 @@ namespace PycLan
             Token objectName = Consume(TokenType.VARIABLE);
             Consume(TokenType.DOT);
             Token methodName = Current;
-            FunctionExpression borrow = new FunctionExpression(methodName);
+            IExpression borrow = FuncParsy();
             return new MethodExpression(objectName, methodName, borrow);
+        }
+
+        private IExpression Attributy()
+        {
+            Token objectName = Consume(TokenType.VARIABLE);
+            Consume(TokenType.DOT);
+            Token attributeName = Consume(TokenType.VARIABLE);
+            return new AttributeExpression(objectName, attributeName);
         }
 
         private IExpression Slicy()
@@ -140,7 +148,13 @@ namespace PycLan
                     return FuncParsy();
 
                 if (next.Type == TokenType.DOT)
-                    return Methody();
+                    if (Get(2).Type == TokenType.VARIABLE)
+                        if (Get(3).Type == TokenType.LEFTSCOB)
+                            return Methody();
+                        else
+                            return Attributy();
+                    else
+                        throw new Exception($"НЕДОПУСТИМОЕ СЛОВО ДЛЯ МЕТОДА ИЛИ АТРИБУТА: <{Get(2)}>");
             }
 
             if (Match(TokenType.SELECT))

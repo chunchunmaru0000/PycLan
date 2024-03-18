@@ -52,9 +52,9 @@ namespace PycLan
     {
         public Token ObjectName;
         public Token MethodName;
-        public FunctionExpression Borrow;
+        public IExpression Borrow;
 
-        public MethodExpression(Token objectName, Token methodName, FunctionExpression borrow)
+        public MethodExpression(Token objectName, Token methodName, IExpression borrow)
         {
             ObjectName = objectName;
             MethodName = methodName;
@@ -65,16 +65,19 @@ namespace PycLan
         {
             IClass classObject = Objects.GetClassObject(ObjectName.View);
             UserFunction method = classObject.GetMethod(MethodName.View);
-            object[] args = Borrow.Args.Select(a => a.Evaluated()).ToArray();
+            FunctionExpression borrow = Borrow as FunctionExpression;
+            object[] args = borrow.Args.Select(a => a.Evaluated()).ToArray();
             if (args.Length < method.ArgsCount())
                 throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{args.Length}> ОЖИДАЛОСЬ<{method.ArgsCount()}>");
-            classObject.Push();
+           // classObject.Push();
             for (int i = 0; i < method.ArgsCount(); i++)
                 classObject.AddAttribute(method.GetArgName(i), args[i]);
             object result = method.Execute();
-            classObject.Pop();
+           // classObject.Pop();
             return result;
         }
+
+        public override string ToString() => $"{ObjectName}.{Borrow}";
     }
 
     public sealed class Sinus : IFunction

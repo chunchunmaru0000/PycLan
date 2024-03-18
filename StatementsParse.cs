@@ -26,21 +26,17 @@ namespace PycLan
             Consume(TokenType.DO_EQUAL);
             if (Match(TokenType.NEW))
             {
-                if (Objects.ContainsClass(Current.View))
+                Token className = Current;
+                Consume(TokenType.VARIABLE);
+                Consume(TokenType.LEFTSCOB);
+                List<IStatement> assignments = new List<IStatement>();
+                while (!Match(TokenType.RIGHTSCOB))
                 {
-                    Token className = Current;
-                    Consume(TokenType.VARIABLE);
-                    Consume(TokenType.LEFTSCOB);
-                    List<IStatement> assignments = new List<IStatement>();
-                    while (!Match(TokenType.RIGHTSCOB))
-                    {
-                        assignments.Add(Statement());
-                        Sep();
-                    }
+                    assignments.Add(Statement());
                     Sep();
-                    return new CreateObjectStatement(current, className, assignments.ToArray());
                 }
-                throw new Exception($"КЛАССА С ТАКИМ НАЗВАНИЕМ НЕ СУЩЕСТВУЕТ: <{Current.View}>");
+                Sep();
+                return new CreateObjectStatement(current, className, assignments.ToArray());
             }
             IExpression expression = Expression();
             IStatement result = new AssignStatement(current, expression);
@@ -207,7 +203,7 @@ namespace PycLan
         public IStatement Classy()
         {
             Token className = Consume(TokenType.VARIABLE);
-            BlockStatement body = (BlockStatement)OneOrBlock();
+            IStatement body = OneOrBlock();
             return new DeclareClassStatement(className, body);
         }
 

@@ -536,4 +536,20 @@ namespace PycLan
     }
 
     public sealed class NothingExpression : IExpression { public object Evaluated() => (long)0; public override string ToString() => "НИЧЕГО"; }
+
+    public sealed class AttributeExpression : IExpression
+    {
+        Token ObjectName;
+        Token AttributeName;
+
+        public AttributeExpression(Token objectName, Token attributeName)
+        {
+            ObjectName = objectName;
+            AttributeName = attributeName;
+        }
+
+        public object Evaluated() => Objects.GetClassObject(ObjectName.View).GetAttribute(AttributeName.View);
+
+        public override string ToString() => $"{ObjectName}.{AttributeName}";
+    }
 }

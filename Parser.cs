@@ -194,7 +194,7 @@ namespace PycLan
         public IStatement Parse()
         {
             BlockStatement parsed = new BlockStatement();
-            while(!Match(TokenType.EOF))
+            while (!Match(TokenType.EOF))
                 parsed.Statements.Add(Statement());
             return parsed;
         }
