@@ -254,6 +254,21 @@ namespace PycLan
         }
     }
 
+    public sealed class Square : IFunction
+    {
+        public object Execute(object[] x)
+        {
+            if (x.Length == 0)
+                throw new Exception($"НЕДОСТАТОЧНО АРГУМЕНТОВ, БЫЛО: <{x.Length}>");
+            return Math.Sqrt(Convert.ToDouble(x[0]));
+        }
+
+        public override string ToString()
+        {
+            return $"КОРЕНЬ(<>)";
+        }
+    }
+
     public sealed class ReadAllFileFunction : IFunction
     {
         public object Execute(object[] x)

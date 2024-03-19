@@ -103,6 +103,7 @@ namespace PycLan
             line++;
             Token current = Current;
             Token next = Get(1);
+            Token next2 = Get(2);
 
             if (current.Type == TokenType.CREATE)
             {
@@ -132,9 +133,13 @@ namespace PycLan
 
                 if (next.Type == TokenType.LCUBSCOB)
                     return ItemAssigny();
+
+                if (next.Type == TokenType.DOT)
+                    if (next2.Type == TokenType.VARIABLE)
+                        return AttMethody();
             }
 
-            if (current.Type == TokenType.PLUSPLUS || current.Type == TokenType.MINUSMINUS && Get(1).Type == TokenType.VARIABLE)
+            if (current.Type == TokenType.PLUSPLUS || current.Type == TokenType.MINUSMINUS && next.Type == TokenType.VARIABLE)
                 return BeforeIncDecy();
 
             if (Match(TokenType.VOVASCRIPT))
@@ -182,7 +187,7 @@ namespace PycLan
             if (Sep())
                 return Nothing;
 
-            try { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"{Get(-1)}; {current}; {Get(1)};"); Console.ResetColor(); } catch (Exception) { }
+            try { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"{Get(-1)}; {current}; {next};"); Console.ResetColor(); } catch (Exception) { }
             throw new Exception($"НЕИЗВЕСТНОЕ ДЕЙСТВИЕ: {current}\nПОЗИЦИЯ: ДЕЙСТВИЕ<{line}> СЛОВО<{position}>");
         }
 

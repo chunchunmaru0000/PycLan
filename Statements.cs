@@ -468,4 +468,42 @@ namespace PycLan
 
         public override string ToString() => $"{ObjectName} = {ClassName}({string.Join(", ", Assignments.Select(a => Convert.ToString(a)))})";
     }
+
+    public sealed class AttributeAssignStatement : IStatement
+    {
+        public Token ObjName;
+        public Token AttributeName;
+        public IExpression Value;
+
+        public AttributeAssignStatement(Token objName, Token attributeName, IExpression value)
+        {
+            ObjName = objName;
+            AttributeName = attributeName;
+            Value = value;
+        }
+
+        public void Execute() => Objects.GetClassObject(ObjName.View).AddAttribute(AttributeName.View, Value.Evaluated());
+
+        public override string ToString() => $"{ObjName}.{AttributeName} = {Value};";
+    }
+
+    public sealed class MethodAssignStatement : IStatement
+    {
+        public Token ObjectName;
+        public Token MethodName;
+        public Token[] Args;
+        public IStatement Body;
+
+        public MethodAssignStatement(Token objectName, Token methodName, Token[] args, IStatement body)
+        {
+            ObjectName = objectName;
+            MethodName = methodName;
+            Args = args;
+            Body = body;
+        }
+
+        public void Execute() => Objects.GetClassObject(ObjectName.View).AddMethod(MethodName.View, new UserFunction(Args, Body));
+
+        public override string ToString() => $"{ObjectName}.{MethodName} => ({string.Join("|", Args.Select(a => a.View))}) {Body};";
+    }
 }

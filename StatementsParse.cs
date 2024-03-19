@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PycLan
 {
@@ -21,8 +22,7 @@ namespace PycLan
         private IStatement Assigny()
         {
             Match(TokenType.THIS);
-            Token current = Current;
-            Consume(TokenType.VARIABLE);
+            Token current = Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
             if (Match(TokenType.NEW))
             {
@@ -67,6 +67,32 @@ namespace PycLan
             IExpression value = Expression();
             Sep();
             return new ItemAssignStatement(variable, index, value);
+        }
+
+        private IStatement AttMethody()
+        {
+            Token objName = Consume(TokenType.VARIABLE);
+            Consume(TokenType.DOT);
+            Token thingName = Consume(TokenType.VARIABLE);
+            if (Match(TokenType.DO_EQUAL))
+            {
+                IExpression value = Expression();
+                Sep();
+                return new AttributeAssignStatement(objName, thingName, value);
+            }
+            if (Match(TokenType.ARROW))
+            {
+                List<Token> args = new List<Token>();
+                Consume(TokenType.LEFTSCOB);
+                while (!Match(TokenType.RIGHTSCOB))
+                {
+                    args.Add(Consume(TokenType.VARIABLE));
+                    Sep();
+                }
+                IStatement body = OneOrBlock();
+                return new MethodAssignStatement(objName, thingName, args.ToArray(), body);
+            }
+            throw new Exception("ДАННОЕ СЛОВО НЕ МОЖЕТ БЫТЬ ИСПОЛЬЗОВАННО В КАЧЕСТВЕ НАЗВАНИЯ ДЛЯ МЕТОДА ИЛИ АТТРИБУТА: {}");
         }
 
         private IStatement Printy()

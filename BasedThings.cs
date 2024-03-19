@@ -302,6 +302,7 @@ namespace PycLan
         public string Name;
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
         public Dictionary<string, UserFunction> Methods = new Dictionary<string, UserFunction>();
+        public Dictionary<string, IClass> ClassObjects = new Dictionary<string, IClass>();
         public Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
         public Stack<Dictionary<string, UserFunction>> RegistersF = new Stack<Dictionary<string, UserFunction>>();
         public Stack<Dictionary<string, IClass>> RegistersO = new Stack<Dictionary<string, IClass>>();
@@ -353,8 +354,6 @@ namespace PycLan
                 Methods.Add(key, value);
         }
         //objs
-        public Dictionary<string, IClass> ClassObjects = new Dictionary<string, IClass>();
-
         public bool ContainsClassObject(string key) => ClassObjects.ContainsKey(key);
 
         public IClass GetClassObject(string key) => ContainsClassObject(key) ? ClassObjects[key] : ClassObjects["ФЕДКИН"];
@@ -375,7 +374,7 @@ namespace PycLan
         /*        VARIABLES          */
 
         public static object NOTHING = (long)0; // need improving i believe
-        public static Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>(); 
+        public static Stack<Dictionary<string, object>> Registers = new Stack<Dictionary<string, object>>();
         public static Stack<Dictionary<string, IFunction>> RegistersF = new Stack<Dictionary<string, IFunction>>();
         public static Stack<Dictionary<string, IClass>> RegistersO = new Stack<Dictionary<string, IClass>>();
         public static Dictionary<string, object> Variables = new Dictionary<string, object>()
@@ -421,6 +420,7 @@ namespace PycLan
         public static IFunction Tan = new Tan();
         public static IFunction Max = new Max();
         public static IFunction Min = new Min();
+        public static IFunction Square = new Square();
         public static IFunction ReadAll = new ReadAllFileFunction();
         public static IFunction Split = new SplitFunction();
         public static IFunction Input = new InputFunction();
@@ -442,6 +442,7 @@ namespace PycLan
             { "большее",  Max },
             { "меньшее",  Min },
             { "мин",  Min },
+            { "корень",  Square },
             { "наименьшее",  Min },
             { "минимум",  Min },
             { "вычитать",  ReadAll },
