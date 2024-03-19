@@ -176,6 +176,9 @@ namespace PycLan
             if (Printble(current.Type))
                 return Printy();
 
+            if (current.Type == TokenType.COLON || current.Type == TokenType.LTRISCOB)
+                return OneOrBlock();
+
             if (Sep())
                 return Nothing;
 

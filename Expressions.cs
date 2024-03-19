@@ -405,12 +405,12 @@ namespace PycLan
             object[] args = new object[argov];
             for (int i = 0; i < argov; i++)
                 args[i] = Args[i].Evaluated();
-            IFunction function = Objects.GetFunction(Name.View);
-            if (function is UserFunction)
+            if (Objects.ContainsFunction(Name.View))
             {
-                if (Objects.ContainsFunction(Name.View))
+                IFunction function = Objects.GetFunction(Name.View);
+                if (function is UserFunction)
                 {
-                    UserFunction userFunction = (UserFunction)function;
+                    UserFunction userFunction = function as UserFunction;
                     if (argov != userFunction.ArgsCount())
                         throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{argov}> ОЖИДАЛОСЬ<{userFunction.ArgsCount()}>");
                     Objects.Push();
@@ -420,15 +420,15 @@ namespace PycLan
                     Objects.Pop();
                     return result;
                 }
+                if (!(function == null))
+                    return function.Execute(args);
                 else
-                {
-                    throw new NotImplementedException("СДЕЛАЙ МЕТОД а вообще это не реально");
-                }
+                    throw new Exception($"НЕСУЩЕСТВУЮЩАЯ ФУНКЦИЯ ХОТЯ БЫ СЕЙЧАС: <{Name.View}>");
             }
-            if (!(function == null))
-                return function.Execute(args);
             else
-                throw new Exception($"НЕСУЩЕСТВУЮЩАЯ ФУНКЦИЯ ХОТЯ БЫ СЕЙЧАС: <{Name.View}>");
+            {
+                throw new NotImplementedException("СДЕЛАЙ МЕТОД а вообще это не реально");
+            }
         }
 
         public override string ToString() => $"ФУНКЦИЯ {Name.View}({string.Join(", ", Args.Select(a => a.ToString()))})";

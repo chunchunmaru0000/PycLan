@@ -69,11 +69,20 @@ namespace PycLan
             object[] args = borrow.Args.Select(a => a.Evaluated()).ToArray();
             if (args.Length < method.ArgsCount())
                 throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{args.Length}> ОЖИДАЛОСЬ<{method.ArgsCount()}>");
-           // classObject.Push();
+            Objects.Push();
+
+            foreach (var attribute in classObject.Attributes)
+                Objects.AddVariable(attribute.Key, attribute.Value);
             for (int i = 0; i < method.ArgsCount(); i++)
-                classObject.AddAttribute(method.GetArgName(i), args[i]);
+                Objects.AddVariable(method.GetArgName(i), args[i]);
+
             object result = method.Execute();
-           // classObject.Pop();
+
+            foreach (var variable in Objects.Variables)
+                if (classObject.ContainsAttribute(variable.Key))
+                    classObject.AddAttribute(variable.Key, variable.Value);
+
+            Objects.Pop();
             return result;
         }
 

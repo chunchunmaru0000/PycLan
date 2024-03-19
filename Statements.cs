@@ -101,10 +101,7 @@ namespace PycLan
     {
         public List<IStatement> Statements;
 
-        public BlockStatement()
-        {
-            Statements = new List<IStatement>();
-        }
+        public BlockStatement() => Statements = new List<IStatement>();
 
         public void Execute()
         {
@@ -112,10 +109,7 @@ namespace PycLan
                 statement.Execute();
         }
 
-        public void AddStatement(IStatement statement)
-        {
-            Statements.Add(statement);
-        }
+        public void AddStatement(IStatement statement) => Statements.Add(statement);
 
         public override string ToString() => string.Join("|", Statements.Select(s =>'<' + s.ToString() + '>').ToArray());
     }
@@ -408,7 +402,6 @@ namespace PycLan
             {
                 if (statement is DeclareFunctionStatement)
                 {
-                    Console.WriteLine("ЭТО В СОЗДАНИИ КАЛАССА ГДЕ ПРОВЕРКА НА СОЗДАНИЕ ФУНКЦИИ");
                     DeclareFunctionStatement method = statement as DeclareFunctionStatement;
                     newClass.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
                     continue;
@@ -428,7 +421,6 @@ namespace PycLan
                 throw new Exception($"НЕДОПУСТИМОЕ ВЫРАЖЕНИЕ ДЛЯ ОБЬЯВЛЕНИЯ В КЛАССЕ: <{TypePrint.Pyc(statement)}> С ТЕЛОМ {statement}");
             }
             Objects.AddClass(newClass.Name, newClass);
-            Console.WriteLine(Objects.GetClass(newClass.Name));
         }
 
         public override string ToString() => $"КЛАСС {ClassName.View}{{{Body}}}";

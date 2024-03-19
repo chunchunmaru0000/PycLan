@@ -26,8 +26,7 @@ namespace PycLan
             Consume(TokenType.DO_EQUAL);
             if (Match(TokenType.NEW))
             {
-                Token className = Current;
-                Consume(TokenType.VARIABLE);
+                Token className = Consume(TokenType.VARIABLE);
                 Consume(TokenType.LEFTSCOB);
                 List<IStatement> assignments = new List<IStatement>();
                 while (!Match(TokenType.RIGHTSCOB))

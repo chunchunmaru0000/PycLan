@@ -123,6 +123,11 @@ namespace PycLan
                     if (Current == '=')
                     {
                         Next();
+                        if (Current == '=')
+                        {
+                            Next();
+                            return new Token() { View = "==", Value = null, Type = TokenType.ARROW };
+                        }
                         return new Token() { View = "==", Value = null, Type = TokenType.EQUALITY };
                     }
                     if (Current == '>')

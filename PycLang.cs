@@ -12,7 +12,7 @@ namespace PycLan
         public static bool PrintFunctionsInDebug = false;
         public static bool PrintVariablesAfterDebug = false;//
         public static bool PrintFunctionsAfterDebug = false;
-        public static bool PrintProgram = true;//
+        public static bool PrintProgram = false;//
         public static bool Debug = false;//
         public static bool TimePrint = true;
         public static void LogTokens(ref Token[] tokens)

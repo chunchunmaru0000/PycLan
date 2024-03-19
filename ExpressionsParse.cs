@@ -8,8 +8,7 @@ namespace PycLan
     {
         private IExpression FuncParsy()
         {
-            Token name = Current;
-            Consume(TokenType.FUNCTION, TokenType.VARIABLE);
+            Token name = Consume(TokenType.FUNCTION, TokenType.VARIABLE);
             Consume(TokenType.LEFTSCOB);
             FunctionExpression function = new FunctionExpression(name);
             while (!Match(TokenType.RIGHTSCOB))
