@@ -23,7 +23,6 @@ namespace PycLan
             Match(TokenType.THIS);
             Token current = Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
-
             IExpression expression = Expression();
             IStatement result = new AssignStatement(current, expression);
             Sep();

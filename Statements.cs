@@ -412,26 +412,20 @@ namespace PycLan
             BlockStatement body = Body as BlockStatement;
             foreach (IStatement statement in body.Statements)
             {
+                if (statement is AssignStatement)
+                {
+                    AssignStatement assign = statement as AssignStatement;
+                    object result = assign.Expression.Evaluated();
+                    if (result is IClass)
+                        newClass.AddClassObject(assign.Variable.View, (IClass)result);
+                    else
+                        newClass.AddAttribute(assign.Variable.View, result);
+                    continue;
+                }
                 if (statement is DeclareFunctionStatement)
                 {
                     DeclareFunctionStatement method = statement as DeclareFunctionStatement;
                     newClass.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
-                    continue;
-                }
-                if (statement is AssignStatement)
-                {
-                    AssignStatement attribute = statement as AssignStatement;
-                    newClass.AddAttribute(attribute.Variable.View, attribute.Expression.Evaluated());
-                    continue;
-                }
-                if (statement is CreateObjectStatement)
-                {
-                    CreateObjectStatement obj = statement as CreateObjectStatement;
-                    Objects.Push();
-                    obj.Execute();
-                    IClass createdObject = Objects.GetClassObject(obj.ObjectName.View).Clone();
-                    newClass.AddClassObject(createdObject.Name, createdObject);
-                    Objects.Pop();
                     continue;
                 }
                 throw new Exception($"НЕДОПУСТИМОЕ ВЫРАЖЕНИЕ ДЛЯ ОБЬЯВЛЕНИЯ В КЛАССЕ: <{TypePrint.Pyc(statement)}> С ТЕЛОМ {statement}");
@@ -440,22 +434,6 @@ namespace PycLan
         }
 
         public override string ToString() => $"КЛАСС {ClassName.View}{{{Body}}}";
-    }
-
-    public sealed class CreateObjectStatement : IStatement
-    {
-        public Token ObjectName;
-        public IExpression ClassObject;
-
-        public CreateObjectStatement(Token objectName, IExpression classObject)
-        {
-            ObjectName = objectName;
-            ClassObject = classObject;
-        }
-
-        public void Execute() => Objects.AddClassObject(ObjectName.View, (IClass)ClassObject.Evaluated());
-
-        public override string ToString() => $"{ObjectName} = {ClassObject})";
     }
 
     public sealed class AttributeAssignStatement : IStatement

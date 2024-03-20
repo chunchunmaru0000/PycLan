@@ -579,23 +579,17 @@ namespace PycLan
                 if (assignment is AssignStatement)
                 {
                     AssignStatement assign = assignment as AssignStatement;
-                    classObject.AddAttribute(assign.Variable.View, assign.Expression.Evaluated());
+                    object result = assign.Expression.Evaluated();
+                    if (result is IClass)
+                        classObject.AddClassObject(assign.Variable.View, (IClass)result);
+                    else
+                        classObject.AddAttribute(assign.Variable.View, result);
                     continue;
                 }
                 if (assignment is DeclareFunctionStatement)
                 {
                     DeclareFunctionStatement method = assignment as DeclareFunctionStatement;
                     classObject.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
-                    continue;
-                }
-                if (assignment is CreateObjectStatement)
-                {
-                    CreateObjectStatement obj = assignment as CreateObjectStatement;
-                    Objects.Push();
-                    obj.Execute();
-                    IClass createdObject = Objects.GetClassObject(obj.ObjectName.View).Clone();
-                    classObject.AddClassObject(createdObject.Name, createdObject);
-                    Objects.Pop();
                     continue;
                 }
             }
