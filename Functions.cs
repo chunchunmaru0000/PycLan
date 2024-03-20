@@ -70,17 +70,31 @@ namespace PycLan
             if (args.Length < method.ArgsCount())
                 throw new Exception($"НЕВЕРНОЕ КОЛИЧЕСТВО АРГУМЕНТОВ: БЫЛО<{args.Length}> ОЖИДАЛОСЬ<{method.ArgsCount()}>");
             Objects.Push();
-
+            //object things
             foreach (var attribute in classObject.Attributes)
                 Objects.AddVariable(attribute.Key, attribute.Value);
+            foreach (var methode in classObject.Methods)
+                Objects.AddFunction(methode.Key, methode.Value);
+            foreach (var obj in classObject.ClassObjects)
+                Objects.AddClassObject(obj.Key, obj.Value);
+            //attrs
             for (int i = 0; i < method.ArgsCount(); i++)
                 Objects.AddVariable(method.GetArgName(i), args[i]);
-
+            //execute
             object result = method.Execute();
-
+            //restore or update
             foreach (var variable in Objects.Variables)
                 if (classObject.ContainsAttribute(variable.Key))
                     classObject.AddAttribute(variable.Key, variable.Value);
+            foreach (var obj in Objects.ClassObjects)
+                if (classObject.ContainsClassObject(obj.Key))
+                    classObject.AddClassObject(obj.Key, obj.Value);
+            try
+            {
+                foreach (var function in Objects.Functions)
+                    if (classObject.ContainsMethod(function.Key))
+                        classObject.AddMethod(function.Key, (UserFunction)function.Value);
+            } catch { }
 
             Objects.Pop();
             return result;

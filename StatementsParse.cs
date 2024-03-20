@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PycLan
 {
@@ -24,19 +23,7 @@ namespace PycLan
             Match(TokenType.THIS);
             Token current = Consume(TokenType.VARIABLE);
             Consume(TokenType.DO_EQUAL);
-            if (Match(TokenType.NEW))
-            {
-                Token className = Consume(TokenType.VARIABLE);
-                Consume(TokenType.LEFTSCOB);
-                List<IStatement> assignments = new List<IStatement>();
-                while (!Match(TokenType.RIGHTSCOB))
-                {
-                    assignments.Add(Statement());
-                    Sep();
-                }
-                Sep();
-                return new CreateObjectStatement(current, className, assignments.ToArray());
-            }
+
             IExpression expression = Expression();
             IStatement result = new AssignStatement(current, expression);
             Sep();

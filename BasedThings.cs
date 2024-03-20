@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace PycLan
 {
@@ -366,7 +367,7 @@ namespace PycLan
                 ClassObjects.Add(key, value);
         }
 
-        public override string ToString() => $"{Name}";
+        public override string ToString() => $"<ОБЬЕКТ КЛАССА {Name}>";
     }
 
     public static class Objects
@@ -395,6 +396,8 @@ namespace PycLan
             else
                 Variables.Add(key, value);
         }
+
+        public static void DeleteVariable(string key) => Variables.Remove(key);
 
         public static void Push()
         {
@@ -509,5 +512,7 @@ namespace PycLan
             else
                 ClassObjects.Add(key, value);
         }
+
+        public static void DeleteClassObject(string key) => ClassObjects.Remove(key);
     }
 }

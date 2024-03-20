@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Security.AccessControl;
 
 namespace PycLan
 {
@@ -274,21 +275,26 @@ namespace PycLan
     public sealed class VariableExpression : IExpression
     {
         public string Name;
-        public object Value;
 
-        public VariableExpression(Token varivable)
+        public VariableExpression(Token varivable) => Name = varivable.View;
+
+        public object Evaluated()
         {
-            Name = varivable.View;
-            Value = Objects.GetVariable(Name);
+            if (Objects.ContainsVariable(Name))
+                return Objects.GetVariable(Name);
+            else
+                return Objects.GetClassObject(Name);
         }
-
-        public object Evaluated() => Objects.GetVariable(Name); 
 
         public override string ToString()
         {
-            if (Value is List<object>)
-                return PrintStatement.ListString((List<object>)Value);
-            return $"{Name} ИМЕЕТ ЗНАЧЕНИЕ {Value}";
+            if (Objects.ContainsVariable(Name))
+            {
+                object value = Objects.GetVariable(Name);
+                if (value is List<object>)
+                return $"{Name} ИМЕЕТ ЗНАЧЕНИЕ {PrintStatement.ListString((List<object>)value)}";
+            }
+            return $"{Name} ИМЕЕТ ЗНАЧЕНИЕ {Objects.GetClassObject(Name)}";
         }
     }
 
@@ -551,5 +557,51 @@ namespace PycLan
         public object Evaluated() => Objects.GetClassObject(ObjectName.View).GetAttribute(AttributeName.View);
 
         public override string ToString() => $"{ObjectName}.{AttributeName}";
+    }
+
+    public sealed class NewObjectExpression : IExpression
+    {
+        public Token ClassName;
+        public IStatement[] Assignments;
+
+        public NewObjectExpression(Token className, IStatement[] assigns)
+        {
+            ClassName = className;
+            Assignments = assigns;
+        }
+
+        public object Evaluated()
+        {
+            IClass classObject = Objects.GetClass(ClassName.View).Clone();
+            classObject.AddAttribute("КЛАССА", ClassName.View);
+            foreach (IStatement assignment in Assignments)
+            {
+                if (assignment is AssignStatement)
+                {
+                    AssignStatement assign = assignment as AssignStatement;
+                    classObject.AddAttribute(assign.Variable.View, assign.Expression.Evaluated());
+                    continue;
+                }
+                if (assignment is DeclareFunctionStatement)
+                {
+                    DeclareFunctionStatement method = assignment as DeclareFunctionStatement;
+                    classObject.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
+                    continue;
+                }
+                if (assignment is CreateObjectStatement)
+                {
+                    CreateObjectStatement obj = assignment as CreateObjectStatement;
+                    Objects.Push();
+                    obj.Execute();
+                    IClass createdObject = Objects.GetClassObject(obj.ObjectName.View).Clone();
+                    classObject.AddClassObject(createdObject.Name, createdObject);
+                    Objects.Pop();
+                    continue;
+                }
+            }
+            return classObject;
+        }
+
+        public override string ToString() => $"НОВЫЙ {ClassName}({PrintStatement.ListString(Assignments.Select(a => (object)a.ToString()).ToList())})";
     }
 }

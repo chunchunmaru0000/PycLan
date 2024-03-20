@@ -20,7 +20,19 @@ namespace PycLan
         {
             string name = Variable.View;
             object result = Expression.Evaluated();
-            Objects.AddVariable(name, result);
+
+            if (Objects.ContainsVariable(name))
+                Objects.DeleteVariable(name);
+            if (Objects.ContainsClassObject(name))
+                Objects.DeleteClassObject(name);
+
+            if (result is IClass)
+            {
+                IClass classObject = result as IClass;
+                Objects.AddClassObject(Variable.View, classObject);
+            }
+            else
+                Objects.AddVariable(name, result);
         }
 
         public override string ToString() => $"{Variable} = {Expression};";
@@ -415,8 +427,12 @@ namespace PycLan
                 if (statement is CreateObjectStatement)
                 {
                     CreateObjectStatement obj = statement as CreateObjectStatement;
-                    throw new Exception("НА ДАННЫЙ МОМЕНТ НЕЛЬЗЯ ЕЩЕ ОБЬЯВЛЯТЬ ОБЬЕКТЫ ВНУТРИ ОБЬЕКТОВ");
-                   // continue;
+                    Objects.Push();
+                    obj.Execute();
+                    IClass createdObject = Objects.GetClassObject(obj.ObjectName.View).Clone();
+                    newClass.AddClassObject(createdObject.Name, createdObject);
+                    Objects.Pop();
+                    continue;
                 }
                 throw new Exception($"НЕДОПУСТИМОЕ ВЫРАЖЕНИЕ ДЛЯ ОБЬЯВЛЕНИЯ В КЛАССЕ: <{TypePrint.Pyc(statement)}> С ТЕЛОМ {statement}");
             }
@@ -429,44 +445,17 @@ namespace PycLan
     public sealed class CreateObjectStatement : IStatement
     {
         public Token ObjectName;
-        public Token ClassName;
-        public IStatement[] Assignments;
+        public IExpression ClassObject;
 
-        public CreateObjectStatement(Token objectName, Token className, IStatement[] assignments)
+        public CreateObjectStatement(Token objectName, IExpression classObject)
         {
             ObjectName = objectName;
-            ClassName = className;
-            Assignments = assignments;
+            ClassObject = classObject;
         }
 
-        public void Execute()
-        {
-            IClass classObject = Objects.GetClass(ClassName.View).Clone();
-            foreach (IStatement assignment in Assignments)
-            { 
-                if (assignment is AssignStatement)
-                {
-                    AssignStatement assign = assignment as AssignStatement;
-                    classObject.AddAttribute(assign.Variable.View, assign.Expression.Evaluated());
-                    continue;
-                }
-                if (assignment is DeclareFunctionStatement)
-                {
-                    DeclareFunctionStatement method = assignment as DeclareFunctionStatement;
-                    classObject.AddMethod(method.Name.View, new UserFunction(method.Args, method.Body));
-                    continue;
-                }
-                if (assignment is CreateObjectStatement)
-                {
-                    CreateObjectStatement obj = assignment as CreateObjectStatement;
-                    throw new Exception("НА ДАННЫЙ МОМЕНТ НЕЛЬЗЯ ЕЩЕ ОБЬЯВЛЯТЬ ОБЬЕКТЫ ВНУТРИ ОБЬЕКТОВ");
-                 //   continue;
-                }
-            }
-            Objects.AddClassObject(ObjectName.View, classObject);
-        }
+        public void Execute() => Objects.AddClassObject(ObjectName.View, (IClass)ClassObject.Evaluated());
 
-        public override string ToString() => $"{ObjectName} = {ClassName}({string.Join(", ", Assignments.Select(a => Convert.ToString(a)))})";
+        public override string ToString() => $"{ObjectName} = {ClassObject})";
     }
 
     public sealed class AttributeAssignStatement : IStatement

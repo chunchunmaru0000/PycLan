@@ -150,12 +150,19 @@ namespace PycLan
         List<object> Data;
         int position;
 
-
         public SQLConditionExpression(Token[] condition, List<object> data)
         {
             Condition = condition;
             Data = data;
             position = 0;
+        }
+
+        public object Parser()
+        {
+            Console.WriteLine(position);
+            Console.WriteLine(PrintStatement.ListString(Data));
+            Console.WriteLine(PrintStatement.ListString(Condition.Select(c => (object)c).ToList()));
+            throw new Exception("ТЫ ДАУН НЕ СДЕЛАЛ ЕЩЕ ЭТО(УСЛОВИЯ В СКЛ)");
         }
 
         public object Evaluated() => throw new Exception("ЧЕЛ");

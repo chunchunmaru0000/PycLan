@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Net.Http.Headers;
 
 namespace PycLan
 {
@@ -34,6 +35,19 @@ namespace PycLan
             Consume(TokenType.DOT);
             Token attributeName = Consume(TokenType.VARIABLE);
             return new AttributeExpression(objectName, attributeName);
+        }
+
+        private IExpression Newy()
+        {
+            Token className = Consume(TokenType.VARIABLE);
+            Consume(TokenType.LEFTSCOB);
+            List<IStatement> assigns = new List<IStatement>();
+            while (!Match(TokenType.RIGHTSCOB))
+            {
+                assigns.Add(Statement());
+                Sep();
+            }
+            return new NewObjectExpression(className, assigns.ToArray());
         }
 
         private IExpression Slicy()
@@ -131,6 +145,9 @@ namespace PycLan
         {
             Token current = Current;
             Token next = Get(1);
+
+            if (Match(TokenType.NEW))
+                return Newy();
 
             if (current.Type == TokenType.STRING)
             {
